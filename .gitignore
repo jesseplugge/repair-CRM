@@ -8,3 +8,5 @@ node_modules
 Thumbs.db
 next-env.d.ts
 npm-debug.log*
+.env*
+tsconfig.tsbuildinfo

@@ -58,7 +58,7 @@ function StatusRow({ status, isFirst, isLast }: { status: Status; isFirst: boole
 
 export function StatusManager({ statuses }: { statuses: Status[] }) {
   const [open, setOpen] = useState(false);
-  const [state, formAction] = useFormState(createStatus, {});
+  const [state, formAction] = useFormState(createStatus, { error: '' });
 
   return (
     <div className="space-y-2">

@@ -16,7 +16,7 @@ function SubmitButton() {
 }
 
 export function LogoUploader({ currentLogoUrl }: { currentLogoUrl: string | null }) {
-  const [state, formAction] = useFormState(uploadLogo, {});
+  const [state, formAction] = useFormState(uploadLogo, { error: '' });
   const [preview, setPreview] = useState<string | null>(null);
 
   return (

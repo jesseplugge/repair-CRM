@@ -17,7 +17,7 @@ function SubmitButton() {
 }
 
 export function NewCustomerForm({ redirectTo }: { redirectTo?: string }) {
-  const [state, formAction] = useFormState(createCustomer, {});
+  const [state, formAction] = useFormState(createCustomer, { error: '' });
   const [phone, setPhone] = useState('');
   const [matches, setMatches] = useState<CustomerSearchResult[]>([]);
   const timer = useRef<ReturnType<typeof setTimeout>>();

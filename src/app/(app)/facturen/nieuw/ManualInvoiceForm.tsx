@@ -19,7 +19,7 @@ function SubmitButton() {
 }
 
 export function ManualInvoiceForm() {
-  const [state, formAction] = useFormState(createManualInvoice, {});
+  const [state, formAction] = useFormState(createManualInvoice, { error: '' });
   const [customer, setCustomer] = useState<CustomerLite | null>(null);
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<CustomerLite[]>([]);

@@ -4,6 +4,7 @@ import { createClient, getCurrentUser } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { calculateFromExclVat, calculateFromInclVat, formatPaymentDescription } from '@/lib/utils/currency';
+import type { Database, Json } from '@/lib/types/database';
 
 export type RepairFormState = { error?: string };
 
@@ -14,8 +15,8 @@ async function logActivity(
   action: string,
   description: string,
   userId: string,
-  old_value: unknown = null,
-  new_value: unknown = null
+  old_value: Json = null,
+  new_value: Json = null
 ) {
   await supabase.from('activity_logs').insert({
     business_id: businessId,
@@ -245,7 +246,10 @@ export async function updateRepairStatus(repairId: string, newStatusId: string) 
   if (!newStatus) return { error: 'Status niet gevonden.' };
   const oldName = oldStatus?.name ?? 'onbekend';
 
-  const patch: Record<string, unknown> = { status_id: newStatusId, updated_at: new Date().toISOString() };
+  const patch: Database['public']['Tables']['repairs']['Update'] = {
+    status_id: newStatusId,
+    updated_at: new Date().toISOString(),
+  };
   if (newStatus.name === 'Gereed') patch.date_completed = new Date().toISOString();
   if (newStatus.name === 'Opgehaald') patch.date_picked_up = new Date().toISOString();
 

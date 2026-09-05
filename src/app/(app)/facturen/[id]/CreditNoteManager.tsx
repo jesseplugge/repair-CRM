@@ -20,7 +20,7 @@ function SubmitButton() {
 
 export function CreditNoteManager({ invoiceId, totalInclVat, creditNotes }: { invoiceId: string; totalInclVat: number; creditNotes: CreditNote[] }) {
   const [open, setOpen] = useState(false);
-  const [state, formAction] = useFormState(createCreditNote, {});
+  const [state, formAction] = useFormState(createCreditNote, { error: '' });
 
   return (
     <Card className="p-4">

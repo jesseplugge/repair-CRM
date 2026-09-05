@@ -110,7 +110,7 @@ export default async function ReparatieDetailPage({ params }: { params: { id: st
                 .map(([k]) => (
                   <li key={k}>&bull; {CONDITION_LABELS[k] ?? k}</li>
                 ))}
-              {condition.other_notes && <li className="italic text-ink-500">{String(condition.other_notes)}</li>}
+              {Boolean(condition.other_notes) && <li className="italic text-ink-500">{String(condition.other_notes)}</li>}
               {Object.entries(condition).filter(([k, v]) => k !== 'other_notes' && v === true).length === 0 &&
                 !condition.other_notes && <li className="text-ink-400">Geen schade geregistreerd</li>}
             </ul>

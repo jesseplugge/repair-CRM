@@ -14,7 +14,7 @@ function SubmitButton() {
 }
 
 export function OpenSessionForm() {
-  const [state, formAction] = useFormState(openCashSession, {});
+  const [state, formAction] = useFormState(openCashSession, { error: '' });
 
   return (
     <Card className="p-5">

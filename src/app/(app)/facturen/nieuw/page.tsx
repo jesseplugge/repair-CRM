@@ -16,6 +16,11 @@ export default async function NieuweFactuurPage({ searchParams }: { searchParams
       .eq('business_id', user!.business_id)
       .single();
 
+    async function submitInvoiceFromRepair(formData: FormData) {
+      'use server';
+      await createInvoiceFromRepair({ error: '' }, formData);
+    }
+
     if (repair) {
       const { data: items } = await supabase.from('repair_items').select('*').eq('repair_id', repair.id);
       const totalInclVat = (items ?? []).reduce((s, i) => s + i.total_incl_vat, 0);
@@ -46,7 +51,7 @@ export default async function NieuweFactuurPage({ searchParams }: { searchParams
               <span>Totaal</span>
               <span className="tabular-nums">{formatEuro(totalInclVat)}</span>
             </div>
-            <form action={createInvoiceFromRepair} className="mt-4">
+            <form action={submitInvoiceFromRepair} className="mt-4">
               <input type="hidden" name="repair_id" value={repair.id} />
               <Button type="submit" variant="primary" size="lg" className="w-full">
                 Factuur aanmaken

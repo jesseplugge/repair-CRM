@@ -14,7 +14,7 @@ function SubmitButton() {
 }
 
 export function BusinessForm({ business }: { business: any }) {
-  const [state, formAction] = useFormState(updateBusiness, {});
+  const [state, formAction] = useFormState(updateBusiness, { error: '' });
 
   return (
     <Card className="p-5">

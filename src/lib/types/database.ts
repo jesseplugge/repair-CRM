@@ -8,6 +8,7 @@ type Table<Row, Insert extends Partial<Row> = Partial<Row>, Update extends Parti
   Row: Row;
   Insert: Insert;
   Update: Update;
+  Relationships: [];
 };
 
 export interface Database {
@@ -352,6 +353,7 @@ export interface Database {
         created_at: string;
       }>;
     };
+    Views: {};
     Functions: {
       next_number: {
         Args: { p_business_id: string; p_type: string; p_year: number; p_prefix: string; p_pad: number };

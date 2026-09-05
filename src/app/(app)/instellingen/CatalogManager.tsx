@@ -32,7 +32,7 @@ function SubmitButton() {
 
 export function CatalogManager({ items }: { items: CatalogItem[] }) {
   const [open, setOpen] = useState(false);
-  const [state, formAction] = useFormState(createCatalogItem, {});
+  const [state, formAction] = useFormState(createCatalogItem, { error: '' });
 
   return (
     <div className="space-y-3">

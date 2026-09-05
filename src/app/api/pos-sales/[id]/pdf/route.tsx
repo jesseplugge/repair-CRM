@@ -13,7 +13,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
   const pdf = await generatePosReceiptPdf(params.id, user.business_id, user.id, format);
   if (!pdf) return NextResponse.json({ error: 'Verkoop niet gevonden' }, { status: 404 });
 
-  return new NextResponse(pdf.buffer, {
+  return new NextResponse(new Uint8Array(pdf.buffer), {
     headers: { 'Content-Type': 'application/pdf', 'Content-Disposition': `inline; filename="${pdf.filename}"` },
   });
 }

@@ -16,7 +16,7 @@ function SubmitButton({ label }: { label: string }) {
 
 export default function LoginPage() {
   const [mode, setMode] = useState<'signin' | 'signup'>('signin');
-  const [state, formAction] = useFormState(authenticate, {});
+  const [state, formAction] = useFormState(authenticate, { error: '' });
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-ink-950 px-4">

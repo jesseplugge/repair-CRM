@@ -14,7 +14,7 @@ function SubmitButton() {
 }
 
 export function OnboardingForm({ defaultEmail }: { defaultEmail: string }) {
-  const [state, formAction] = useFormState(createBusiness, {});
+  const [state, formAction] = useFormState(createBusiness, { error: '' });
 
   return (
     <Card className="p-6">

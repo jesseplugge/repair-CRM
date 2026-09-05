@@ -45,9 +45,9 @@ export default async function KassaladePage() {
             {recentClosed.map((s) => (
               <div key={s.id} className="flex items-center justify-between border-b border-ink-100 pb-2 last:border-0">
                 <span className="text-ink-600">{formatDateTime(s.closed_at)}</span>
-                <span className={`tabular-nums font-medium ${Math.abs(s.difference) > 0.01 ? 'text-red-600' : 'text-green-600'}`}>
-                  {s.difference > 0 ? '+' : ''}
-                  {formatEuro(s.difference)}
+                <span className={`tabular-nums font-medium ${Math.abs(s.difference ?? 0) > 0.01 ? 'text-red-600' : 'text-green-600'}`}>
+                  {(s.difference ?? 0) > 0 ? '+' : ''}
+                  {formatEuro(s.difference ?? 0)}
                 </span>
               </div>
             ))}

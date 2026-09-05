@@ -18,7 +18,7 @@ function AddMovementButton() {
 }
 
 export function CashSessionPanel({ session, movements }: { session: any; movements: any[] }) {
-  const [state, formAction] = useFormState(addCashMovement, {});
+  const [state, formAction] = useFormState(addCashMovement, { error: '' });
   const [closing, setClosing] = useState(false);
   const [actualAmount, setActualAmount] = useState('');
   const [result, setResult] = useState<{ expected: number; difference: number } | null>(null);

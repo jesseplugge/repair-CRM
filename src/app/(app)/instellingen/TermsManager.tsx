@@ -20,7 +20,7 @@ function SubmitButton() {
 
 export function TermsManager({ versions }: { versions: TermsVersion[] }) {
   const [open, setOpen] = useState(false);
-  const [state, formAction] = useFormState(createTermsVersion, {});
+  const [state, formAction] = useFormState(createTermsVersion, { error: '' });
   const active = versions.find((v) => v.is_active);
   const history = versions.filter((v) => !v.is_active);
 

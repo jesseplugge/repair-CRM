@@ -31,7 +31,7 @@ function QuickAddSelect({
   extraFields?: { name: string; placeholder: string }[];
 }) {
   const [adding, setAdding] = useState(false);
-  const [state, formAction] = useFormState(action, {});
+  const [state, formAction] = useFormState(action, { error: '' });
 
   if (adding) {
     return (
@@ -72,7 +72,7 @@ function QuickAddSelect({
 
 export function AddProductForm({ categories, suppliers }: { categories: Option[]; suppliers: Option[] }) {
   const [open, setOpen] = useState(false);
-  const [state, formAction] = useFormState(createProduct, {});
+  const [state, formAction] = useFormState(createProduct, { error: '' });
 
   if (!open) {
     return (

@@ -17,7 +17,7 @@ function SubmitButton() {
 
 export function AddDeviceForm({ customerId }: { customerId: string }) {
   const [open, setOpen] = useState(false);
-  const [state, formAction] = useFormState(createDevice, {});
+  const [state, formAction] = useFormState(createDevice, { error: '' });
 
   if (!open) {
     return (

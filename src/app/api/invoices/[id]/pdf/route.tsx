@@ -11,7 +11,7 @@ export async function GET(_request: Request, { params }: { params: { id: string 
   const pdf = await generateInvoicePdf(params.id, user.business_id);
   if (!pdf) return NextResponse.json({ error: 'Factuur niet gevonden' }, { status: 404 });
 
-  return new NextResponse(pdf.buffer, {
+  return new NextResponse(new Uint8Array(pdf.buffer), {
     headers: { 'Content-Type': 'application/pdf', 'Content-Disposition': `inline; filename="${pdf.filename}"` },
   });
 }

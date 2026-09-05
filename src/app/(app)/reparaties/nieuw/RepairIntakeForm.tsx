@@ -45,7 +45,7 @@ export function RepairIntakeForm({
   initialCustomer: CustomerLite | null;
   initialDevice: DeviceLite | null;
 }) {
-  const [state, formAction] = useFormState(createRepair, {});
+  const [state, formAction] = useFormState(createRepair, { error: '' });
 
   // --- customer ---
   const [customer, setCustomer] = useState<CustomerLite | null>(initialCustomer);
