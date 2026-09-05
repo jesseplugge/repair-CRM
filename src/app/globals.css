@@ -1,0 +1,24 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Default accent tokens — overridden per-business via inline style once
+       a business record with an accent_color exists (see AppLayout). */
+    --accent: #0c7c82;
+    --accent-hover: #0a6267;
+    --accent-light: #6bb3b7;
+    --accent-soft: rgba(12, 124, 130, 0.12);
+    --accent-border-soft: rgba(12, 124, 130, 0.35);
+  }
+
+  body {
+    @apply bg-ink-50 text-ink-900 antialiased;
+  }
+
+  /* Currency and repair/invoice numbers should never wiggle as digits change. */
+  .tabular-nums {
+    font-feature-settings: 'tnum' 1, 'lnum' 1;
+  }
+}
