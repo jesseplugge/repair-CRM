@@ -1,17 +1,16 @@
 /**
- * Sends transactional email with a PDF attachment via Resend (resend.com).
- * Server-only — never import this from a client component.
+ * Sends transactional email via Resend (resend.com). Server-only — never
+ * import this from a client component.
  *
  * Requires RESEND_API_KEY in .env.local. Without it, this returns an error
  * the UI surfaces directly rather than silently failing — see the "E-mail"
  * buttons throughout the app.
  */
-export async function sendPdfEmail(params: {
+export async function sendEmail(params: {
   to: string;
   subject: string;
   html: string;
-  filename: string;
-  pdfBuffer: Buffer;
+  attachments?: { filename: string; content: Buffer }[];
 }): Promise<{ error?: string }> {
   const apiKey = process.env.RESEND_API_KEY;
   const from = process.env.RESEND_FROM_EMAIL;
@@ -35,12 +34,7 @@ export async function sendPdfEmail(params: {
         to: params.to,
         subject: params.subject,
         html: params.html,
-        attachments: [
-          {
-            filename: params.filename,
-            content: params.pdfBuffer.toString('base64'),
-          },
-        ],
+        attachments: params.attachments?.map((a) => ({ filename: a.filename, content: a.content.toString('base64') })),
       }),
     });
 

@@ -43,6 +43,7 @@ export type InvoiceDocumentProps = {
   totalVat: number;
   totalInclVat: number;
   notes?: string | null;
+  footerNote?: string | null;
 };
 
 const s = StyleSheet.create({
@@ -201,6 +202,7 @@ export function InvoiceDocument(props: InvoiceDocumentProps) {
           factuurnummer {props.invoiceNumber}
           {props.business.iban ? ` naar IBAN ${props.business.iban}` : ''}.
         </Text>
+        {props.footerNote?.trim() && <Text style={[s.footer, { marginTop: 6 }]}>{props.footerNote}</Text>}
       </Page>
     </Document>
   );

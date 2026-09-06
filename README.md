@@ -87,12 +87,8 @@ transaction-safe Postgres function — never re-derived at render time or entere
 
 ## What's still open
 
-- Multi-employee invite flow (see above)
-- Document template editor — PDFs are hardcoded React components, not DB-driven templates
-  (`document_templates` table exists for this, unused so far)
 - Raw ESC/POS thermal printing — current approach is a tall fixed-size PDF page, which the person
   using this confirmed is fine since they're printing to a normal printer, not a receipt printer
-- Outstanding-invoices report, PDF export of reports (CSV export already works)
 
 ## Increment 4 additions (latest)
 
@@ -125,20 +121,57 @@ check that, so shipping it "unverified" felt like the wrong trade-off versus the
 approach above, which is contained, mechanical, and I could exhaustively grep for correctness.
 If you want dark mode specifically (not just brand color), say so and I'll take it on properly.
 
+## Increment 5 additions (latest)
+
+- **Outstanding-invoices report + PDF export** — Rapportages now shows currently unpaid invoices
+  (sent/partially paid/overdue) with a per-invoice remaining balance computed from actual payments
+  and a due date derived from `payment_terms_days`, independent of the selected date range. A "PDF
+  export" button sits next to the existing CSV export, rendering the same numbers as a document
+  (`src/lib/pdf/ReportDocument.tsx`). The query logic is now shared between the page and the PDF
+  export via `src/lib/reports/data.ts` so the two can never disagree.
+- **Multi-employee invites** — Instellingen → Gebruikers now has "Teamlid uitnodigen" (owners only):
+  enter an email + role, get a secure 7-day invite link. If `RESEND_API_KEY` is configured it's
+  emailed automatically; otherwise the link is shown to copy and send manually. The invite
+  acceptance page (`/uitnodiging/[token]`, public) handles both a brand-new signup and someone
+  returning after confirming their email. See `supabase/migrations/0004_invites.sql` — **you need
+  to run this migration** for the feature to work. It also tightens a real gap in the original
+  schema: the old `users_insert` RLS policy only checked `id = auth.uid()`, so any authenticated
+  user could previously insert themselves into `public.users` with an arbitrary `business_id` and
+  `role = 'owner'`, granting themselves access to any business's data. That policy is now dropped;
+  the only ways to create a `users` row are the `create_business_and_owner` and `accept_invite`
+  `security definer` functions, both unaffected by RLS.
+- **Document template editor** — Instellingen → Documentsjablonen (owners only) lets you customize
+  the notes/footers that appear on PDFs (intake terms note, receipt/invoice footer text) without
+  touching code, stored in the existing `document_templates` table. Deliberately scoped to text
+  content rather than a full layout designer — layout and all computed numbers stay fixed React
+  components, so the "numbers are always computed correctly, never hand-editable" guarantee holds.
+- **Next.js bumped to 14.2.35** (from 14.2.15) to close a large batch of known CVEs, including an
+  auth-bypass-in-Middleware advisory that mattered here since every route is gated through
+  middleware. Deliberately *not* jumped to Next 16 (what `npm audit fix --force` suggests) — that's
+  a breaking major version (async `cookies()`/route params across every page) for advisories that
+  don't apply to this app's actual surface (no `next/image`, no custom server, no Pages Router
+  i18n, not self-hosted).
+- `package-lock.json` is now committed. A previous fresh `npm install` (no lockfile) had silently
+  pulled a much newer `@supabase/supabase-js` that broke `@supabase/ssr@0.5.2`'s internal typing —
+  every Supabase query resolved to `never`. Fixed by bumping `@supabase/ssr` to `^0.12.6` and
+  committing the lockfile so this can't happen again unnoticed.
+
 ## Setup — new migration
 
-Run `supabase/migrations/0003_branding.sql` in the SQL editor (adds `businesses.accent_color` and
-creates the `logos` storage bucket with its RLS policies). `0001` and `0002` are unchanged.
+Run, in order if starting fresh: `0001_init.sql`, `0002_pos_payments_invoices.sql`,
+`0003_branding.sql`, then **`0004_invites.sql`** (new — required for the invite feature above).
+If your project already has 0001–0003 applied, just run 0004 now.
 
 ## Setup — env vars
 
-`.env.local.example` now also lists `RESEND_API_KEY` / `RESEND_FROM_EMAIL` (optional, only needed
-for the email buttons). Everything else is unchanged from before — just `npm install` again if
-you're updating an existing checkout, to pick up `@react-pdf/renderer`.
+`.env.local.example` lists `RESEND_API_KEY` / `RESEND_FROM_EMAIL` (optional) — needed for the
+"E-mail" buttons and for invite emails to send automatically; without it, invites still work via
+the copyable link. Run `npm install` again to pick up the dependency updates above.
 
 ## Next steps
 
-Test the credit note flow, status editing, and — if you set up a Resend key — the email buttons.
-Report back what breaks. After that, the document template editor and multi-employee invites are
-the natural remaining scope, whenever useful to you.
+Run migration 0004, then test: inviting a teammate (both the immediate-signup path and, if your
+Supabase project requires email confirmation, the "confirm then return to the link" path), editing
+a document template and confirming it shows up on the relevant PDF, and the outstanding-invoices
+report/PDF export. Report back what breaks.
 

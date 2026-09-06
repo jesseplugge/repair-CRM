@@ -5,18 +5,35 @@ import { TermsManager } from './TermsManager';
 import { StatusManager } from './StatusManager';
 import { LogoUploader } from './LogoUploader';
 import { AccentColorPicker } from './AccentColorPicker';
+import { UserInviteManager } from './UserInviteManager';
+import { TemplateManager } from './TemplateManager';
+import { getTemplateContent, TEMPLATE_TYPES } from '@/lib/pdf/templates';
 
 export default async function InstellingenPage() {
   const user = await getCurrentUser();
   const supabase = createClient();
 
-  const [{ data: business }, { data: catalog }, { data: statuses }, { data: terms }, { data: businessUsers }] = await Promise.all([
-    supabase.from('businesses').select('*').eq('id', user!.business_id).single(),
-    supabase.from('catalog_repair_types').select('*').eq('business_id', user!.business_id).order('name'),
-    supabase.from('repair_statuses').select('*').eq('business_id', user!.business_id).order('sort_order'),
-    supabase.from('terms_versions').select('*').eq('business_id', user!.business_id).order('effective_date', { ascending: false }),
-    supabase.from('users').select('*').eq('business_id', user!.business_id).order('created_at'),
-  ]);
+  const [{ data: business }, { data: catalog }, { data: statuses }, { data: terms }, { data: businessUsers }, { data: invites }, templateEntries] =
+    await Promise.all([
+      supabase.from('businesses').select('*').eq('id', user!.business_id).single(),
+      supabase.from('catalog_repair_types').select('*').eq('business_id', user!.business_id).order('name'),
+      supabase.from('repair_statuses').select('*').eq('business_id', user!.business_id).order('sort_order'),
+      supabase.from('terms_versions').select('*').eq('business_id', user!.business_id).order('effective_date', { ascending: false }),
+      supabase.from('users').select('*').eq('business_id', user!.business_id).order('created_at'),
+      supabase
+        .from('invites')
+        .select('*')
+        .eq('business_id', user!.business_id)
+        .is('accepted_at', null)
+        .gt('expires_at', new Date().toISOString())
+        .order('created_at'),
+      Promise.all(TEMPLATE_TYPES.map((type) => getTemplateContent(user!.business_id, type))),
+    ]);
+
+  const templates = Object.fromEntries(TEMPLATE_TYPES.map((type, i) => [type, templateEntries[i]])) as Record<
+    (typeof TEMPLATE_TYPES)[number],
+    Record<string, string>
+  >;
 
   return (
     <div className="max-w-4xl space-y-10">
@@ -67,25 +84,21 @@ export default async function InstellingenPage() {
       </section>
       <section>
         <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-400">Gebruikers</h2>
-        <div className="rounded-lg border border-ink-100 bg-white shadow-card">
-          {(businessUsers ?? []).map((u) => (
-            <div key={u.id} className="flex items-center justify-between border-b border-ink-100 px-4 py-3 text-sm last:border-0">
-              <div>
-                <div className="font-medium text-ink-900">{u.full_name}</div>
-                <div className="text-ink-400">{u.email}</div>
-              </div>
-              <span className="rounded-full bg-ink-100 px-2.5 py-1 text-xs font-medium text-ink-600">
-                {u.role === 'owner' ? 'Eigenaar' : 'Medewerker'}
-              </span>
-            </div>
-          ))}
-        </div>
-        <p className="mt-2 text-xs text-ink-400">
-          Teamleden uitnodigen (met beperkte rechten per rol) is een volgend increment — de datastructuur
-          (business_id per gebruiker, met rol) ondersteunt dit al.
-        </p>
+        <UserInviteManager
+          members={businessUsers ?? []}
+          invites={invites ?? []}
+          canInvite={user!.role === 'owner'}
+        />
       </section>
 
+      <section>
+        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-400">Documentsjablonen</h2>
+        <p className="mb-3 text-sm text-ink-600">
+          Pas de opmerkingen en voetteksten aan die op je PDF-documenten verschijnen. Lay-out en berekende bedragen
+          blijven vast — alleen deze teksten zijn aanpasbaar.
+        </p>
+        <TemplateManager templates={templates} canEdit={user!.role === 'owner'} />
+      </section>
     </div>
   );
 }

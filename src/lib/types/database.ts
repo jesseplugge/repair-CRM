@@ -336,6 +336,17 @@ export interface Database {
         is_active: boolean;
         created_at: string;
       }>;
+      invites: Table<{
+        id: string;
+        business_id: string;
+        email: string;
+        role: string;
+        token: string;
+        invited_by: string | null;
+        accepted_at: string | null;
+        expires_at: string;
+        created_at: string;
+      }>;
       intake_signatures: Table<{
         id: string;
         business_id: string;
@@ -374,6 +385,14 @@ export interface Database {
           p_full_name: string;
         };
         Returns: string;
+      };
+      get_invite_info: {
+        Args: { p_token: string };
+        Returns: { business_name: string; email: string; role: string; valid: boolean }[];
+      };
+      accept_invite: {
+        Args: { p_token: string; p_full_name: string };
+        Returns: undefined;
       };
     };
   };

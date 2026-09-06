@@ -5,6 +5,7 @@ import { InvoiceDocument } from './InvoiceDocument';
 import { SignedIntakeDocument } from './SignedIntakeDocument';
 import { ReportDocument } from './ReportDocument';
 import { businessForPdf } from './data';
+import { getTemplateContent } from './templates';
 import { getReportData } from '@/lib/reports/data';
 import type { DocFormat } from './format';
 
@@ -57,9 +58,10 @@ export async function generateIntakePdf(repairId: string, businessId: string, us
     .single();
   if (!repair) return null;
 
-  const [{ data: business }, { data: items }] = await Promise.all([
+  const [{ data: business }, { data: items }, template] = await Promise.all([
     supabase.from('businesses').select('*').eq('id', businessId).single(),
     supabase.from('repair_items').select('*').eq('repair_id', repair.id),
+    getTemplateContent(businessId, 'dropoff'),
   ]);
   const customer = repair.customer as any;
   const device = repair.device as any;
@@ -100,7 +102,8 @@ export async function generateIntakePdf(repairId: string, businessId: string, us
       totalVat={totalVat}
       totalInclVat={totalInclVat}
       complaint={repair.customer_complaint}
-      termsNote="Dit is een geschatte prijs. De definitieve prijs kan afwijken na diagnose."
+      termsNote={template.termsNote}
+      footerNote={template.footerNote}
     />
   );
 
@@ -123,10 +126,11 @@ export async function generateCompletionPdf(repairId: string, businessId: string
     .single();
   if (!repair) return null;
 
-  const [{ data: business }, { data: items }, { data: payments }] = await Promise.all([
+  const [{ data: business }, { data: items }, { data: payments }, template] = await Promise.all([
     supabase.from('businesses').select('*').eq('id', businessId).single(),
     supabase.from('repair_items').select('*').eq('repair_id', repair.id),
     supabase.from('payments').select('*').eq('repair_id', repair.id).order('paid_at', { ascending: false }),
+    getTemplateContent(businessId, 'completion'),
   ]);
   const customer = repair.customer as any;
   const device = repair.device as any;
@@ -162,6 +166,7 @@ export async function generateCompletionPdf(repairId: string, businessId: string
       totalInclVat={totalInclVat}
       paymentMethod={lastPaymentMethod}
       warrantyMonths={repair.warranty_months}
+      footerNote={template.footerNote}
     />
   );
 
@@ -184,9 +189,10 @@ export async function generateInvoicePdf(invoiceId: string, businessId: string):
     .single();
   if (!invoice) return null;
 
-  const [{ data: business }, { data: items }] = await Promise.all([
+  const [{ data: business }, { data: items }, template] = await Promise.all([
     supabase.from('businesses').select('*').eq('id', businessId).single(),
     supabase.from('invoice_items').select('*').eq('invoice_id', invoice.id),
+    getTemplateContent(businessId, 'invoice'),
   ]);
   const customer = invoice.customer as any;
 
@@ -218,6 +224,7 @@ export async function generateInvoicePdf(invoiceId: string, businessId: string):
       totalVat={invoice.total_vat}
       totalInclVat={invoice.total_incl_vat}
       notes={invoice.notes}
+      footerNote={template.footerNote}
     />
   );
 
@@ -297,10 +304,11 @@ export async function generatePosReceiptPdf(saleId: string, businessId: string, 
     .single();
   if (!sale) return null;
 
-  const [{ data: business }, { data: items }, { data: payments }] = await Promise.all([
+  const [{ data: business }, { data: items }, { data: payments }, template] = await Promise.all([
     supabase.from('businesses').select('*').eq('id', businessId).single(),
     supabase.from('pos_sale_items').select('*').eq('pos_sale_id', sale.id),
     supabase.from('payments').select('*').eq('pos_sale_id', sale.id).order('paid_at', { ascending: false }),
+    getTemplateContent(businessId, 'receipt'),
   ]);
   const customer = sale.customer as any;
 
@@ -332,6 +340,7 @@ export async function generatePosReceiptPdf(saleId: string, businessId: string, 
       totalVat={sale.total_vat}
       totalInclVat={sale.total_incl_vat}
       paymentMethod={payments && payments[0] ? payments[0].method : null}
+      footerNote={template.footerNote}
     />
   );
 

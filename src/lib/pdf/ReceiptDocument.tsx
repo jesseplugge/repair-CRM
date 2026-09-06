@@ -45,6 +45,7 @@ export type ReceiptDocumentProps = {
   warrantyMonths?: number | null;
   complaint?: string | null;
   termsNote?: string;
+  footerNote?: string;
 };
 
 function styles(format: DocFormat) {
@@ -191,7 +192,9 @@ export function ReceiptDocument(props: ReceiptDocumentProps) {
           </View>
         )}
 
-        <Text style={s.footer}>Bedankt voor uw vertrouwen in {props.business.name}.</Text>
+        <Text style={s.footer}>
+          {props.footerNote?.trim() || `Bedankt voor uw vertrouwen in ${props.business.name}.`}
+        </Text>
       </Page>
     </Document>
   );

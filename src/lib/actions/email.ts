@@ -2,7 +2,7 @@
 
 import { getCurrentUser } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
-import { sendPdfEmail } from '@/lib/email';
+import { sendEmail } from '@/lib/email';
 import {
   generateIntakePdf,
   generateCompletionPdf,
@@ -26,12 +26,11 @@ export async function emailIntakeDocument(repairId: string, overrideEmail?: stri
   const to = overrideEmail || pdf.customerEmail;
   if (!to) return { error: 'Geen e-mailadres bekend voor deze klant.' };
 
-  const result = await sendPdfEmail({
+  const result = await sendEmail({
     to,
     subject: `Innamebewijs ${pdf.documentNumber}`,
     html: html('ons reparatiebedrijf', 'Hierbij ontvangt u het innamebewijs van uw reparatie.'),
-    filename: pdf.filename,
-    pdfBuffer: pdf.buffer,
+    attachments: [{ filename: pdf.filename, content: pdf.buffer }],
   });
   return result.error ? { error: result.error } : { success: true };
 }
@@ -44,12 +43,11 @@ export async function emailCompletionReceipt(repairId: string, overrideEmail?: s
   const to = overrideEmail || pdf.customerEmail;
   if (!to) return { error: 'Geen e-mailadres bekend voor deze klant.' };
 
-  const result = await sendPdfEmail({
+  const result = await sendEmail({
     to,
     subject: `Kassabon ${pdf.documentNumber}`,
     html: html('ons reparatiebedrijf', 'Bedankt voor uw bezoek. Hierbij de kassabon van uw reparatie.'),
-    filename: pdf.filename,
-    pdfBuffer: pdf.buffer,
+    attachments: [{ filename: pdf.filename, content: pdf.buffer }],
   });
   return result.error ? { error: result.error } : { success: true };
 }
@@ -62,12 +60,11 @@ export async function emailInvoice(invoiceId: string, overrideEmail?: string): P
   const to = overrideEmail || pdf.customerEmail;
   if (!to) return { error: 'Geen e-mailadres bekend voor deze klant.' };
 
-  const result = await sendPdfEmail({
+  const result = await sendEmail({
     to,
     subject: `Factuur ${pdf.documentNumber}`,
     html: html('ons reparatiebedrijf', 'Hierbij ontvangt u de factuur.'),
-    filename: pdf.filename,
-    pdfBuffer: pdf.buffer,
+    attachments: [{ filename: pdf.filename, content: pdf.buffer }],
   });
   return result.error ? { error: result.error } : { success: true };
 }
@@ -80,12 +77,11 @@ export async function emailSignedIntake(repairId: string, overrideEmail?: string
   const to = overrideEmail || pdf.customerEmail;
   if (!to) return { error: 'Geen e-mailadres bekend voor deze klant.' };
 
-  const result = await sendPdfEmail({
+  const result = await sendEmail({
     to,
     subject: `Ondertekend innamebewijs ${pdf.documentNumber}`,
     html: html('ons reparatiebedrijf', 'Hierbij een kopie van het ondertekende innamebewijs.'),
-    filename: pdf.filename,
-    pdfBuffer: pdf.buffer,
+    attachments: [{ filename: pdf.filename, content: pdf.buffer }],
   });
   return result.error ? { error: result.error } : { success: true };
 }
@@ -98,12 +94,11 @@ export async function emailPosReceipt(saleId: string, overrideEmail?: string): P
   const to = overrideEmail || pdf.customerEmail;
   if (!to) return { error: 'Geen e-mailadres bekend.' };
 
-  const result = await sendPdfEmail({
+  const result = await sendEmail({
     to,
     subject: `Bon ${pdf.documentNumber}`,
     html: html('ons reparatiebedrijf', 'Bedankt voor uw aankoop. Hierbij de bon.'),
-    filename: pdf.filename,
-    pdfBuffer: pdf.buffer,
+    attachments: [{ filename: pdf.filename, content: pdf.buffer }],
   });
   return result.error ? { error: result.error } : { success: true };
 }
