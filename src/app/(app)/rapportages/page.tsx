@@ -1,8 +1,12 @@
-import { createClient, getCurrentUser } from '@/lib/supabase/server';
+import Link from 'next/link';
+import { getCurrentUser } from '@/lib/supabase/server';
 import { Card } from '@/components/ui/primitives';
+import { StatusBadge } from '@/components/StatusBadge';
 import { formatEuro } from '@/lib/utils/currency';
+import { formatDate } from '@/lib/utils/format';
 import { DateRangeFilter } from './DateRangeFilter';
 import { Download } from 'lucide-react';
+import { getReportData } from '@/lib/reports/data';
 
 function startOfMonth() {
   const d = new Date();
@@ -12,72 +16,19 @@ function today() {
   return new Date().toISOString().slice(0, 10);
 }
 
+const INVOICE_STATUS_LABELS: Record<string, { label: string; color: string }> = {
+  sent: { label: 'Verzonden', color: '#0C7C82' },
+  partially_paid: { label: 'Gedeeltelijk betaald', color: '#C97A22' },
+  overdue: { label: 'Vervallen', color: '#C4453A' },
+};
+
 export default async function RapportagesPage({ searchParams }: { searchParams: { from?: string; to?: string } }) {
   const user = await getCurrentUser();
-  const supabase = createClient();
 
   const from = searchParams.from || startOfMonth();
   const to = searchParams.to || today();
-  const toExclusive = new Date(new Date(to).getTime() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
 
-  const [{ data: repairs }, { data: posSales }, { data: allRepairsForPopular }] = await Promise.all([
-    supabase
-      .from('repairs')
-      .select('id, final_price, parts_cost, payment_status, date_completed, repair_type_label')
-      .eq('business_id', user!.business_id)
-      .eq('payment_status', 'paid')
-      .gte('date_completed', from)
-      .lt('date_completed', toExclusive),
-    supabase
-      .from('pos_sales')
-      .select('id, subtotal_excl_vat, total_vat, total_incl_vat, status, created_at')
-      .eq('business_id', user!.business_id)
-      .eq('status', 'paid')
-      .gte('created_at', from)
-      .lt('created_at', toExclusive),
-    supabase
-      .from('repairs')
-      .select('repair_type_label')
-      .eq('business_id', user!.business_id)
-      .gte('date_received', from)
-      .lt('date_received', toExclusive),
-  ]);
-
-  const { data: repairItems } = await supabase
-    .from('repair_items')
-    .select('repair_id, total_excl_vat, total_incl_vat, vat_rate')
-    .in('repair_id', (repairs ?? []).map((r) => r.id));
-
-  const { data: posSaleItems } = await supabase
-    .from('pos_sale_items')
-    .select('pos_sale_id, total_excl_vat, total_incl_vat, vat_rate')
-    .in('pos_sale_id', (posSales ?? []).map((p) => p.id));
-
-  const repairRevenueIncl = (repairs ?? []).reduce((s, r) => s + (r.final_price ?? 0), 0);
-  const repairRevenueExcl = (repairItems ?? []).reduce((s, i) => s + i.total_excl_vat, 0);
-  const repairVat = (repairItems ?? []).reduce((s, i) => s + (i.total_incl_vat - i.total_excl_vat), 0);
-  const partsCost = (repairs ?? []).reduce((s, r) => s + (r.parts_cost ?? 0), 0);
-
-  const productRevenueIncl = (posSales ?? []).reduce((s, p) => s + p.total_incl_vat, 0);
-  const productVat = (posSales ?? []).reduce((s, p) => s + p.total_vat, 0);
-
-  const totalOmzet = repairRevenueIncl + productRevenueIncl;
-  const totalBtw = repairVat + productVat;
-  const grossProfit = repairRevenueExcl - partsCost + (productRevenueIncl - productVat);
-
-  const popularity = new Map<string, number>();
-  for (const r of allRepairsForPopular ?? []) {
-    const label = r.repair_type_label ?? 'Overig';
-    popularity.set(label, (popularity.get(label) ?? 0) + 1);
-  }
-  const popular = [...popularity.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5);
-
-  const vatByRate = new Map<number, number>();
-  for (const i of [...(repairItems ?? []), ...(posSaleItems ?? [])]) {
-    const vat = i.total_incl_vat - i.total_excl_vat;
-    vatByRate.set(i.vat_rate, (vatByRate.get(i.vat_rate) ?? 0) + vat);
-  }
-  const vatBreakdown = [...vatByRate.entries()].sort((a, b) => b[0] - a[0]);
+  const data = await getReportData(user!.business_id, from, to);
 
   return (
     <div className="space-y-6">
@@ -86,21 +37,29 @@ export default async function RapportagesPage({ searchParams }: { searchParams: 
           <h1 className="font-display text-2xl font-semibold text-ink-950">Rapportages</h1>
           <p className="text-sm text-ink-600">Omzet, BTW en winst — berekend uit werkelijke transacties.</p>
         </div>
-        <a
-          href={`/api/reports/csv?from=${from}&to=${to}`}
-          className="flex items-center gap-1.5 rounded border border-ink-200 px-3 py-2 text-sm font-medium text-ink-700 hover:bg-ink-50"
-        >
-          <Download size={15} /> CSV export
-        </a>
+        <div className="flex items-center gap-2">
+          <a
+            href={`/api/reports/csv?from=${from}&to=${to}`}
+            className="flex items-center gap-1.5 rounded border border-ink-200 px-3 py-2 text-sm font-medium text-ink-700 hover:bg-ink-50"
+          >
+            <Download size={15} /> CSV export
+          </a>
+          <a
+            href={`/api/reports/pdf?from=${from}&to=${to}`}
+            className="flex items-center gap-1.5 rounded border border-ink-200 px-3 py-2 text-sm font-medium text-ink-700 hover:bg-ink-50"
+          >
+            <Download size={15} /> PDF export
+          </a>
+        </div>
       </div>
 
       <DateRangeFilter from={from} to={to} />
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatCard label="Omzet" value={formatEuro(totalOmzet)} />
-        <StatCard label="BTW" value={formatEuro(totalBtw)} />
-        <StatCard label="Onderdelenkosten" value={formatEuro(partsCost)} />
-        <StatCard label="Brutowinst" value={formatEuro(grossProfit)} />
+        <StatCard label="Omzet" value={formatEuro(data.totalOmzet)} />
+        <StatCard label="BTW" value={formatEuro(data.totalBtw)} />
+        <StatCard label="Onderdelenkosten" value={formatEuro(data.partsCost)} />
+        <StatCard label="Brutowinst" value={formatEuro(data.grossProfit)} />
       </div>
 
       <div className="grid grid-cols-2 gap-4">
@@ -109,11 +68,11 @@ export default async function RapportagesPage({ searchParams }: { searchParams: 
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
               <span className="text-ink-600">Reparaties</span>
-              <span className="tabular-nums font-medium">{formatEuro(repairRevenueIncl)}</span>
+              <span className="tabular-nums font-medium">{formatEuro(data.repairRevenueIncl)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-ink-600">Producten (kassa)</span>
-              <span className="tabular-nums font-medium">{formatEuro(productRevenueIncl)}</span>
+              <span className="tabular-nums font-medium">{formatEuro(data.productRevenueIncl)}</span>
             </div>
           </div>
         </Card>
@@ -121,33 +80,80 @@ export default async function RapportagesPage({ searchParams }: { searchParams: 
         <Card className="p-4">
           <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink-400">Populaire reparaties</h3>
           <div className="space-y-2 text-sm">
-            {popular.map(([label, count]) => (
+            {data.popular.map(([label, count]) => (
               <div key={label} className="flex justify-between">
                 <span className="text-ink-600">{label}</span>
                 <span className="tabular-nums font-medium">{count}x</span>
               </div>
             ))}
-            {popular.length === 0 && <p className="text-ink-400">Geen data in deze periode.</p>}
+            {data.popular.length === 0 && <p className="text-ink-400">Geen data in deze periode.</p>}
           </div>
         </Card>
 
         <Card className="p-4">
           <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink-400">BTW per tarief</h3>
           <div className="space-y-2 text-sm">
-            {vatBreakdown.map(([rate, vat]) => (
+            {data.vatBreakdown.map(([rate, vat]) => (
               <div key={rate} className="flex justify-between">
                 <span className="text-ink-600">{rate}%</span>
                 <span className="tabular-nums font-medium">{formatEuro(vat)}</span>
               </div>
             ))}
-            {vatBreakdown.length === 0 && <p className="text-ink-400">Geen data in deze periode.</p>}
+            {data.vatBreakdown.length === 0 && <p className="text-ink-400">Geen data in deze periode.</p>}
           </div>
         </Card>
       </div>
 
-      <p className="text-xs text-ink-400">
-        Openstaande facturen en PDF-export volgen in een volgend increment.
-      </p>
+      <Card className="p-4">
+        <div className="mb-3 flex items-center justify-between">
+          <h3 className="text-xs font-semibold uppercase tracking-wide text-ink-400">
+            Openstaande facturen ({data.outstandingInvoices.length})
+          </h3>
+          <span className="text-sm font-medium tabular-nums text-ink-900">
+            Totaal: {formatEuro(data.totalOutstanding)}
+          </span>
+        </div>
+        {data.outstandingInvoices.length === 0 ? (
+          <p className="text-sm text-ink-400">Geen openstaande facturen.</p>
+        ) : (
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-ink-100 text-left text-xs uppercase tracking-wide text-ink-400">
+                <th className="py-2 font-medium">Nummer</th>
+                <th className="py-2 font-medium">Klant</th>
+                <th className="py-2 font-medium">Factuurdatum</th>
+                <th className="py-2 font-medium">Vervaldatum</th>
+                <th className="py-2 font-medium">Status</th>
+                <th className="py-2 text-right font-medium">Openstaand</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.outstandingInvoices.map((inv) => {
+                const status = INVOICE_STATUS_LABELS[inv.status] ?? { label: inv.status, color: '#495164' };
+                return (
+                  <tr key={inv.id} className="border-b border-ink-100 last:border-0 hover:bg-ink-50">
+                    <td className="py-2">
+                      <Link href={`/facturen/${inv.id}`} className="font-medium text-[var(--accent)] hover:underline">
+                        {inv.invoiceNumber}
+                      </Link>
+                    </td>
+                    <td className="py-2 text-ink-700">{inv.customerName}</td>
+                    <td className="py-2 text-ink-600">{formatDate(inv.invoiceDate)}</td>
+                    <td className={`py-2 ${inv.overdue ? 'font-medium text-red-600' : 'text-ink-600'}`}>
+                      {formatDate(inv.dueDate)}
+                      {inv.overdue ? ' · vervallen' : ''}
+                    </td>
+                    <td className="py-2">
+                      <StatusBadge name={status.label} color={status.color} />
+                    </td>
+                    <td className="py-2 text-right tabular-nums text-ink-900">{formatEuro(inv.outstanding)}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        )}
+      </Card>
     </div>
   );
 }

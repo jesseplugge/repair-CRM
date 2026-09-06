@@ -3,7 +3,9 @@ import { createClient } from '@/lib/supabase/server';
 import { ReceiptDocument } from './ReceiptDocument';
 import { InvoiceDocument } from './InvoiceDocument';
 import { SignedIntakeDocument } from './SignedIntakeDocument';
+import { ReportDocument } from './ReportDocument';
 import { businessForPdf } from './data';
+import { getReportData } from '@/lib/reports/data';
 import type { DocFormat } from './format';
 
 export type GeneratedPdf = {
@@ -340,4 +342,18 @@ export async function generatePosReceiptPdf(saleId: string, businessId: string, 
     customerEmail: customer?.email ?? null,
     customerName: customer ? `${customer.first_name} ${customer.last_name}` : 'Contant',
   };
+}
+
+export async function generateReportPdf(businessId: string, from: string, to: string) {
+  const supabase = createClient();
+  const [{ data: business }, data] = await Promise.all([
+    supabase.from('businesses').select('*').eq('id', businessId).single(),
+    getReportData(businessId, from, to),
+  ]);
+
+  const buffer = await renderToBuffer(
+    <ReportDocument businessName={businessForPdf(business).name} data={data} />
+  );
+
+  return { buffer, filename: `rapportage-${from}-tot-${to}.pdf` };
 }
