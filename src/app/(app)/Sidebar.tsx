@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import {
   LayoutDashboard,
   Wrench,
@@ -17,25 +18,25 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
-import { useRouter } from 'next/navigation';
 
 const NAV = [
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/reparaties', label: 'Reparaties', icon: Wrench },
-  { href: '/garantie', label: 'Garantie', icon: ShieldCheck },
-  { href: '/kassa', label: 'Kassa', icon: ShoppingCart },
-  { href: '/klanten', label: 'Klanten', icon: Users },
-  { href: '/producten', label: 'Producten', icon: Package },
-  { href: '/voorraad', label: 'Voorraad', icon: Boxes },
-  { href: '/facturen', label: 'Facturen', icon: FileText },
-  { href: '/bonnen', label: 'Bonnen', icon: Receipt },
-  { href: '/rapportages', label: 'Rapportages', icon: BarChart3 },
-  { href: '/instellingen', label: 'Instellingen', icon: Settings },
-];
+  { href: '/dashboard', key: 'dashboard', icon: LayoutDashboard },
+  { href: '/reparaties', key: 'repairs', icon: Wrench },
+  { href: '/garantie', key: 'warranty', icon: ShieldCheck },
+  { href: '/kassa', key: 'pos', icon: ShoppingCart },
+  { href: '/klanten', key: 'customers', icon: Users },
+  { href: '/producten', key: 'products', icon: Package },
+  { href: '/voorraad', key: 'inventory', icon: Boxes },
+  { href: '/facturen', key: 'invoices', icon: FileText },
+  { href: '/bonnen', key: 'receipts', icon: Receipt },
+  { href: '/rapportages', key: 'reports', icon: BarChart3 },
+  { href: '/instellingen', key: 'settings', icon: Settings },
+] as const;
 
 export function Sidebar({ userName, logoUrl, businessName }: { userName: string; logoUrl: string | null; businessName: string }) {
   const pathname = usePathname();
   const router = useRouter();
+  const t = useTranslations('nav');
 
   async function handleLogout() {
     const supabase = createClient();
@@ -55,7 +56,7 @@ export function Sidebar({ userName, logoUrl, businessName }: { userName: string;
       </div>
 
       <nav className="flex-1 space-y-0.5 px-3">
-        {NAV.map(({ href, label, icon: Icon }) => {
+        {NAV.map(({ href, key, icon: Icon }) => {
           const active = pathname === href || pathname.startsWith(href + '/');
           return (
             <Link
@@ -66,20 +67,20 @@ export function Sidebar({ userName, logoUrl, businessName }: { userName: string;
               }`}
             >
               <Icon size={17} strokeWidth={2} />
-              {label}
+              {t(key)}
             </Link>
           );
         })}
       </nav>
 
       <div className="border-t border-ink-900 px-3 py-4">
-        <div className="mb-2 px-3 text-xs text-ink-400">Ingelogd als {userName}</div>
+        <div className="mb-2 px-3 text-xs text-ink-400">{t('loggedInAs', { name: userName })}</div>
         <button
           onClick={handleLogout}
           className="flex w-full items-center gap-3 rounded px-3 py-2 text-sm text-ink-200 hover:bg-ink-900 hover:text-white"
         >
           <LogOut size={17} />
-          Uitloggen
+          {t('logout')}
         </button>
       </div>
     </aside>
