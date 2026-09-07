@@ -1,15 +1,17 @@
 'use client';
 
 import { useFormState, useFormStatus } from 'react-dom';
+import { useTranslations } from 'next-intl';
 import { saveDocumentTemplate } from '@/lib/actions/templates';
 import { Button, Card, Field, Textarea } from '@/components/ui/primitives';
 import type { DocumentTemplateType } from '@/lib/pdf/templates';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
+  const t = useTranslations('documentTemplates');
   return (
     <Button type="submit" variant="primary" disabled={pending}>
-      {pending ? 'Opslaan…' : 'Opslaan'}
+      {pending ? t('saving') : t('save')}
     </Button>
   );
 }
@@ -30,6 +32,7 @@ function TemplateForm({
   canEdit: boolean;
 }) {
   const [state, formAction] = useFormState(saveDocumentTemplate, { error: '' });
+  const t = useTranslations('documentTemplates');
 
   return (
     <Card className="p-4">
@@ -43,7 +46,7 @@ function TemplateForm({
           </Field>
         ))}
         {state?.error && <p className="rounded bg-red-50 px-3 py-2 text-sm text-red-700">{state.error}</p>}
-        {state?.success && <p className="rounded bg-green-50 px-3 py-2 text-sm text-green-700">Opgeslagen.</p>}
+        {state?.success && <p className="rounded bg-green-50 px-3 py-2 text-sm text-green-700">{t('saved')}</p>}
         {canEdit && <SubmitButton />}
       </form>
     </Card>
@@ -57,40 +60,41 @@ export function TemplateManager({
   templates: Record<DocumentTemplateType, Record<string, string>>;
   canEdit: boolean;
 }) {
+  const t = useTranslations('documentTemplates');
   return (
     <div className="grid grid-cols-2 gap-4">
       <TemplateForm
         type="dropoff"
-        title="Innamebewijs"
-        description="Getoond op het intakebewijs bij het afgeven van een toestel."
+        title={t('dropoffTitle')}
+        description={t('dropoffDescription')}
         fields={[
-          { name: 'termsNote', label: 'Opmerking bij geschatte prijs' },
-          { name: 'footerNote', label: 'Voettekst (leeg = standaard bedankttekst)' },
+          { name: 'termsNote', label: t('dropoffTermsNote') },
+          { name: 'footerNote', label: t('footerNote') },
         ]}
         values={templates.dropoff}
         canEdit={canEdit}
       />
       <TemplateForm
         type="completion"
-        title="Afhaalbon (reparatie)"
-        description="Getoond op de kassabon bij het ophalen van een gerepareerd toestel."
-        fields={[{ name: 'footerNote', label: 'Voettekst (leeg = standaard bedankttekst)' }]}
+        title={t('completionTitle')}
+        description={t('completionDescription')}
+        fields={[{ name: 'footerNote', label: t('footerNote') }]}
         values={templates.completion}
         canEdit={canEdit}
       />
       <TemplateForm
         type="receipt"
-        title="Kassabon (verkoop)"
-        description="Getoond op de bon van een productverkoop via de kassa."
-        fields={[{ name: 'footerNote', label: 'Voettekst (leeg = standaard bedankttekst)' }]}
+        title={t('receiptTitle')}
+        description={t('receiptDescription')}
+        fields={[{ name: 'footerNote', label: t('footerNote') }]}
         values={templates.receipt}
         canEdit={canEdit}
       />
       <TemplateForm
         type="invoice"
-        title="Factuur"
-        description="Extra regel onderaan elke factuur, na de betaalinstructie."
-        fields={[{ name: 'footerNote', label: 'Extra voettekst (optioneel)' }]}
+        title={t('invoiceTitle')}
+        description={t('invoiceDescription')}
+        fields={[{ name: 'footerNote', label: t('invoiceFooterNote') }]}
         values={templates.invoice}
         canEdit={canEdit}
       />

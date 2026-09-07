@@ -2,17 +2,19 @@
 
 import { createClient, getCurrentUser } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
+import { getTranslations } from 'next-intl/server';
 import { TEMPLATE_TYPES } from '@/lib/pdf/templates';
 
 type TemplateState = { error?: string; success?: boolean };
 
 export async function saveDocumentTemplate(_prevState: TemplateState, formData: FormData): Promise<TemplateState> {
   const user = await getCurrentUser();
-  if (!user) return { error: 'Niet ingelogd.' };
-  if (user.role !== 'owner') return { error: 'Alleen eigenaren kunnen documentsjablonen aanpassen.' };
+  const t = await getTranslations('templateErrors');
+  if (!user) return { error: t('notLoggedIn') };
+  if (user.role !== 'owner') return { error: t('onlyOwnersCanEdit') };
 
   const type = formData.get('type') as string;
-  if (!TEMPLATE_TYPES.includes(type as any)) return { error: 'Ongeldig documenttype.' };
+  if (!TEMPLATE_TYPES.includes(type as any)) return { error: t('invalidType') };
 
   const content: Record<string, string> = {};
   for (const [key, value] of formData.entries()) {
