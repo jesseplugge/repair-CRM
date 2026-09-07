@@ -4,16 +4,19 @@ import { Card, Button } from '@/components/ui/primitives';
 import { StatusBadge, PaymentStatusBadge } from '@/components/StatusBadge';
 import { formatDate } from '@/lib/utils/format';
 import { formatEuro } from '@/lib/utils/currency';
-import { Plus } from 'lucide-react';
+import { Plus, List, Kanban } from 'lucide-react';
+import { ReparatiesKanban } from './ReparatiesKanban';
 
-export default async function ReparatiesPage({ searchParams }: { searchParams: { status?: string } }) {
+export default async function ReparatiesPage({ searchParams }: { searchParams: { status?: string; view?: string } }) {
   const user = await getCurrentUser();
   const supabase = createClient();
+  const view = searchParams.view === 'kanban' ? 'kanban' : 'list';
 
   const { data: statuses } = await supabase
     .from('repair_statuses')
     .select('*')
     .eq('business_id', user!.business_id)
+    .eq('active', true)
     .order('sort_order');
 
   let query = supabase
@@ -35,24 +38,45 @@ export default async function ReparatiesPage({ searchParams }: { searchParams: {
           <h1 className="font-display text-2xl font-semibold text-ink-950">Reparaties</h1>
           <p className="text-sm text-ink-600">{repairs?.length ?? 0} reparaties</p>
         </div>
-        <Link href="/reparaties/nieuw">
-          <Button variant="primary">
-            <Plus size={16} /> Nieuwe reparatie
-          </Button>
-        </Link>
-      </div>
-
-      <div className="flex flex-wrap gap-2">
-        <Link href="/reparaties">
-          <FilterChip active={!searchParams.status} label="Alle" />
-        </Link>
-        {(statuses ?? []).map((s) => (
-          <Link key={s.id} href={`/reparaties?status=${s.id}`}>
-            <FilterChip active={searchParams.status === s.id} label={s.name} color={s.color} />
+        <div className="flex items-center gap-2">
+          <div className="flex rounded border border-ink-200 bg-white p-0.5">
+            <Link
+              href={{ pathname: '/reparaties', query: { ...(searchParams.status ? { status: searchParams.status } : {}), view: 'list' } }}
+              className={`flex items-center gap-1.5 rounded px-2.5 py-1.5 text-sm ${view === 'list' ? 'bg-ink-100 text-ink-900' : 'text-ink-500'}`}
+            >
+              <List size={14} /> Lijst
+            </Link>
+            <Link
+              href={{ pathname: '/reparaties', query: { ...(searchParams.status ? { status: searchParams.status } : {}), view: 'kanban' } }}
+              className={`flex items-center gap-1.5 rounded px-2.5 py-1.5 text-sm ${view === 'kanban' ? 'bg-ink-100 text-ink-900' : 'text-ink-500'}`}
+            >
+              <Kanban size={14} /> Kanban
+            </Link>
+          </div>
+          <Link href="/reparaties/nieuw">
+            <Button variant="primary">
+              <Plus size={16} /> Nieuwe reparatie
+            </Button>
           </Link>
-        ))}
+        </div>
       </div>
 
+      {view === 'list' && (
+        <div className="flex flex-wrap gap-2">
+          <Link href="/reparaties">
+            <FilterChip active={!searchParams.status} label="Alle" />
+          </Link>
+          {(statuses ?? []).map((s) => (
+            <Link key={s.id} href={`/reparaties?status=${s.id}`}>
+              <FilterChip active={searchParams.status === s.id} label={s.name} color={s.color} />
+            </Link>
+          ))}
+        </div>
+      )}
+
+      {view === 'kanban' ? (
+        <ReparatiesKanban statuses={statuses ?? []} repairs={(repairs ?? []) as any} />
+      ) : (
       <Card>
         <table className="w-full text-sm">
           <thead>
@@ -102,6 +126,7 @@ export default async function ReparatiesPage({ searchParams }: { searchParams: {
           </tbody>
         </table>
       </Card>
+      )}
     </div>
   );
 }
