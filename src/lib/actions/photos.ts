@@ -2,18 +2,21 @@
 
 import { createClient, getCurrentUser } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
+import { getTranslations } from 'next-intl/server';
 
 const LABELS = ['front', 'back', 'left', 'right', 'top', 'bottom', 'damage'] as const;
 
 export async function uploadRepairPhoto(_prevState: { error?: string }, formData: FormData): Promise<{ error?: string }> {
   const user = await getCurrentUser();
-  if (!user) return { error: 'Niet ingelogd.' };
+  const t = await getTranslations('photoErrors');
+  const tCommon = await getTranslations('common');
+  if (!user) return { error: tCommon('notLoggedIn') };
 
   const repairId = formData.get('repair_id') as string;
   const label = (formData.get('label') as string) || null;
   const file = formData.get('photo') as File | null;
-  if (!file || file.size === 0) return { error: 'Kies een foto.' };
-  if (file.size > 8 * 1024 * 1024) return { error: 'Bestand is te groot (max 8MB).' };
+  if (!file || file.size === 0) return { error: t('chooseFile') };
+  if (file.size > 8 * 1024 * 1024) return { error: t('fileTooLarge') };
 
   const supabase = createClient();
   const ext = file.name.split('.').pop() || 'jpg';

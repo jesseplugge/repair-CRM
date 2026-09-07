@@ -2,14 +2,17 @@
 
 import { createClient, getCurrentUser } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
+import { getTranslations } from 'next-intl/server';
 
 export async function createWarrantyClaim(_prevState: { error?: string }, formData: FormData): Promise<{ error?: string }> {
   const user = await getCurrentUser();
-  if (!user) return { error: 'Niet ingelogd.' };
+  const t = await getTranslations('warrantyErrors');
+  const tCommon = await getTranslations('common');
+  if (!user) return { error: tCommon('notLoggedIn') };
 
   const repairId = formData.get('repair_id') as string;
   const description = (formData.get('description') as string)?.trim();
-  if (!description) return { error: 'Beschrijf de klacht.' };
+  if (!description) return { error: t('describeComplaint') };
 
   const supabase = createClient();
   const { data: claimNumber, error: numError } = await supabase.rpc('next_number', {
@@ -19,7 +22,7 @@ export async function createWarrantyClaim(_prevState: { error?: string }, formDa
     p_prefix: 'GAR-',
     p_pad: 4,
   });
-  if (numError || !claimNumber) return { error: numError?.message ?? 'Kon geen claimnummer genereren.' };
+  if (numError || !claimNumber) return { error: numError?.message ?? t('claimNumberFailed') };
 
   const { error } = await supabase.from('warranty_claims').insert({
     business_id: user.business_id,
@@ -40,8 +43,10 @@ const VALID_STATUSES = ['new', 'investigating', 'approved', 'rejected', 'repairi
 
 export async function updateWarrantyClaimStatus(claimId: string, status: string, resolution?: string) {
   const user = await getCurrentUser();
-  if (!user) return { error: 'Niet ingelogd.' };
-  if (!VALID_STATUSES.includes(status)) return { error: 'Ongeldige status.' };
+  const t = await getTranslations('warrantyErrors');
+  const tCommon = await getTranslations('common');
+  if (!user) return { error: tCommon('notLoggedIn') };
+  if (!VALID_STATUSES.includes(status)) return { error: t('invalidStatus') };
 
   const supabase = createClient();
   const { data: claim, error } = await supabase

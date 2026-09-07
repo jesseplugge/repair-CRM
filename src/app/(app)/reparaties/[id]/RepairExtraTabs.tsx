@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Card } from '@/components/ui/primitives';
 import { DiagnosticsPanel } from './DiagnosticsPanel';
 import { PhotosPanel } from './PhotosPanel';
@@ -10,11 +11,6 @@ type Result = 'pass' | 'fail' | 'not_tested' | 'na';
 
 const TABS = ['diagnostics', 'photos', 'warranty'] as const;
 type Tab = (typeof TABS)[number];
-const TAB_LABELS: Record<Tab, string> = {
-  diagnostics: 'Diagnose',
-  photos: "Foto's",
-  warranty: 'Garantie',
-};
 
 export function RepairExtraTabs({
   repairId,
@@ -30,21 +26,22 @@ export function RepairExtraTabs({
   claims: WarrantyClaim[];
 }) {
   const [tab, setTab] = useState<Tab>('diagnostics');
+  const t = useTranslations('repairTabs');
 
   return (
     <Card className="p-4">
       <div className="mb-4 flex gap-1 border-b border-ink-100">
-        {TABS.map((t) => (
+        {TABS.map((tabKey) => (
           <button
-            key={t}
-            onClick={() => setTab(t)}
+            key={tabKey}
+            onClick={() => setTab(tabKey)}
             className={`px-3 py-2 text-sm font-medium transition-colors ${
-              tab === t ? 'border-b-2 border-[var(--accent)] text-[var(--accent)]' : 'text-ink-500 hover:text-ink-800'
+              tab === tabKey ? 'border-b-2 border-[var(--accent)] text-[var(--accent)]' : 'text-ink-500 hover:text-ink-800'
             }`}
           >
-            {TAB_LABELS[t]}
-            {t === 'photos' && photos.length > 0 && <span className="ml-1 text-ink-400">({photos.length})</span>}
-            {t === 'warranty' && claims.length > 0 && <span className="ml-1 text-ink-400">({claims.length})</span>}
+            {t(tabKey)}
+            {tabKey === 'photos' && photos.length > 0 && <span className="ml-1 text-ink-400">({photos.length})</span>}
+            {tabKey === 'warranty' && claims.length > 0 && <span className="ml-1 text-ink-400">({claims.length})</span>}
           </button>
         ))}
       </div>

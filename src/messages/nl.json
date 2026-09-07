@@ -1,4 +1,7 @@
 {
+  "common": {
+    "notLoggedIn": "Niet ingelogd."
+  },
   "nav": {
     "dashboard": "Dashboard",
     "repairs": "Reparaties",
@@ -176,5 +179,65 @@
     "repairNotFound": "Reparatie niet gevonden.",
     "statusNotFound": "Status niet gevonden.",
     "descriptionAndPriceRequired": "Omschrijving en prijs zijn verplicht."
+  },
+  "repairTabs": {
+    "diagnostics": "Diagnose",
+    "photos": "Foto's",
+    "warranty": "Garantie",
+    "noDiagnosticProfile": "Geen diagnoseprofiel ingesteld. Voeg er een toe via Instellingen.",
+    "component": "Onderdeel",
+    "beforeRepair": "Voor reparatie",
+    "afterRepair": "Na reparatie",
+    "resultPass": "OK",
+    "resultFail": "Fout",
+    "resultNotTested": "Niet getest",
+    "resultNa": "N.v.t.",
+    "photo": "Foto",
+    "label": "Label",
+    "none": "Geen",
+    "labelFront": "Voorkant",
+    "labelBack": "Achterkant",
+    "labelLeft": "Links",
+    "labelRight": "Rechts",
+    "labelTop": "Boven",
+    "labelBottom": "Onder",
+    "labelDamage": "Schade",
+    "upload": "Uploaden",
+    "uploading": "Uploaden…",
+    "noPhotosYet": "Nog geen foto's toegevoegd.",
+    "deletePhoto": "Verwijderen",
+    "noClaimsYet": "Nog geen garantieclaims.",
+    "claimComplaint": "Klacht",
+    "claimDescriptionPlaceholder": "Wat is er mis na de reparatie?",
+    "resolutionLabel": "Afhandeling: {resolution}",
+    "createClaim": "Garantieclaim aanmaken",
+    "cancel": "Annuleren",
+    "busy": "Bezig…",
+    "statusNew": "Nieuw",
+    "statusInvestigating": "Onderzoek",
+    "statusApproved": "Goedgekeurd",
+    "statusRejected": "Afgewezen",
+    "statusRepairing": "In reparatie",
+    "statusResolved": "Afgehandeld"
+  },
+  "warrantyPage": {
+    "title": "Garantie",
+    "openCount": "{count} openstaande garantieclaim(s)",
+    "colClaim": "Claim",
+    "colRepair": "Reparatie",
+    "colCustomer": "Klant",
+    "colDevice": "Apparaat",
+    "colStatus": "Status",
+    "colDate": "Datum",
+    "empty": "Nog geen garantieclaims. Claims worden aangemaakt vanuit een reparatie."
+  },
+  "warrantyErrors": {
+    "describeComplaint": "Beschrijf de klacht.",
+    "claimNumberFailed": "Kon geen claimnummer genereren.",
+    "invalidStatus": "Ongeldige status."
+  },
+  "photoErrors": {
+    "chooseFile": "Kies een foto.",
+    "fileTooLarge": "Bestand is te groot (max 8MB)."
   }
 }
