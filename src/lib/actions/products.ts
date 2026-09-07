@@ -3,6 +3,7 @@
 import { createClient, getCurrentUser } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { getTranslations } from 'next-intl/server';
 
 export async function createProduct(_prevState: { error?: string }, formData: FormData) {
   const user = await getCurrentUser();
@@ -11,7 +12,10 @@ export async function createProduct(_prevState: { error?: string }, formData: Fo
 
   const name = (formData.get('name') as string)?.trim();
   const sellingPrice = parseFloat(formData.get('selling_price_excl_vat') as string);
-  if (!name || isNaN(sellingPrice)) return { error: 'Naam en verkoopprijs zijn verplicht.' };
+  if (!name || isNaN(sellingPrice)) {
+    const t = await getTranslations('productErrors');
+    return { error: t('nameAndPriceRequired') };
+  }
 
   const categoryId = (formData.get('category_id') as string) || null;
   const supplierId = (formData.get('supplier_id') as string) || null;
@@ -42,7 +46,10 @@ export async function createCategory(_prevState: { error?: string }, formData: F
   if (!user) redirect('/login');
   const supabase = createClient();
   const name = (formData.get('name') as string)?.trim();
-  if (!name) return { error: 'Naam is verplicht.' };
+  if (!name) {
+    const t = await getTranslations('productErrors');
+    return { error: t('nameRequired') };
+  }
   const { error } = await supabase.from('product_categories').insert({ business_id: user.business_id, name });
   if (error) return { error: error.message };
   revalidatePath('/producten');
@@ -54,7 +61,10 @@ export async function createSupplier(_prevState: { error?: string }, formData: F
   if (!user) redirect('/login');
   const supabase = createClient();
   const name = (formData.get('name') as string)?.trim();
-  if (!name) return { error: 'Naam is verplicht.' };
+  if (!name) {
+    const t = await getTranslations('productErrors');
+    return { error: t('nameRequired') };
+  }
   const { error } = await supabase.from('suppliers').insert({
     business_id: user.business_id,
     name,
