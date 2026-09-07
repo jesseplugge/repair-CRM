@@ -442,6 +442,55 @@ export async function refundRepairPayment(repairId: string, paymentId: string, a
   return { error: undefined };
 }
 
+/**
+ * Deletes a repair created by mistake. Refuses if the repair already has real
+ * business history attached (a payment, invoice, signed intake, or warranty claim) —
+ * those need to be handled first rather than silently disappearing. Receipts and
+ * activity log entries are just lifecycle records of the repair itself (the intake
+ * receipt is generated automatically the moment a repair is created, so treating it
+ * as a blocker would make delete impossible for every repair) — those are cleaned
+ * up as part of the delete rather than blocking it.
+ */
+export async function deleteRepair(repairId: string) {
+  const user = await getCurrentUser();
+  if (!user) redirect('/login');
+  const supabase = createClient();
+  const t = await getTranslations('repairErrors');
+
+  const { data: repair } = await supabase
+    .from('repairs')
+    .select('id, business_id')
+    .eq('id', repairId)
+    .eq('business_id', user.business_id)
+    .single();
+  if (!repair) return { error: t('repairNotFound') };
+
+  const [{ count: paymentCount }, { count: invoiceCount }, { count: signatureCount }, { count: warrantyCount }] = await Promise.all([
+    supabase.from('payments').select('id', { count: 'exact', head: true }).eq('repair_id', repairId),
+    supabase.from('invoices').select('id', { count: 'exact', head: true }).eq('repair_id', repairId),
+    supabase.from('intake_signatures').select('id', { count: 'exact', head: true }).eq('repair_id', repairId),
+    supabase.from('warranty_claims').select('id', { count: 'exact', head: true }).eq('repair_id', repairId),
+  ]);
+  if ((paymentCount ?? 0) > 0 || (invoiceCount ?? 0) > 0 || (signatureCount ?? 0) > 0 || (warrantyCount ?? 0) > 0) {
+    return { error: t('cannotDeleteHasRecords') };
+  }
+
+  const { data: photos } = await supabase.from('repair_photos').select('storage_path').eq('repair_id', repairId);
+  if (photos && photos.length > 0) {
+    await supabase.storage.from('repair-photos').remove(photos.map((p) => p.storage_path));
+  }
+
+  await supabase.from('receipts').delete().eq('repair_id', repairId);
+  await supabase.from('activity_logs').delete().eq('entity_type', 'repair').eq('entity_id', repairId);
+
+  const { error } = await supabase.from('repairs').delete().eq('id', repairId);
+  if (error) return { error: error.message };
+
+  revalidatePath('/reparaties');
+  revalidatePath('/dashboard');
+  return { error: undefined };
+}
+
 export async function searchCatalog(query: string, businessId: string) {
   const supabase = createClient();
   const q = query.trim().replace(/[,()]/g, ' ').trim();
