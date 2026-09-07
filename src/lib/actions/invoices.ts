@@ -5,6 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { calculateFromExclVat, calculateFromInclVat } from '@/lib/utils/currency';
 import { insertPayment } from './payments';
+import { getTranslations } from 'next-intl/server';
 
 export type InvoiceLineInput = { description: string; quantity: number; unitPriceExclVat: number; vatRate: number };
 
@@ -78,7 +79,10 @@ export async function createInvoiceFromRepair(_prevState: { error?: string }, fo
 
   const repairId = formData.get('repair_id') as string;
   const { data: repair } = await supabase.from('repairs').select('*').eq('id', repairId).eq('business_id', user.business_id).single();
-  if (!repair) return { error: 'Reparatie niet gevonden.' };
+  if (!repair) {
+    const t = await getTranslations('invoiceErrors');
+    return { error: t('repairNotFound') };
+  }
 
   const { data: items } = await supabase.from('repair_items').select('*').eq('repair_id', repairId);
 
@@ -109,7 +113,10 @@ export async function createManualInvoice(_prevState: { error?: string }, formDa
   if (!user) redirect('/login');
 
   const customerId = formData.get('customer_id') as string;
-  if (!customerId) return { error: 'Selecteer een klant.' };
+  if (!customerId) {
+    const t = await getTranslations('invoiceErrors');
+    return { error: t('selectCustomer') };
+  }
 
   const descriptions = formData.getAll('line_description') as string[];
   const quantities = formData.getAll('line_quantity') as string[];
@@ -125,7 +132,10 @@ export async function createManualInvoice(_prevState: { error?: string }, formDa
     }))
     .filter((l) => l.description.trim() && !isNaN(l.unitPriceExclVat));
 
-  if (lines.length === 0) return { error: 'Voeg minimaal één regel toe.' };
+  if (lines.length === 0) {
+    const t = await getTranslations('invoiceErrors');
+    return { error: t('addAtLeastOneLine') };
+  }
 
   const result = await insertInvoiceWithLines(
     user.business_id,
@@ -155,7 +165,10 @@ export async function recordInvoicePayment(invoiceId: string, amount: number, me
   const supabase = createClient();
 
   const { data: invoice } = await supabase.from('invoices').select('*').eq('id', invoiceId).single();
-  if (!invoice) return { error: 'Factuur niet gevonden.' };
+  if (!invoice) {
+    const t = await getTranslations('invoiceErrors');
+    return { error: t('invoiceNotFound') };
+  }
 
   const result = await insertPayment(
     { businessId: invoice.business_id, customerId: invoice.customer_id, invoiceId },
@@ -189,10 +202,11 @@ export async function createCreditNote(
   const amountInclVat = parseFloat(formData.get('amount_incl_vat') as string);
   const vatRate = parseFloat((formData.get('vat_rate') as string) || '21');
   const reason = (formData.get('reason') as string) || null;
-  if (isNaN(amountInclVat) || amountInclVat <= 0) return { error: 'Vul een geldig bedrag in.' };
+  const t = await getTranslations('invoiceErrors');
+  if (isNaN(amountInclVat) || amountInclVat <= 0) return { error: t('invalidAmount') };
 
   const { data: invoice } = await supabase.from('invoices').select('business_id, total_incl_vat').eq('id', invoiceId).single();
-  if (!invoice) return { error: 'Factuur niet gevonden.' };
+  if (!invoice) return { error: t('invoiceNotFound') };
 
   const { exclVat, vatAmount } = calculateFromInclVat(amountInclVat, vatRate);
 

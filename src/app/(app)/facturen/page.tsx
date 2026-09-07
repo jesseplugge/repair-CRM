@@ -1,22 +1,25 @@
 import Link from 'next/link';
+import { getTranslations } from 'next-intl/server';
 import { createClient, getCurrentUser } from '@/lib/supabase/server';
 import { Card, Button } from '@/components/ui/primitives';
 import { formatDate } from '@/lib/utils/format';
 import { formatEuro } from '@/lib/utils/currency';
 import { Plus } from 'lucide-react';
 
-const STATUS_LABELS: Record<string, { label: string; color: string }> = {
-  draft: { label: 'Concept', color: '#495164' },
-  sent: { label: 'Verzonden', color: '#0C7C82' },
-  paid: { label: 'Betaald', color: '#2F8F5B' },
-  partially_paid: { label: 'Gedeeltelijk betaald', color: '#C97A22' },
-  overdue: { label: 'Vervallen', color: '#C4453A' },
-  cancelled: { label: 'Geannuleerd', color: '#8A93A6' },
+const STATUS_COLORS: Record<string, string> = {
+  draft: '#495164',
+  sent: '#0C7C82',
+  paid: '#2F8F5B',
+  partially_paid: '#C97A22',
+  overdue: '#C4453A',
+  cancelled: '#8A93A6',
 };
 
 export default async function FacturenPage() {
   const user = await getCurrentUser();
   const supabase = createClient();
+  const t = await getTranslations('invoicesList');
+  const tStatus = await getTranslations('invoiceStatus');
   const { data: invoices } = await supabase
     .from('invoices')
     .select('*, customer:customers(first_name, last_name)')
@@ -27,12 +30,12 @@ export default async function FacturenPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-display text-2xl font-semibold text-ink-950">Facturen</h1>
-          <p className="text-sm text-ink-600">{invoices?.length ?? 0} facturen</p>
+          <h1 className="font-display text-2xl font-semibold text-ink-950">{t('title')}</h1>
+          <p className="text-sm text-ink-600">{t('count', { count: invoices?.length ?? 0 })}</p>
         </div>
         <Link href="/facturen/nieuw">
           <Button variant="primary">
-            <Plus size={16} /> Nieuwe factuur
+            <Plus size={16} /> {t('newInvoice')}
           </Button>
         </Link>
       </div>
@@ -41,16 +44,17 @@ export default async function FacturenPage() {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-ink-100 text-left text-xs uppercase tracking-wide text-ink-400">
-              <th className="px-4 py-3 font-medium">Nummer</th>
-              <th className="px-4 py-3 font-medium">Klant</th>
-              <th className="px-4 py-3 font-medium">Datum</th>
-              <th className="px-4 py-3 font-medium">Status</th>
-              <th className="px-4 py-3 text-right font-medium">Bedrag</th>
+              <th className="px-4 py-3 font-medium">{t('colNumber')}</th>
+              <th className="px-4 py-3 font-medium">{t('colCustomer')}</th>
+              <th className="px-4 py-3 font-medium">{t('colDate')}</th>
+              <th className="px-4 py-3 font-medium">{t('colStatus')}</th>
+              <th className="px-4 py-3 text-right font-medium">{t('colAmount')}</th>
             </tr>
           </thead>
           <tbody>
             {(invoices ?? []).map((inv: any) => {
-              const status = STATUS_LABELS[inv.status] ?? { label: inv.status, color: '#495164' };
+              const label = STATUS_COLORS[inv.status] ? tStatus(inv.status as any) : inv.status;
+              const color = STATUS_COLORS[inv.status] ?? '#495164';
               return (
                 <tr key={inv.id} className="border-b border-ink-100 last:border-0 hover:bg-ink-50">
                   <td className="px-4 py-3">
@@ -63,8 +67,8 @@ export default async function FacturenPage() {
                   </td>
                   <td className="px-4 py-3 text-ink-600">{formatDate(inv.invoice_date)}</td>
                   <td className="px-4 py-3">
-                    <span className="rounded-full px-2.5 py-1 text-xs font-medium" style={{ backgroundColor: `${status.color}1a`, color: status.color }}>
-                      {status.label}
+                    <span className="rounded-full px-2.5 py-1 text-xs font-medium" style={{ backgroundColor: `${color}1a`, color }}>
+                      {label}
                     </span>
                   </td>
                   <td className="px-4 py-3 text-right tabular-nums text-ink-900">{formatEuro(inv.total_incl_vat)}</td>
@@ -74,7 +78,7 @@ export default async function FacturenPage() {
             {(invoices ?? []).length === 0 && (
               <tr>
                 <td colSpan={5} className="px-4 py-10 text-center text-ink-400">
-                  Nog geen facturen.
+                  {t('empty')}
                 </td>
               </tr>
             )}

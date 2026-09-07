@@ -515,5 +515,80 @@
     "reasonPosSale": "Verkoop (kassa)",
     "reasonCorrection": "Correctie",
     "movementsEmpty": "Nog geen voorraadbewegingen."
+  },
+  "invoiceStatus": {
+    "draft": "Concept",
+    "sent": "Verzonden",
+    "paid": "Betaald",
+    "partially_paid": "Gedeeltelijk betaald",
+    "overdue": "Vervallen",
+    "cancelled": "Geannuleerd"
+  },
+  "invoicesList": {
+    "title": "Facturen",
+    "count": "{count} facturen",
+    "newInvoice": "Nieuwe factuur",
+    "colNumber": "Nummer",
+    "colCustomer": "Klant",
+    "colDate": "Datum",
+    "colStatus": "Status",
+    "colAmount": "Bedrag",
+    "empty": "Nog geen facturen."
+  },
+  "invoiceDetail": {
+    "print": "Printen",
+    "lines": "Regels",
+    "exclVat": "excl.",
+    "vat": "BTW",
+    "subtotalExclVat": "Subtotaal excl. BTW",
+    "vatLabel": "BTW",
+    "total": "Totaal",
+    "status": "Status",
+    "payment": "Betaling",
+    "fullyPaid": "Volledig betaald",
+    "busy": "Bezig…",
+    "confirm": "Bevestigen",
+    "cancel": "Annuleren",
+    "registerPayment": "Betaling registreren",
+    "methodCash": "Contant",
+    "methodPin": "Pin",
+    "methodBank": "Bankoverschrijving"
+  },
+  "creditNotes": {
+    "title": "Creditfacturen",
+    "empty": "Geen creditfacturen.",
+    "amountInclVat": "Bedrag incl. BTW",
+    "vatRate": "BTW-tarief",
+    "reason": "Reden",
+    "busy": "Bezig…",
+    "create": "Creditfactuur aanmaken",
+    "cancel": "Annuleren",
+    "createNew": "+ Creditfactuur maken"
+  },
+  "manualInvoice": {
+    "pageTitle": "Nieuwe factuur",
+    "pageSubtitle": "Handmatige factuur, niet gekoppeld aan een reparatie.",
+    "fromRepairTitle": "Factuur maken",
+    "fromRepairSubtitle": "Vanuit reparatie {repairNumber}",
+    "total": "Totaal",
+    "createInvoice": "Factuur aanmaken",
+    "customer": "Klant",
+    "searchCustomerPlaceholder": "Zoek klant op naam of telefoonnummer…",
+    "change": "Wijzigen",
+    "lines": "Regels",
+    "description": "Omschrijving",
+    "quantity": "Aantal",
+    "priceExcl": "Prijs excl.",
+    "addLine": "Regel toevoegen",
+    "serviceDateOptional": "Leverdatum (optioneel)",
+    "notes": "Opmerkingen",
+    "busy": "Bezig…"
+  },
+  "invoiceErrors": {
+    "repairNotFound": "Reparatie niet gevonden.",
+    "selectCustomer": "Selecteer een klant.",
+    "addAtLeastOneLine": "Voeg minimaal één regel toe.",
+    "invoiceNotFound": "Factuur niet gevonden.",
+    "invalidAmount": "Vul een geldig bedrag in."
   }
 }

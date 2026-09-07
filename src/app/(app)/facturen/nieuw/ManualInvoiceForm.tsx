@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useFormState, useFormStatus } from 'react-dom';
+import { useTranslations } from 'next-intl';
 import { createManualInvoice } from '@/lib/actions/invoices';
 import { Button, Card, Field, Input, Textarea } from '@/components/ui/primitives';
 import { Plus, Trash2, Search } from 'lucide-react';
@@ -11,9 +12,10 @@ type Line = { id: string; description: string; quantity: string; price: string; 
 
 function SubmitButton() {
   const { pending } = useFormStatus();
+  const t = useTranslations('manualInvoice');
   return (
     <Button type="submit" variant="primary" size="lg" disabled={pending}>
-      {pending ? 'Bezig…' : 'Factuur aanmaken'}
+      {pending ? t('busy') : t('createInvoice')}
     </Button>
   );
 }
@@ -24,17 +26,18 @@ export function ManualInvoiceForm() {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<CustomerLite[]>([]);
   const [lines, setLines] = useState<Line[]>([{ id: crypto.randomUUID(), description: '', quantity: '1', price: '', vatRate: '21' }]);
+  const t = useTranslations('manualInvoice');
 
   useEffect(() => {
     if (customer || query.trim().length < 2) {
       setResults([]);
       return;
     }
-    const t = setTimeout(async () => {
+    const timer = setTimeout(async () => {
       const res = await fetch(`/api/customers/search?q=${encodeURIComponent(query)}`);
       setResults(res.ok ? await res.json() : []);
     }, 250);
-    return () => clearTimeout(t);
+    return () => clearTimeout(timer);
   }, [query, customer]);
 
   function updateLine(id: string, patch: Partial<Line>) {
@@ -52,20 +55,20 @@ export function ManualInvoiceForm() {
   return (
     <form action={formAction} className="space-y-4">
       <Card className="p-5">
-        <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink-400">Klant</h3>
+        <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink-400">{t('customer')}</h3>
         {customer ? (
           <div className="flex items-center justify-between rounded border border-[var(--accent-border-soft)] bg-[var(--accent-soft)] px-3 py-2">
             <span className="text-sm font-medium">
               {customer.first_name} {customer.last_name}
             </span>
             <button type="button" onClick={() => setCustomer(null)} className="text-xs text-[var(--accent)] underline">
-              Wijzigen
+              {t('change')}
             </button>
           </div>
         ) : (
           <div className="relative">
             <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-400" />
-            <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Zoek klant…" className="pl-9" />
+            <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder={t('searchCustomerPlaceholder')} className="pl-9" />
             {results.length > 0 && (
               <div className="mt-1 divide-y divide-ink-100 rounded border border-ink-100">
                 {results.map((c) => (
@@ -86,7 +89,7 @@ export function ManualInvoiceForm() {
       </Card>
 
       <Card className="p-5">
-        <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink-400">Regels</h3>
+        <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink-400">{t('lines')}</h3>
         <div className="space-y-2">
           {lines.map((l) => (
             <div key={l.id} className="grid grid-cols-12 gap-2">
@@ -94,7 +97,7 @@ export function ManualInvoiceForm() {
                 name="line_description"
                 value={l.description}
                 onChange={(e) => updateLine(l.id, { description: e.target.value })}
-                placeholder="Omschrijving"
+                placeholder={t('description')}
                 className="col-span-5"
               />
               <Input
@@ -110,7 +113,7 @@ export function ManualInvoiceForm() {
                 step="0.01"
                 value={l.price}
                 onChange={(e) => updateLine(l.id, { price: e.target.value })}
-                placeholder="Prijs excl."
+                placeholder={t('priceExcl')}
                 className="col-span-3"
               />
               <select
@@ -130,12 +133,12 @@ export function ManualInvoiceForm() {
           ))}
         </div>
         <button type="button" onClick={addLine} className="mt-3 flex items-center gap-1.5 text-sm font-medium text-[var(--accent)] hover:underline">
-          <Plus size={15} /> Regel toevoegen
+          <Plus size={15} /> {t('addLine')}
         </button>
       </Card>
 
       <Card className="p-5">
-        <Field label="Opmerkingen">
+        <Field label={t('notes')}>
           <Textarea name="notes" rows={2} />
         </Field>
       </Card>

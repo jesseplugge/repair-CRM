@@ -1,3 +1,4 @@
+import { getTranslations } from 'next-intl/server';
 import { createClient, getCurrentUser } from '@/lib/supabase/server';
 import { createInvoiceFromRepair } from '@/lib/actions/invoices';
 import { Button, Card } from '@/components/ui/primitives';
@@ -7,6 +8,7 @@ import { ManualInvoiceForm } from './ManualInvoiceForm';
 export default async function NieuweFactuurPage({ searchParams }: { searchParams: { repair_id?: string } }) {
   const user = await getCurrentUser();
   const supabase = createClient();
+  const t = await getTranslations('manualInvoice');
 
   if (searchParams.repair_id) {
     const { data: repair } = await supabase
@@ -29,8 +31,8 @@ export default async function NieuweFactuurPage({ searchParams }: { searchParams
       return (
         <div className="mx-auto max-w-xl space-y-6">
           <div>
-            <h1 className="font-display text-2xl font-semibold text-ink-950">Factuur maken</h1>
-            <p className="text-sm text-ink-600">Vanuit reparatie {repair.repair_number}</p>
+            <h1 className="font-display text-2xl font-semibold text-ink-950">{t('fromRepairTitle')}</h1>
+            <p className="text-sm text-ink-600">{t('fromRepairSubtitle', { repairNumber: repair.repair_number })}</p>
           </div>
           <Card className="p-5">
             <p className="text-sm text-ink-700">
@@ -48,13 +50,13 @@ export default async function NieuweFactuurPage({ searchParams }: { searchParams
               ))}
             </div>
             <div className="mt-3 flex justify-between border-t border-ink-100 pt-3 font-display text-lg font-semibold text-ink-950">
-              <span>Totaal</span>
+              <span>{t('total')}</span>
               <span className="tabular-nums">{formatEuro(totalInclVat)}</span>
             </div>
             <form action={submitInvoiceFromRepair} className="mt-4">
               <input type="hidden" name="repair_id" value={repair.id} />
               <Button type="submit" variant="primary" size="lg" className="w-full">
-                Factuur aanmaken
+                {t('createInvoice')}
               </Button>
             </form>
           </Card>
@@ -66,8 +68,8 @@ export default async function NieuweFactuurPage({ searchParams }: { searchParams
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <div>
-        <h1 className="font-display text-2xl font-semibold text-ink-950">Nieuwe factuur</h1>
-        <p className="text-sm text-ink-600">Handmatige factuur, niet gekoppeld aan een reparatie.</p>
+        <h1 className="font-display text-2xl font-semibold text-ink-950">{t('pageTitle')}</h1>
+        <p className="text-sm text-ink-600">{t('pageSubtitle')}</p>
       </div>
       <ManualInvoiceForm />
     </div>
