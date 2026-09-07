@@ -14,6 +14,7 @@ import { EmailButton } from '@/components/EmailButton';
 import { emailIntakeDocument, emailCompletionReceipt } from '@/lib/actions/email';
 import { PrintControls } from '@/components/PrintControls';
 import { SignatureModalTrigger } from './SignatureModalTrigger';
+import { RepairExtraTabs } from './RepairExtraTabs';
 
 export default async function ReparatieDetailPage({ params }: { params: { id: string } }) {
   const user = await getCurrentUser();
@@ -29,7 +30,18 @@ export default async function ReparatieDetailPage({ params }: { params: { id: st
     .single();
   if (!repair) notFound();
 
-  const [{ data: items }, { data: statuses }, { data: activity }, { data: payments }, { data: signature }, { data: terms }] = await Promise.all([
+  const [
+    { data: items },
+    { data: statuses },
+    { data: activity },
+    { data: payments },
+    { data: signature },
+    { data: terms },
+    { data: diagnosticProfile },
+    { data: diagnosticRows },
+    { data: photoRows },
+    { data: claims },
+  ] = await Promise.all([
     supabase.from('repair_items').select('*').eq('repair_id', repair.id).order('created_at'),
     supabase.from('repair_statuses').select('*').eq('business_id', user!.business_id).order('sort_order'),
     supabase
@@ -41,6 +53,10 @@ export default async function ReparatieDetailPage({ params }: { params: { id: st
     supabase.from('payments').select('*').eq('repair_id', repair.id).order('paid_at', { ascending: false }),
     supabase.from('intake_signatures').select('*').eq('repair_id', repair.id).order('created_at', { ascending: false }).limit(1).maybeSingle(),
     supabase.from('terms_versions').select('*').eq('business_id', user!.business_id).eq('is_active', true),
+    supabase.from('diagnostic_profiles').select('*').eq('business_id', user!.business_id).eq('active', true).limit(1).maybeSingle(),
+    supabase.from('repair_diagnostics').select('*').eq('repair_id', repair.id),
+    supabase.from('repair_photos').select('*').eq('repair_id', repair.id).order('created_at'),
+    supabase.from('warranty_claims').select('*').eq('repair_id', repair.id).order('created_at', { ascending: false }),
   ]);
 
   const customer = repair.customer as any;
@@ -52,6 +68,25 @@ export default async function ReparatieDetailPage({ params }: { params: { id: st
   const subtotalExclVat = (items ?? []).reduce((s, i) => s + i.total_excl_vat, 0);
   const totalVat = (items ?? []).reduce((s, i) => s + (i.total_incl_vat - i.total_excl_vat), 0);
   const totalInclVat = (items ?? []).reduce((s, i) => s + i.total_incl_vat, 0);
+
+  const totalCost = (items ?? []).reduce((s, i) => s + (i.cost_price_excl_vat ?? 0) * i.quantity, 0);
+  const profit = subtotalExclVat - totalCost;
+  const margin = subtotalExclVat > 0 ? (profit / subtotalExclVat) * 100 : 0;
+
+  const diagnosticItems = diagnosticProfile?.items ?? [];
+  const diagnosticResults: Record<string, { pre: 'pass' | 'fail' | 'not_tested' | 'na'; post: 'pass' | 'fail' | 'not_tested' | 'na' }> = {};
+  for (const item of diagnosticItems) diagnosticResults[item] = { pre: 'not_tested', post: 'not_tested' };
+  for (const row of diagnosticRows ?? []) {
+    if (!diagnosticResults[row.item]) diagnosticResults[row.item] = { pre: 'not_tested', post: 'not_tested' };
+    diagnosticResults[row.item][row.stage as 'pre' | 'post'] = row.result as 'pass' | 'fail' | 'not_tested' | 'na';
+  }
+
+  const photos = await Promise.all(
+    (photoRows ?? []).map(async (p) => {
+      const { data: signed } = await supabase.storage.from('repair-photos').createSignedUrl(p.storage_path, 3600);
+      return { id: p.id, url: signed?.signedUrl ?? '', label: p.label };
+    })
+  );
 
   return (
     <div className="space-y-6">
@@ -190,6 +225,12 @@ export default async function ReparatieDetailPage({ params }: { params: { id: st
                 <span>Totaal</span>
                 <span className="tabular-nums">{formatEuro(totalInclVat)}</span>
               </div>
+              <div className="mt-2 flex justify-between border-t border-ink-100 pt-2 text-xs text-ink-400">
+                <span>Winst (excl. BTW)</span>
+                <span className="tabular-nums">
+                  {formatEuro(profit)} &middot; {margin.toFixed(0)}%
+                </span>
+              </div>
             </div>
             {repair.warranty_months && (
               <p className="mt-3 text-xs text-ink-400">Garantie: {repair.warranty_months} maanden na oplevering</p>
@@ -244,6 +285,14 @@ export default async function ReparatieDetailPage({ params }: { params: { id: st
           </Card>
         </div>
       </div>
+
+      <RepairExtraTabs
+        repairId={repair.id}
+        diagnosticItems={diagnosticItems}
+        diagnosticResults={diagnosticResults}
+        photos={photos}
+        claims={claims ?? []}
+      />
     </div>
   );
 }

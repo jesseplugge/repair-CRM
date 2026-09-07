@@ -77,10 +77,19 @@ export async function checkoutPosSale(
     if (!line.productId) continue;
     const { data: product } = await supabase.from('products').select('stock_quantity').eq('id', line.productId).single();
     if (product) {
-      await supabase
-        .from('products')
-        .update({ stock_quantity: Math.max(0, product.stock_quantity - line.quantity) })
-        .eq('id', line.productId);
+      const newQuantity = Math.max(0, product.stock_quantity - line.quantity);
+      const actualChange = newQuantity - product.stock_quantity;
+      await supabase.from('products').update({ stock_quantity: newQuantity }).eq('id', line.productId);
+      if (actualChange !== 0) {
+        await supabase.from('stock_movements').insert({
+          business_id: user.business_id,
+          product_id: line.productId,
+          change: actualChange,
+          reason: 'pos_sale',
+          related_pos_sale_id: sale.id,
+          created_by: user.id,
+        });
+      }
     }
   }
 

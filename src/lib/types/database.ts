@@ -336,6 +336,57 @@ export interface Database {
         is_active: boolean;
         created_at: string;
       }>;
+      repair_photos: Table<{
+        id: string;
+        business_id: string;
+        repair_id: string;
+        storage_path: string;
+        label: string | null;
+        created_by: string | null;
+        created_at: string;
+      }>;
+      diagnostic_profiles: Table<{
+        id: string;
+        business_id: string;
+        name: string;
+        items: string[];
+        active: boolean;
+        created_at: string;
+      }>;
+      repair_diagnostics: Table<{
+        id: string;
+        business_id: string;
+        repair_id: string;
+        stage: string;
+        item: string;
+        result: string;
+        created_by: string | null;
+        created_at: string;
+        updated_at: string;
+      }>;
+      warranty_claims: Table<{
+        id: string;
+        business_id: string;
+        repair_id: string;
+        claim_number: string;
+        description: string;
+        status: string;
+        resolution: string | null;
+        created_by: string | null;
+        created_at: string;
+        updated_at: string;
+      }>;
+      stock_movements: Table<{
+        id: string;
+        business_id: string;
+        product_id: string;
+        change: number;
+        reason: string;
+        related_pos_sale_id: string | null;
+        related_repair_id: string | null;
+        created_by: string | null;
+        created_at: string;
+      }>;
       invites: Table<{
         id: string;
         business_id: string;

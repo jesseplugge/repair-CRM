@@ -1,7 +1,8 @@
+import Link from 'next/link';
 import { createClient, getCurrentUser } from '@/lib/supabase/server';
 import { Card } from '@/components/ui/primitives';
 import { StockControls } from './StockControls';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, History } from 'lucide-react';
 
 export default async function VoorraadPage() {
   const user = await getCurrentUser();
@@ -17,9 +18,14 @@ export default async function VoorraadPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="font-display text-2xl font-semibold text-ink-950">Voorraad</h1>
-        <p className="text-sm text-ink-600">{lowStock.length} product(en) op of onder minimumvoorraad.</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="font-display text-2xl font-semibold text-ink-950">Voorraad</h1>
+          <p className="text-sm text-ink-600">{lowStock.length} product(en) op of onder minimumvoorraad.</p>
+        </div>
+        <Link href="/voorraad/bewegingen" className="flex items-center gap-1.5 text-sm font-medium text-[var(--accent)] hover:underline">
+          <History size={15} /> Bewegingen
+        </Link>
       </div>
 
       {lowStock.length > 0 && (

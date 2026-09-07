@@ -68,13 +68,26 @@ export async function createSupplier(_prevState: { error?: string }, formData: F
 }
 
 export async function adjustStock(productId: string, delta: number) {
+  const user = await getCurrentUser();
+  if (!user) redirect('/login');
   const supabase = createClient();
   const { data: product } = await supabase.from('products').select('stock_quantity').eq('id', productId).single();
   if (!product) return;
-  await supabase
-    .from('products')
-    .update({ stock_quantity: Math.max(0, product.stock_quantity + delta) })
-    .eq('id', productId);
+  const newQuantity = Math.max(0, product.stock_quantity + delta);
+  const actualChange = newQuantity - product.stock_quantity;
+
+  await supabase.from('products').update({ stock_quantity: newQuantity }).eq('id', productId);
+
+  if (actualChange !== 0) {
+    await supabase.from('stock_movements').insert({
+      business_id: user.business_id,
+      product_id: productId,
+      change: actualChange,
+      reason: 'manual',
+      created_by: user.id,
+    });
+  }
+
   revalidatePath('/producten');
   revalidatePath('/voorraad');
 }
