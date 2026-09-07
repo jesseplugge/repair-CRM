@@ -1,14 +1,8 @@
 'use client';
 
 import { useRef, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Printer, Download } from 'lucide-react';
-
-const FORMATS = [
-  { value: 'a4', label: 'A4' },
-  { value: 'a5', label: 'A5' },
-  { value: 'thermal80', label: '80mm thermisch' },
-  { value: 'thermal58', label: '58mm thermisch' },
-];
 
 export function PrintControls({
   baseUrl,
@@ -22,6 +16,14 @@ export function PrintControls({
   const [format, setFormat] = useState('a4');
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [printing, setPrinting] = useState(false);
+  const t = useTranslations('printControls');
+
+  const FORMATS = [
+    { value: 'a4', label: 'A4' },
+    { value: 'a5', label: 'A5' },
+    { value: 'thermal80', label: t('thermal80') },
+    { value: 'thermal58', label: t('thermal58') },
+  ];
 
   const url = showFormatPicker ? `${baseUrl}${baseUrl.includes('?') ? '&' : '?'}format=${format}` : baseUrl;
 
@@ -65,7 +67,7 @@ export function PrintControls({
           target="_blank"
           rel="noreferrer"
           className="flex items-center justify-center rounded border border-ink-200 px-3 py-2 text-sm text-ink-700 hover:bg-ink-50"
-          title="PDF openen in nieuw tabblad"
+          title={t('openInNewTab')}
         >
           <Download size={15} />
         </a>

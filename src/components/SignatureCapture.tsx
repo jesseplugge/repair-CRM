@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, useState, useTransition } from 'react';
+import { useTranslations } from 'next-intl';
 import { createIntakeSignature } from '@/lib/actions/signatures';
 import { Button, Card } from '@/components/ui/primitives';
 import { RotateCcw } from 'lucide-react';
@@ -23,6 +24,7 @@ export function SignatureCapture({
   const [hasDrawn, setHasDrawn] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const t = useTranslations('signatureCapture');
 
   function getCtx() {
     const canvas = canvasRef.current;
@@ -75,11 +77,11 @@ export function SignatureCapture({
   function handleSubmit() {
     setError(null);
     if (!checked) {
-      setError('Vink aan dat de Algemene Voorwaarden zijn gelezen.');
+      setError(t('mustCheckTerms'));
       return;
     }
     if (!hasSignature.current || !canvasRef.current) {
-      setError('Er is nog geen handtekening gezet.');
+      setError(t('noSignatureYet'));
       return;
     }
     const dataUrl = canvasRef.current.toDataURL('image/png');
@@ -97,29 +99,29 @@ export function SignatureCapture({
     <div className="space-y-4">
       <Card className="p-4">
         <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink-400">
-          Algemene Voorwaarden {termsVersionLabel}
+          {t('termsHeading', { version: termsVersionLabel })}
         </h3>
         <div className="max-h-48 overflow-y-auto whitespace-pre-wrap rounded border border-ink-100 bg-ink-50 p-3 text-sm text-ink-700">
           {termsContent}
         </div>
         <label className="mt-3 flex items-start gap-2 text-sm text-ink-700">
           <input type="checkbox" checked={checked} onChange={(e) => setChecked(e.target.checked)} className="mt-0.5" />
-          Ik heb de Algemene Voorwaarden gelezen en ga hiermee akkoord.
+          {t('termsAgree')}
         </label>
       </Card>
 
       <Card className="p-4">
-        <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink-400">Verklaring</h3>
+        <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink-400">{t('declaration')}</h3>
         <ul className="space-y-1 text-sm text-ink-700">
-          <li>• Het apparaat is afgegeven in de beschreven staat.</li>
-          <li>• De gegevens van het apparaat zijn correct.</li>
-          <li>• De geschatte prijs is begrepen, indien van toepassing.</li>
-          <li>• Kennis genomen van en akkoord met de hierboven getoonde voorwaarden.</li>
+          <li>• {t('declarationDeviceCondition')}</li>
+          <li>• {t('declarationDeviceDataCorrect')}</li>
+          <li>• {t('declarationPriceUnderstood')}</li>
+          <li>• {t('declarationTermsAccepted')}</li>
         </ul>
       </Card>
 
       <Card className="p-4">
-        <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink-400">Handtekening</h3>
+        <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink-400">{t('signature')}</h3>
         <canvas
           ref={canvasRef}
           width={600}
@@ -134,10 +136,10 @@ export function SignatureCapture({
         {error && <p className="mt-2 text-sm text-red-700">{error}</p>}
         <div className="mt-3 flex gap-2">
           <Button type="button" variant="ghost" onClick={handleClear}>
-            <RotateCcw size={15} /> Opnieuw
+            <RotateCcw size={15} /> {t('redo')}
           </Button>
           <Button type="button" variant="primary" onClick={handleSubmit} disabled={pending || !hasDrawn}>
-            {pending ? 'Bezig…' : 'Ondertekenen'}
+            {pending ? t('busy') : t('sign')}
           </Button>
         </div>
       </Card>

@@ -3,6 +3,7 @@
 import { createClient, getCurrentUser } from '@/lib/supabase/server';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { getTranslations } from 'next-intl/server';
 
 export async function createIntakeSignature(
   repairId: string,
@@ -11,8 +12,9 @@ export async function createIntakeSignature(
 ): Promise<{ error?: string }> {
   const user = await getCurrentUser();
   if (!user) redirect('/login');
-  if (!checkboxConfirmed) return { error: 'De klant moet akkoord gaan met de Algemene Voorwaarden.' };
-  if (!signatureImage || signatureImage.length < 100) return { error: 'Handtekening ontbreekt.' };
+  const t = await getTranslations('signatureErrors');
+  if (!checkboxConfirmed) return { error: t('mustAcceptTerms') };
+  if (!signatureImage || signatureImage.length < 100) return { error: t('signatureMissing') };
 
   const supabase = createClient();
 
@@ -22,7 +24,7 @@ export async function createIntakeSignature(
     .eq('id', repairId)
     .eq('business_id', user.business_id)
     .single();
-  if (!repair) return { error: 'Reparatie niet gevonden.' };
+  if (!repair) return { error: t('repairNotFound') };
 
   // Snapshot every currently-active terms version — never the "current" pointer,
   // so this record keeps meaning even after new versions are uploaded later.
@@ -33,7 +35,7 @@ export async function createIntakeSignature(
     .eq('is_active', true);
 
   if (!activeTerms || activeTerms.length === 0) {
-    return { error: 'Geen actieve Algemene Voorwaarden ingesteld — ga naar Instellingen.' };
+    return { error: t('noActiveTerms') };
   }
 
   const ip = headers().get('x-forwarded-for')?.split(',')[0]?.trim() || null;

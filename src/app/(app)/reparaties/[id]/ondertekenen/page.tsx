@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import { getTranslations } from 'next-intl/server';
 import { createClient, getCurrentUser } from '@/lib/supabase/server';
 import { getIntakeSignature } from '@/lib/actions/signatures';
 import { OndertekenenClient } from './OndertekenenClient';
@@ -11,6 +12,7 @@ import { emailSignedIntake } from '@/lib/actions/email';
 export default async function OndertekenenPage({ params }: { params: { id: string } }) {
   const user = await getCurrentUser();
   const supabase = createClient();
+  const t = await getTranslations('signPage');
 
   const { data: repair } = await supabase
     .from('repairs')
@@ -35,15 +37,15 @@ export default async function OndertekenenPage({ params }: { params: { id: strin
       <div className="mx-auto max-w-lg">
         <Card className="flex flex-col items-center gap-3 p-8 text-center">
           <CheckCircle2 size={32} className="text-green-600" />
-          <h1 className="font-display text-xl font-semibold text-ink-950">Ondertekening voltooid</h1>
-          <p className="text-sm text-ink-600">Getekend op {formatDateTime(existing.signed_at)}.</p>
+          <h1 className="font-display text-xl font-semibold text-ink-950">{t('completedTitle')}</h1>
+          <p className="text-sm text-ink-600">{t('signedOn', { date: formatDateTime(existing.signed_at) })}</p>
           <div className="flex w-full max-w-xs flex-col gap-2 pt-2">
             <a
               href={`/api/repairs/${repair.id}/signature-pdf`}
               target="_blank"
               className="rounded border border-ink-200 px-4 py-2 text-center text-sm font-medium text-ink-700 hover:bg-ink-50"
             >
-              PDF openen
+              {t('openPdf')}
             </a>
             <EmailButton id={repair.id} action={emailSignedIntake} defaultEmail={(repair.customer as any)?.email} />
           </div>
@@ -55,10 +57,7 @@ export default async function OndertekenenPage({ params }: { params: { id: strin
   if (!av) {
     return (
       <div className="mx-auto max-w-lg">
-        <Card className="p-6 text-center text-sm text-ink-600">
-          Geen actieve Algemene Voorwaarden ingesteld. Ga naar Instellingen → Algemene Voorwaarden om er een toe te
-          voegen voordat de klant kan ondertekenen.
-        </Card>
+        <Card className="p-6 text-center text-sm text-ink-600">{t('noActiveTerms')}</Card>
       </div>
     );
   }
@@ -69,7 +68,7 @@ export default async function OndertekenenPage({ params }: { params: { id: strin
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <div>
-        <h1 className="font-display text-2xl font-semibold text-ink-950">Ondertekenen — {repair.repair_number}</h1>
+        <h1 className="font-display text-2xl font-semibold text-ink-950">{t('title', { repairNumber: repair.repair_number })}</h1>
         <p className="text-sm text-ink-600">
           {customer.first_name} {customer.last_name} &middot; {device.brand} {device.model}
         </p>

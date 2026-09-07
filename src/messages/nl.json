@@ -288,5 +288,44 @@
     "change": "Wijzigen",
     "pageTitle": "Nieuwe reparatie",
     "pageSubtitle": "Klant → apparaat → reparatietype → intake. Eén keer invullen."
+  },
+  "signPage": {
+    "completedTitle": "Ondertekening voltooid",
+    "signedOn": "Getekend op {date}.",
+    "openPdf": "PDF openen",
+    "noActiveTerms": "Geen actieve Algemene Voorwaarden ingesteld. Ga naar Instellingen → Algemene Voorwaarden om er een toe te voegen voordat de klant kan ondertekenen.",
+    "title": "Ondertekenen — {repairNumber}"
+  },
+  "emailButton": {
+    "default": "E-mailen",
+    "busy": "Bezig…",
+    "sent": "Verzonden",
+    "promptEmail": "E-mailadres:"
+  },
+  "signatureCapture": {
+    "termsHeading": "Algemene Voorwaarden {version}",
+    "termsAgree": "Ik heb de Algemene Voorwaarden gelezen en ga hiermee akkoord.",
+    "declaration": "Verklaring",
+    "declarationDeviceCondition": "Het apparaat is afgegeven in de beschreven staat.",
+    "declarationDeviceDataCorrect": "De gegevens van het apparaat zijn correct.",
+    "declarationPriceUnderstood": "De geschatte prijs is begrepen, indien van toepassing.",
+    "declarationTermsAccepted": "Kennis genomen van en akkoord met de hierboven getoonde voorwaarden.",
+    "signature": "Handtekening",
+    "redo": "Opnieuw",
+    "sign": "Ondertekenen",
+    "busy": "Bezig…",
+    "mustCheckTerms": "Vink aan dat de Algemene Voorwaarden zijn gelezen.",
+    "noSignatureYet": "Er is nog geen handtekening gezet."
+  },
+  "printControls": {
+    "thermal80": "80mm thermisch",
+    "thermal58": "58mm thermisch",
+    "openInNewTab": "PDF openen in nieuw tabblad"
+  },
+  "signatureErrors": {
+    "mustAcceptTerms": "De klant moet akkoord gaan met de Algemene Voorwaarden.",
+    "signatureMissing": "Handtekening ontbreekt.",
+    "repairNotFound": "Reparatie niet gevonden.",
+    "noActiveTerms": "Geen actieve Algemene Voorwaarden ingesteld — ga naar Instellingen."
   }
 }
