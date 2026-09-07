@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { addRepairItem } from '@/lib/actions/repairs';
 import { Button, Input } from '@/components/ui/primitives';
+import { useToast } from '@/components/ui/toast';
 import { Plus } from 'lucide-react';
 
 export function AddItemForm({ repairId }: { repairId: string }) {
@@ -14,6 +15,7 @@ export function AddItemForm({ repairId }: { repairId: string }) {
   const formRef = useRef<HTMLFormElement>(null);
   const router = useRouter();
   const t = useTranslations('repairSub');
+  const toast = useToast();
 
   const TYPES = [
     { value: 'part', label: t('typePart') },
@@ -34,6 +36,7 @@ export function AddItemForm({ repairId }: { repairId: string }) {
         setError(null);
         formRef.current?.reset();
         setOpen(false);
+        toast({ variant: 'success', title: t('itemAdded') });
         router.refresh();
       }
     });

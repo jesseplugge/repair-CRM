@@ -2,6 +2,8 @@ import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import { getCurrentUser } from '@/lib/supabase/server';
 import { Card } from '@/components/ui/primitives';
+import { Table, Thead, Tbody, Tr, Th, Td } from '@/components/ui/table';
+import { MetricStrip } from '@/components/ui/metric-strip';
 import { StatusBadge } from '@/components/StatusBadge';
 import { formatEuro } from '@/lib/utils/currency';
 import { formatDate } from '@/lib/utils/format';
@@ -58,12 +60,14 @@ export default async function RapportagesPage({ searchParams }: { searchParams: 
 
       <DateRangeFilter from={from} to={to} />
 
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatCard label={t('revenue')} value={formatEuro(data.totalOmzet)} />
-        <StatCard label={t('vat')} value={formatEuro(data.totalBtw)} />
-        <StatCard label={t('partsCost')} value={formatEuro(data.partsCost)} />
-        <StatCard label={t('grossProfit')} value={formatEuro(data.grossProfit)} />
-      </div>
+      <MetricStrip
+        items={[
+          { label: t('revenue'), value: formatEuro(data.totalOmzet) },
+          { label: t('vat'), value: formatEuro(data.totalBtw) },
+          { label: t('partsCost'), value: formatEuro(data.partsCost) },
+          { label: t('grossProfit'), value: formatEuro(data.grossProfit) },
+        ]}
+      />
 
       <div className="grid grid-cols-2 gap-4">
         <Card className="p-4">
@@ -119,54 +123,45 @@ export default async function RapportagesPage({ searchParams }: { searchParams: 
         {data.outstandingInvoices.length === 0 ? (
           <p className="text-sm text-ink-400">{t('noOutstandingInvoices')}</p>
         ) : (
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-ink-100 text-left text-xs uppercase tracking-wide text-ink-400">
-                <th className="py-2 font-medium">{t('colNumber')}</th>
-                <th className="py-2 font-medium">{t('colCustomer')}</th>
-                <th className="py-2 font-medium">{t('colInvoiceDate')}</th>
-                <th className="py-2 font-medium">{t('colDueDate')}</th>
-                <th className="py-2 font-medium">{t('colStatus')}</th>
-                <th className="py-2 text-right font-medium">{t('colOutstanding')}</th>
+          <Table>
+            <Thead>
+              <tr>
+                <Th className="!px-0">{t('colNumber')}</Th>
+                <Th>{t('colCustomer')}</Th>
+                <Th>{t('colInvoiceDate')}</Th>
+                <Th>{t('colDueDate')}</Th>
+                <Th>{t('colStatus')}</Th>
+                <Th align="right" className="!px-0">{t('colOutstanding')}</Th>
               </tr>
-            </thead>
-            <tbody>
+            </Thead>
+            <Tbody>
               {data.outstandingInvoices.map((inv) => {
                 const label = STATUS_COLORS[inv.status] ? tStatus(inv.status as any) : inv.status;
                 const color = STATUS_COLORS[inv.status] ?? '#495164';
                 return (
-                  <tr key={inv.id} className="border-b border-ink-100 last:border-0 hover:bg-ink-50">
-                    <td className="py-2">
+                  <Tr key={inv.id}>
+                    <Td className="!px-0">
                       <Link href={`/facturen/${inv.id}`} className="font-medium text-[var(--accent)] hover:underline">
                         {inv.invoiceNumber}
                       </Link>
-                    </td>
-                    <td className="py-2 text-ink-700">{inv.customerName}</td>
-                    <td className="py-2 text-ink-600">{formatDate(inv.invoiceDate)}</td>
-                    <td className={`py-2 ${inv.overdue ? 'font-medium text-red-600' : 'text-ink-600'}`}>
+                    </Td>
+                    <Td className="text-ink-700">{inv.customerName}</Td>
+                    <Td className="text-ink-600">{formatDate(inv.invoiceDate)}</Td>
+                    <Td className={inv.overdue ? 'font-medium text-red-600' : 'text-ink-600'}>
                       {formatDate(inv.dueDate)}
                       {inv.overdue ? ` · ${t('overdue')}` : ''}
-                    </td>
-                    <td className="py-2">
+                    </Td>
+                    <Td>
                       <StatusBadge name={label} color={color} />
-                    </td>
-                    <td className="py-2 text-right tabular-nums text-ink-900">{formatEuro(inv.outstanding)}</td>
-                  </tr>
+                    </Td>
+                    <Td align="right" className="!px-0 tabular-nums text-ink-900">{formatEuro(inv.outstanding)}</Td>
+                  </Tr>
                 );
               })}
-            </tbody>
-          </table>
+            </Tbody>
+          </Table>
         )}
       </Card>
     </div>
-  );
-}
-
-function StatCard({ label, value }: { label: string; value: string }) {
-  return (
-    <Card className="px-4 py-4">
-      <div className="font-display text-2xl font-semibold tabular-nums text-ink-950">{value}</div>
-      <div className="mt-1 text-sm text-ink-600">{label}</div>
-    </Card>
   );
 }

@@ -9,6 +9,7 @@ import { AccentColorPicker } from './AccentColorPicker';
 import { UserInviteManager } from './UserInviteManager';
 import { TemplateManager } from './TemplateManager';
 import { getTemplateContent, TEMPLATE_TYPES } from '@/lib/pdf/templates';
+import { SettingsShell } from './SettingsShell';
 
 export default async function InstellingenPage() {
   const user = await getCurrentUser();
@@ -38,61 +39,71 @@ export default async function InstellingenPage() {
   >;
 
   return (
-    <div className="max-w-4xl space-y-10">
+    <div className="space-y-6">
       <div>
         <h1 className="font-display text-2xl font-semibold text-ink-950">{t('title')}</h1>
         <p className="text-sm text-ink-600">{t('subtitle')}</p>
       </div>
 
-      <section>
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-400">{t('brandingSection')}</h2>
-        <div className="space-y-4 rounded-lg border border-ink-100 bg-white p-5 shadow-card">
-          <div>
-            <p className="mb-2 text-sm font-medium text-ink-900">{t('logo')}</p>
-            <LogoUploader currentLogoUrl={business!.logo_url} />
-          </div>
-          <div className="border-t border-ink-100 pt-4">
-            <p className="mb-2 text-sm font-medium text-ink-900">{t('accentColor')}</p>
-            <AccentColorPicker businessId={business!.id} currentColor={business!.accent_color} />
-          </div>
-        </div>
-      </section>
-
-      <section>
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-400">{t('businessSection')}</h2>
-        <BusinessForm business={business!} />
-      </section>
-
-      <section>
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-400">{t('catalogSection')}</h2>
-        <p className="mb-3 text-sm text-ink-600">{t('catalogSubtitle')}</p>
-        <CatalogManager items={catalog ?? []} />
-      </section>
-
-      <section>
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-400">{t('termsSection')}</h2>
-        <p className="mb-3 text-sm text-ink-600">{t('termsSubtitle')}</p>
-        <TermsManager versions={terms ?? []} />
-      </section>
-
-      <section>
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-400">{t('statusesSection')}</h2>
-        <StatusManager statuses={statuses ?? []} />
-      </section>
-      <section>
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-400">{t('usersSection')}</h2>
-        <UserInviteManager
-          members={businessUsers ?? []}
-          invites={invites ?? []}
-          canInvite={user!.role === 'owner'}
-        />
-      </section>
-
-      <section>
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-400">{t('templatesSection')}</h2>
-        <p className="mb-3 text-sm text-ink-600">{t('templatesSubtitle')}</p>
-        <TemplateManager templates={templates} canEdit={user!.role === 'owner'} />
-      </section>
+      <SettingsShell
+        categories={[
+          {
+            key: 'branding',
+            label: t('brandingSection'),
+            content: (
+              <div className="space-y-4 rounded-lg border border-ink-100 bg-white p-5 shadow-card">
+                <div>
+                  <p className="mb-2 text-sm font-medium text-ink-900">{t('logo')}</p>
+                  <LogoUploader currentLogoUrl={business!.logo_url} />
+                </div>
+                <div className="border-t border-ink-100 pt-4">
+                  <p className="mb-2 text-sm font-medium text-ink-900">{t('accentColor')}</p>
+                  <AccentColorPicker businessId={business!.id} currentColor={business!.accent_color} />
+                </div>
+              </div>
+            ),
+          },
+          { key: 'business', label: t('businessSection'), content: <BusinessForm business={business!} /> },
+          {
+            key: 'catalog',
+            label: t('catalogSection'),
+            content: (
+              <div>
+                <p className="mb-3 text-sm text-ink-600">{t('catalogSubtitle')}</p>
+                <CatalogManager items={catalog ?? []} />
+              </div>
+            ),
+          },
+          {
+            key: 'terms',
+            label: t('termsSection'),
+            content: (
+              <div>
+                <p className="mb-3 text-sm text-ink-600">{t('termsSubtitle')}</p>
+                <TermsManager versions={terms ?? []} />
+              </div>
+            ),
+          },
+          { key: 'statuses', label: t('statusesSection'), content: <StatusManager statuses={statuses ?? []} /> },
+          {
+            key: 'users',
+            label: t('usersSection'),
+            content: (
+              <UserInviteManager members={businessUsers ?? []} invites={invites ?? []} canInvite={user!.role === 'owner'} />
+            ),
+          },
+          {
+            key: 'templates',
+            label: t('templatesSection'),
+            content: (
+              <div>
+                <p className="mb-3 text-sm text-ink-600">{t('templatesSubtitle')}</p>
+                <TemplateManager templates={templates} canEdit={user!.role === 'owner'} />
+              </div>
+            ),
+          },
+        ]}
+      />
     </div>
   );
 }

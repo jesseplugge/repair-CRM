@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useEffect, useRef, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { useFormState, useFormStatus } from 'react-dom';
 import { useTranslations } from 'next-intl';
 import { createWarrantyClaim, updateWarrantyClaimStatus } from '@/lib/actions/warranty';
 import { Button, Field, Textarea } from '@/components/ui/primitives';
 import { StatusBadge } from '@/components/StatusBadge';
+import { useToast } from '@/components/ui/toast';
 import { formatDate } from '@/lib/utils/format';
 import { Plus } from 'lucide-react';
 
@@ -89,6 +90,20 @@ export function WarrantyPanel({ repairId, claims }: { repairId: string; claims: 
   const [open, setOpen] = useState(false);
   const [state, formAction] = useFormState(createWarrantyClaim, { error: '' });
   const t = useTranslations('repairTabs');
+  const toast = useToast();
+  const isFirstRender = useRef(true);
+
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    if (!state?.error) {
+      toast({ variant: 'success', title: t('claimCreated') });
+      setOpen(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state]);
 
   return (
     <div className="space-y-3">

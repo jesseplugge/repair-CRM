@@ -27,4 +27,22 @@
   .tabular-nums {
     font-feature-settings: 'tnum' 1, 'lnum' 1;
   }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer utilities {
+  /* Shared focus treatment for interactive elements outside <Button> (menu items,
+     tabs, sortable table headers, dialog close buttons) — keeps keyboard focus
+     visually consistent without retyping the outline chain everywhere. */
+  .focus-ring {
+    @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)];
+  }
 }

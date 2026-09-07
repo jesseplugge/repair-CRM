@@ -2,7 +2,10 @@ import { getTranslations } from 'next-intl/server';
 import { createClient, getCurrentUser } from '@/lib/supabase/server';
 import { formatEuro } from '@/lib/utils/currency';
 import { Card } from '@/components/ui/primitives';
+import { Table, Thead, Tbody, Tr, Th, Td } from '@/components/ui/table';
+import { EmptyState } from '@/components/ui/empty-state';
 import { AddProductForm } from './AddProductForm';
+import { Package } from 'lucide-react';
 
 export default async function ProductenPage() {
   const user = await getCurrentUser();
@@ -22,45 +25,44 @@ export default async function ProductenPage() {
       </div>
 
       <Card>
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-ink-100 text-left text-xs uppercase tracking-wide text-ink-400">
-              <th className="px-4 py-2.5 font-medium">{t('colName')}</th>
-              <th className="px-4 py-2.5 font-medium">{t('colSku')}</th>
-              <th className="px-4 py-2.5 font-medium">{t('colCategory')}</th>
-              <th className="px-4 py-2.5 text-right font-medium">{t('colPurchaseExcl')}</th>
-              <th className="px-4 py-2.5 text-right font-medium">{t('colSellExcl')}</th>
-              <th className="px-4 py-2.5 text-right font-medium">{t('colVat')}</th>
-              <th className="px-4 py-2.5 text-right font-medium">{t('colStock')}</th>
+        <Table>
+          <Thead>
+            <tr>
+              <Th>{t('colName')}</Th>
+              <Th>{t('colSku')}</Th>
+              <Th>{t('colCategory')}</Th>
+              <Th align="right">{t('colPurchaseExcl')}</Th>
+              <Th align="right">{t('colSellExcl')}</Th>
+              <Th align="right">{t('colVat')}</Th>
+              <Th align="right">{t('colStock')}</Th>
             </tr>
-          </thead>
-          <tbody>
+          </Thead>
+          <Tbody>
             {(products ?? []).map((p: any) => (
-              <tr key={p.id} className="border-b border-ink-100 last:border-0">
-                <td className="px-4 py-2.5 font-medium text-ink-900">{p.name}</td>
-                <td className="px-4 py-2.5 text-ink-500">{p.sku ?? '—'}</td>
-                <td className="px-4 py-2.5 text-ink-500">{p.category?.name ?? '—'}</td>
-                <td className="px-4 py-2.5 text-right tabular-nums text-ink-600">{formatEuro(p.purchase_price_excl_vat)}</td>
-                <td className="px-4 py-2.5 text-right tabular-nums text-ink-900">{formatEuro(p.selling_price_excl_vat)}</td>
-                <td className="px-4 py-2.5 text-right text-ink-600">{p.vat_rate}%</td>
-                <td
-                  className={`px-4 py-2.5 text-right tabular-nums ${
-                    p.stock_quantity <= (p.minimum_stock ?? 0) ? 'font-semibold text-red-600' : 'text-ink-900'
-                  }`}
+              <Tr key={p.id}>
+                <Td className="font-medium text-ink-900">{p.name}</Td>
+                <Td className="text-ink-500">{p.sku ?? '—'}</Td>
+                <Td className="text-ink-500">{p.category?.name ?? '—'}</Td>
+                <Td align="right" className="tabular-nums text-ink-600">{formatEuro(p.purchase_price_excl_vat)}</Td>
+                <Td align="right" className="tabular-nums text-ink-900">{formatEuro(p.selling_price_excl_vat)}</Td>
+                <Td align="right" className="text-ink-600">{p.vat_rate}%</Td>
+                <Td
+                  align="right"
+                  className={`tabular-nums ${p.stock_quantity <= (p.minimum_stock ?? 0) ? 'font-semibold text-red-600' : 'text-ink-900'}`}
                 >
                   {p.stock_quantity}
-                </td>
-              </tr>
+                </Td>
+              </Tr>
             ))}
             {(products ?? []).length === 0 && (
               <tr>
-                <td colSpan={7} className="px-4 py-10 text-center text-ink-400">
-                  {t('empty')}
+                <td colSpan={7}>
+                  <EmptyState icon={Package} title={t('empty')} />
                 </td>
               </tr>
             )}
-          </tbody>
-        </table>
+          </Tbody>
+        </Table>
       </Card>
 
       <AddProductForm categories={categories ?? []} suppliers={suppliers ?? []} />

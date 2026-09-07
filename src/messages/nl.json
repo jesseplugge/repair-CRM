@@ -1,6 +1,11 @@
 {
   "common": {
-    "notLoggedIn": "Niet ingelogd."
+    "notLoggedIn": "Niet ingelogd.",
+    "confirm": "Bevestigen",
+    "errorTitle": "Deze pagina kon niet worden geladen.",
+    "errorTryAgain": "Opnieuw proberen",
+    "errorDetails": "Details",
+    "cancel": "Annuleren"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -15,11 +20,15 @@
     "reports": "Rapportages",
     "settings": "Instellingen",
     "loggedInAs": "Ingelogd als {name}",
-    "logout": "Uitloggen"
+    "logout": "Uitloggen",
+    "groupWorkspace": "Werkruimte",
+    "groupOperations": "Bedrijfsvoering",
+    "groupInsights": "Inzichten"
   },
   "topbar": {
     "search": "Zoeken…",
-    "language": "Taal"
+    "language": "Taal",
+    "newRepair": "Nieuwe reparatie"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -138,7 +147,11 @@
     "condCamera": "Camera beschadigd",
     "condButtons": "Knoppen",
     "condPort": "Laadconnector",
-    "condWater": "Waterschade"
+    "condWater": "Waterschade",
+    "deleteRepair": "Reparatie verwijderen",
+    "deleteConfirmTitle": "Deze reparatie verwijderen?",
+    "deleteConfirmBody": "Dit verwijdert de reparatie inclusief de regels, foto's en diagnostiek. Dit kan niet ongedaan worden gemaakt.",
+    "repairDeleted": "Reparatie verwijderd"
   },
   "repairSub": {
     "typePart": "Onderdeel",
@@ -165,7 +178,17 @@
     "registerPayment": "Betaling registreren",
     "noActiveTerms": "Geen actieve Algemene Voorwaarden — voeg er een toe in Instellingen om te kunnen ondertekenen.",
     "letCustomerSign": "Klant laten ondertekenen",
-    "signTitle": "Ondertekenen"
+    "signTitle": "Ondertekenen",
+    "statusUpdated": "Status bijgewerkt",
+    "itemAdded": "Regel toegevoegd",
+    "itemRemoved": "Regel verwijderd",
+    "paymentRecorded": "Betaling geregistreerd",
+    "refundIssued": "Terugbetaling verwerkt",
+    "signatureSaved": "Handtekening opgeslagen",
+    "confirmStatusChange": "Status wijzigen naar {status}?",
+    "refundTitle": "Betaling terugbetalen",
+    "refundAmountLabel": "Terug te betalen bedrag",
+    "refundMax": "Maximaal {max}"
   },
   "repairErrors": {
     "selectCustomerOrFillName": "Selecteer een klant of vul voor- en achternaam in.",
@@ -178,7 +201,8 @@
     "createRepairFailed": "Aanmaken reparatie mislukt.",
     "repairNotFound": "Reparatie niet gevonden.",
     "statusNotFound": "Status niet gevonden.",
-    "descriptionAndPriceRequired": "Omschrijving en prijs zijn verplicht."
+    "descriptionAndPriceRequired": "Omschrijving en prijs zijn verplicht.",
+    "cannotDeleteHasRecords": "Deze reparatie kan niet worden verwijderd — er is al een betaling, factuur, handtekening of garantieclaim aan gekoppeld."
   },
   "repairTabs": {
     "diagnostics": "Diagnose",
@@ -218,7 +242,11 @@
     "statusApproved": "Goedgekeurd",
     "statusRejected": "Afgewezen",
     "statusRepairing": "In reparatie",
-    "statusResolved": "Afgehandeld"
+    "statusResolved": "Afgehandeld",
+    "claimCreated": "Garantieclaim aangemaakt",
+    "photoUploaded": "Foto geüpload",
+    "photoDeleted": "Foto verwijderd",
+    "activity": "Activiteit"
   },
   "warrantyPage": {
     "title": "Garantie",
@@ -391,7 +419,11 @@
     "notes": "Opmerkingen",
     "totals": "Totalen",
     "totalSpent": "Totaal besteed",
-    "outstanding": "Openstaand"
+    "outstanding": "Openstaand",
+    "overview": "Overzicht",
+    "invoices": "Facturen",
+    "newSale": "Nieuwe verkoop",
+    "noInvoicesYet": "Nog geen facturen voor deze klant."
   },
   "deviceHistory": {
     "knownDamage": "Bekende schade",

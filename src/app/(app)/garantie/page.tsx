@@ -2,8 +2,11 @@ import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import { createClient, getCurrentUser } from '@/lib/supabase/server';
 import { Card } from '@/components/ui/primitives';
+import { Table, Thead, Tbody, Tr, Th, Td } from '@/components/ui/table';
+import { EmptyState } from '@/components/ui/empty-state';
 import { StatusBadge } from '@/components/StatusBadge';
 import { formatDate } from '@/lib/utils/format';
+import { ShieldCheck } from 'lucide-react';
 
 const STATUS_KEYS: Record<string, string> = {
   new: 'statusNew',
@@ -44,18 +47,18 @@ export default async function GarantiePage() {
       </div>
 
       <Card>
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-ink-100 text-left text-xs uppercase tracking-wide text-ink-400">
-              <th className="px-4 py-3 font-medium">{t('colClaim')}</th>
-              <th className="px-4 py-3 font-medium">{t('colRepair')}</th>
-              <th className="px-4 py-3 font-medium">{t('colCustomer')}</th>
-              <th className="px-4 py-3 font-medium">{t('colDevice')}</th>
-              <th className="px-4 py-3 font-medium">{t('colStatus')}</th>
-              <th className="px-4 py-3 font-medium">{t('colDate')}</th>
+        <Table>
+          <Thead>
+            <tr>
+              <Th>{t('colClaim')}</Th>
+              <Th>{t('colRepair')}</Th>
+              <Th>{t('colCustomer')}</Th>
+              <Th>{t('colDevice')}</Th>
+              <Th>{t('colStatus')}</Th>
+              <Th>{t('colDate')}</Th>
             </tr>
-          </thead>
-          <tbody>
+          </Thead>
+          <Tbody>
             {(claims ?? []).map((c) => {
               const repair = c.repair as any;
               const customer = repair?.customer;
@@ -63,35 +66,35 @@ export default async function GarantiePage() {
               const label = STATUS_KEYS[c.status] ? tTabs(STATUS_KEYS[c.status] as any) : c.status;
               const color = STATUS_COLORS[c.status] ?? '#495164';
               return (
-                <tr key={c.id} className="border-b border-ink-100 last:border-0 hover:bg-ink-50">
-                  <td className="px-4 py-3 font-medium text-ink-900">{c.claim_number}</td>
-                  <td className="px-4 py-3">
+                <Tr key={c.id}>
+                  <Td className="font-medium text-ink-900">{c.claim_number}</Td>
+                  <Td>
                     {repair && (
                       <Link href={`/reparaties/${repair.id}`} className="text-[var(--accent)] hover:underline">
                         {repair.repair_number}
                       </Link>
                     )}
-                  </td>
-                  <td className="px-4 py-3 text-ink-700">
+                  </Td>
+                  <Td className="text-ink-700">
                     {customer ? `${customer.first_name} ${customer.last_name}` : '—'}
-                  </td>
-                  <td className="px-4 py-3 text-ink-600">{device ? `${device.brand} ${device.model}` : '—'}</td>
-                  <td className="px-4 py-3">
+                  </Td>
+                  <Td className="text-ink-600">{device ? `${device.brand} ${device.model}` : '—'}</Td>
+                  <Td>
                     <StatusBadge name={label} color={color} />
-                  </td>
-                  <td className="px-4 py-3 text-ink-600">{formatDate(c.created_at)}</td>
-                </tr>
+                  </Td>
+                  <Td className="text-ink-600">{formatDate(c.created_at)}</Td>
+                </Tr>
               );
             })}
             {(claims ?? []).length === 0 && (
               <tr>
-                <td colSpan={6} className="px-4 py-10 text-center text-ink-400">
-                  {t('empty')}
+                <td colSpan={6}>
+                  <EmptyState icon={ShieldCheck} title={t('empty')} />
                 </td>
               </tr>
             )}
-          </tbody>
-        </table>
+          </Tbody>
+        </Table>
       </Card>
     </div>
   );

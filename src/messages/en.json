@@ -1,6 +1,11 @@
 {
   "common": {
-    "notLoggedIn": "Not logged in."
+    "notLoggedIn": "Not logged in.",
+    "confirm": "Confirm",
+    "errorTitle": "We couldn't load this page.",
+    "errorTryAgain": "Try again",
+    "errorDetails": "Details",
+    "cancel": "Cancel"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -15,11 +20,15 @@
     "reports": "Reports",
     "settings": "Settings",
     "loggedInAs": "Logged in as {name}",
-    "logout": "Log out"
+    "logout": "Log out",
+    "groupWorkspace": "Workspace",
+    "groupOperations": "Operations",
+    "groupInsights": "Insights"
   },
   "topbar": {
     "search": "Search…",
-    "language": "Language"
+    "language": "Language",
+    "newRepair": "New repair"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -138,7 +147,11 @@
     "condCamera": "Camera damaged",
     "condButtons": "Buttons",
     "condPort": "Charging port",
-    "condWater": "Water damage"
+    "condWater": "Water damage",
+    "deleteRepair": "Delete repair",
+    "deleteConfirmTitle": "Delete this repair?",
+    "deleteConfirmBody": "This removes the repair along with its line items, photos, and diagnostics. This can't be undone.",
+    "repairDeleted": "Repair deleted"
   },
   "repairSub": {
     "typePart": "Part",
@@ -165,7 +178,17 @@
     "registerPayment": "Register payment",
     "noActiveTerms": "No active Terms & Conditions — add one in Settings to allow signing.",
     "letCustomerSign": "Let customer sign",
-    "signTitle": "Sign"
+    "signTitle": "Sign",
+    "statusUpdated": "Status updated",
+    "itemAdded": "Item added",
+    "itemRemoved": "Item removed",
+    "paymentRecorded": "Payment recorded",
+    "refundIssued": "Refund issued",
+    "signatureSaved": "Signature saved",
+    "confirmStatusChange": "Change status to {status}?",
+    "refundTitle": "Refund payment",
+    "refundAmountLabel": "Amount to refund",
+    "refundMax": "Maximum {max}"
   },
   "repairErrors": {
     "selectCustomerOrFillName": "Select a customer or enter a first and last name.",
@@ -178,7 +201,8 @@
     "createRepairFailed": "Failed to create repair.",
     "repairNotFound": "Repair not found.",
     "statusNotFound": "Status not found.",
-    "descriptionAndPriceRequired": "Description and price are required."
+    "descriptionAndPriceRequired": "Description and price are required.",
+    "cannotDeleteHasRecords": "This repair can't be deleted — it already has a payment, invoice, signature, or warranty claim attached."
   },
   "repairTabs": {
     "diagnostics": "Diagnostics",
@@ -218,7 +242,11 @@
     "statusApproved": "Approved",
     "statusRejected": "Rejected",
     "statusRepairing": "Repairing",
-    "statusResolved": "Resolved"
+    "statusResolved": "Resolved",
+    "claimCreated": "Warranty claim created",
+    "photoUploaded": "Photo uploaded",
+    "photoDeleted": "Photo deleted",
+    "activity": "Activity"
   },
   "warrantyPage": {
     "title": "Warranty",
@@ -391,7 +419,11 @@
     "notes": "Notes",
     "totals": "Totals",
     "totalSpent": "Total spent",
-    "outstanding": "Outstanding"
+    "outstanding": "Outstanding",
+    "overview": "Overview",
+    "invoices": "Invoices",
+    "newSale": "New sale",
+    "noInvoicesYet": "No invoices for this customer yet."
   },
   "deviceHistory": {
     "knownDamage": "Known damage",

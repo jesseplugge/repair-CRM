@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import { createClient, getCurrentUser } from '@/lib/supabase/server';
 import { Sidebar } from './Sidebar';
+import { MobileNav } from './MobileNav';
 import { TopBar } from './TopBar';
 import { buildAccentTokens } from '@/lib/utils/color';
 import { getNotifications } from '@/lib/actions/notifications';
@@ -25,10 +26,11 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         logoUrl={business?.logo_url ?? null}
         businessName={business?.trading_name || business?.legal_name || 'Reparatie CRM'}
       />
-      <main className="flex-1 bg-ink-50 p-6 lg:p-8">
+      <main className="flex-1 bg-ink-50 p-4 pb-24 sm:p-6 lg:p-8 lg:pb-8">
         <TopBar notifications={notifications} />
         {children}
       </main>
+      <MobileNav />
       <CommandPalette />
     </div>
   );

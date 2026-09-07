@@ -1,6 +1,11 @@
 {
   "common": {
-    "notLoggedIn": "Nicht angemeldet."
+    "notLoggedIn": "Nicht angemeldet.",
+    "confirm": "Bestätigen",
+    "errorTitle": "Diese Seite konnte nicht geladen werden.",
+    "errorTryAgain": "Erneut versuchen",
+    "errorDetails": "Details",
+    "cancel": "Abbrechen"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -15,11 +20,15 @@
     "reports": "Berichte",
     "settings": "Einstellungen",
     "loggedInAs": "Angemeldet als {name}",
-    "logout": "Abmelden"
+    "logout": "Abmelden",
+    "groupWorkspace": "Arbeitsbereich",
+    "groupOperations": "Betrieb",
+    "groupInsights": "Einblicke"
   },
   "topbar": {
     "search": "Suchen…",
-    "language": "Sprache"
+    "language": "Sprache",
+    "newRepair": "Neue Reparatur"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -138,7 +147,11 @@
     "condCamera": "Kamera beschädigt",
     "condButtons": "Tasten",
     "condPort": "Ladeanschluss",
-    "condWater": "Wasserschaden"
+    "condWater": "Wasserschaden",
+    "deleteRepair": "Reparatur löschen",
+    "deleteConfirmTitle": "Diese Reparatur löschen?",
+    "deleteConfirmBody": "Dies entfernt die Reparatur samt Positionen, Fotos und Diagnosen dauerhaft. Kann nicht rückgängig gemacht werden.",
+    "repairDeleted": "Reparatur gelöscht"
   },
   "repairSub": {
     "typePart": "Teil",
@@ -165,7 +178,17 @@
     "registerPayment": "Zahlung erfassen",
     "noActiveTerms": "Keine aktiven AGB — füge in den Einstellungen eine hinzu, um unterschreiben lassen zu können.",
     "letCustomerSign": "Kunde unterschreiben lassen",
-    "signTitle": "Unterschreiben"
+    "signTitle": "Unterschreiben",
+    "statusUpdated": "Status aktualisiert",
+    "itemAdded": "Position hinzugefügt",
+    "itemRemoved": "Position entfernt",
+    "paymentRecorded": "Zahlung erfasst",
+    "refundIssued": "Rückerstattung ausgeführt",
+    "signatureSaved": "Unterschrift gespeichert",
+    "confirmStatusChange": "Status auf {status} ändern?",
+    "refundTitle": "Zahlung erstatten",
+    "refundAmountLabel": "Zu erstattender Betrag",
+    "refundMax": "Maximal {max}"
   },
   "repairErrors": {
     "selectCustomerOrFillName": "Wähle einen Kunden oder gib Vor- und Nachname ein.",
@@ -178,7 +201,8 @@
     "createRepairFailed": "Reparatur konnte nicht angelegt werden.",
     "repairNotFound": "Reparatur nicht gefunden.",
     "statusNotFound": "Status nicht gefunden.",
-    "descriptionAndPriceRequired": "Beschreibung und Preis sind Pflichtfelder."
+    "descriptionAndPriceRequired": "Beschreibung und Preis sind Pflichtfelder.",
+    "cannotDeleteHasRecords": "Diese Reparatur kann nicht gelöscht werden — es ist bereits eine Zahlung, Rechnung, Unterschrift oder Garantiefall vorhanden."
   },
   "repairTabs": {
     "diagnostics": "Diagnose",
@@ -218,7 +242,11 @@
     "statusApproved": "Genehmigt",
     "statusRejected": "Abgelehnt",
     "statusRepairing": "In Reparatur",
-    "statusResolved": "Erledigt"
+    "statusResolved": "Erledigt",
+    "claimCreated": "Garantiefall erstellt",
+    "photoUploaded": "Foto hochgeladen",
+    "photoDeleted": "Foto gelöscht",
+    "activity": "Aktivität"
   },
   "warrantyPage": {
     "title": "Garantie",
@@ -391,7 +419,11 @@
     "notes": "Notizen",
     "totals": "Summen",
     "totalSpent": "Gesamt ausgegeben",
-    "outstanding": "Offen"
+    "outstanding": "Offen",
+    "overview": "Übersicht",
+    "invoices": "Rechnungen",
+    "newSale": "Neuer Verkauf",
+    "noInvoicesYet": "Noch keine Rechnungen für diesen Kunden."
   },
   "deviceHistory": {
     "knownDamage": "Bekannte Schäden",

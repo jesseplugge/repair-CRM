@@ -2,8 +2,10 @@ import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import { createClient, getCurrentUser } from '@/lib/supabase/server';
 import { Card } from '@/components/ui/primitives';
+import { Table, Thead, Tbody, Tr, Th, Td } from '@/components/ui/table';
+import { EmptyState } from '@/components/ui/empty-state';
 import { StockControls } from './StockControls';
-import { AlertTriangle, History } from 'lucide-react';
+import { AlertTriangle, History, Boxes } from 'lucide-react';
 
 export default async function VoorraadPage() {
   const user = await getCurrentUser();
@@ -40,37 +42,37 @@ export default async function VoorraadPage() {
       )}
 
       <Card>
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-ink-100 text-left text-xs uppercase tracking-wide text-ink-400">
-              <th className="px-4 py-2.5 font-medium">{t('colProduct')}</th>
-              <th className="px-4 py-2.5 text-right font-medium">{t('colMinimum')}</th>
-              <th className="px-4 py-2.5 text-right font-medium">{t('colStock')}</th>
-              <th className="px-4 py-2.5 text-right font-medium">{t('colMutation')}</th>
+        <Table>
+          <Thead>
+            <tr>
+              <Th>{t('colProduct')}</Th>
+              <Th align="right">{t('colMinimum')}</Th>
+              <Th align="right">{t('colStock')}</Th>
+              <Th align="right">{t('colMutation')}</Th>
             </tr>
-          </thead>
-          <tbody>
+          </Thead>
+          <Tbody>
             {(products ?? []).map((p) => (
-              <tr key={p.id} className="border-b border-ink-100 last:border-0">
-                <td className="px-4 py-2.5 font-medium text-ink-900">{p.name}</td>
-                <td className="px-4 py-2.5 text-right text-ink-500">{p.minimum_stock ?? 0}</td>
-                <td className={`px-4 py-2.5 text-right tabular-nums ${p.stock_quantity <= (p.minimum_stock ?? 0) ? 'font-semibold text-red-600' : 'text-ink-900'}`}>
+              <Tr key={p.id}>
+                <Td className="font-medium text-ink-900">{p.name}</Td>
+                <Td align="right" className="text-ink-500">{p.minimum_stock ?? 0}</Td>
+                <Td align="right" className={`tabular-nums ${p.stock_quantity <= (p.minimum_stock ?? 0) ? 'font-semibold text-red-600' : 'text-ink-900'}`}>
                   {p.stock_quantity}
-                </td>
-                <td className="px-4 py-2.5 text-right">
+                </Td>
+                <Td align="right">
                   <StockControls productId={p.id} />
-                </td>
-              </tr>
+                </Td>
+              </Tr>
             ))}
             {(products ?? []).length === 0 && (
               <tr>
-                <td colSpan={4} className="px-4 py-10 text-center text-ink-400">
-                  {t('empty')}
+                <td colSpan={4}>
+                  <EmptyState icon={Boxes} title={t('empty')} />
                 </td>
               </tr>
             )}
-          </tbody>
-        </table>
+          </Tbody>
+        </Table>
       </Card>
     </div>
   );

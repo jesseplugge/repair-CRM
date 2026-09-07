@@ -2,10 +2,12 @@ import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import { createClient, getCurrentUser } from '@/lib/supabase/server';
 import { Card, Button } from '@/components/ui/primitives';
+import { Table, Thead, Tbody, Tr, Th, Td } from '@/components/ui/table';
+import { EmptyState } from '@/components/ui/empty-state';
 import { StatusBadge, PaymentStatusBadge } from '@/components/StatusBadge';
 import { formatDate } from '@/lib/utils/format';
 import { formatEuro } from '@/lib/utils/currency';
-import { Plus, List, Kanban } from 'lucide-react';
+import { Plus, List, Kanban, Wrench } from 'lucide-react';
 import { ReparatiesKanban } from './ReparatiesKanban';
 
 export default async function ReparatiesPage({ searchParams }: { searchParams: { status?: string; view?: string } }) {
@@ -80,53 +82,53 @@ export default async function ReparatiesPage({ searchParams }: { searchParams: {
         <ReparatiesKanban statuses={statuses ?? []} repairs={(repairs ?? []) as any} />
       ) : (
       <Card>
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-ink-100 text-left text-xs uppercase tracking-wide text-ink-400">
-              <th className="px-4 py-3 font-medium">{t('colNumber')}</th>
-              <th className="px-4 py-3 font-medium">{t('colCustomer')}</th>
-              <th className="px-4 py-3 font-medium">{t('colDevice')}</th>
-              <th className="px-4 py-3 font-medium">{t('colType')}</th>
-              <th className="px-4 py-3 font-medium">{t('colReceived')}</th>
-              <th className="px-4 py-3 font-medium">{t('colStatus')}</th>
-              <th className="px-4 py-3 font-medium">{t('colPayment')}</th>
-              <th className="px-4 py-3 text-right font-medium">{t('colAmount')}</th>
+        <Table>
+          <Thead>
+            <tr>
+              <Th>{t('colNumber')}</Th>
+              <Th>{t('colCustomer')}</Th>
+              <Th>{t('colDevice')}</Th>
+              <Th>{t('colType')}</Th>
+              <Th>{t('colReceived')}</Th>
+              <Th>{t('colStatus')}</Th>
+              <Th>{t('colPayment')}</Th>
+              <Th align="right">{t('colAmount')}</Th>
             </tr>
-          </thead>
-          <tbody>
+          </Thead>
+          <Tbody>
             {(repairs ?? []).map((r: any) => (
-              <tr key={r.id} className="border-b border-ink-100 last:border-0 hover:bg-ink-50">
-                <td className="px-4 py-3">
+              <Tr key={r.id}>
+                <Td>
                   <Link href={`/reparaties/${r.id}`} className="font-medium text-[var(--accent)] hover:underline">
                     {r.repair_number}
                   </Link>
-                </td>
-                <td className="px-4 py-3 text-ink-700">
+                </Td>
+                <Td className="text-ink-700">
                   {r.customer?.first_name} {r.customer?.last_name}
-                </td>
-                <td className="px-4 py-3 text-ink-600">
+                </Td>
+                <Td className="text-ink-600">
                   {r.device?.brand} {r.device?.model}
-                </td>
-                <td className="px-4 py-3 text-ink-600">{r.repair_type_label ?? '—'}</td>
-                <td className="px-4 py-3 text-ink-600">{formatDate(r.date_received)}</td>
-                <td className="px-4 py-3">{r.status && <StatusBadge name={r.status.name} color={r.status.color} />}</td>
-                <td className="px-4 py-3">
+                </Td>
+                <Td className="text-ink-600">{r.repair_type_label ?? '—'}</Td>
+                <Td className="text-ink-600">{formatDate(r.date_received)}</Td>
+                <Td>{r.status && <StatusBadge name={r.status.name} color={r.status.color} />}</Td>
+                <Td>
                   <PaymentStatusBadge status={r.payment_status} />
-                </td>
-                <td className="px-4 py-3 text-right tabular-nums text-ink-900">
+                </Td>
+                <Td align="right" className="tabular-nums text-ink-900">
                   {formatEuro(r.final_price ?? r.estimated_price)}
-                </td>
-              </tr>
+                </Td>
+              </Tr>
             ))}
             {(repairs ?? []).length === 0 && (
               <tr>
-                <td colSpan={8} className="px-4 py-10 text-center text-ink-400">
-                  {t('empty')}
+                <td colSpan={8}>
+                  <EmptyState icon={Wrench} title={t('empty')} />
                 </td>
               </tr>
             )}
-          </tbody>
-        </table>
+          </Tbody>
+        </Table>
       </Card>
       )}
     </div>

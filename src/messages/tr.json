@@ -1,6 +1,11 @@
 {
   "common": {
-    "notLoggedIn": "Oturum açılmadı."
+    "notLoggedIn": "Oturum açılmadı.",
+    "confirm": "Onayla",
+    "errorTitle": "Bu sayfa yüklenemedi.",
+    "errorTryAgain": "Tekrar dene",
+    "errorDetails": "Ayrıntılar",
+    "cancel": "İptal"
   },
   "nav": {
     "dashboard": "Kontrol paneli",
@@ -15,11 +20,15 @@
     "reports": "Raporlar",
     "settings": "Ayarlar",
     "loggedInAs": "{name} olarak giriş yapıldı",
-    "logout": "Çıkış yap"
+    "logout": "Çıkış yap",
+    "groupWorkspace": "Çalışma Alanı",
+    "groupOperations": "Operasyonlar",
+    "groupInsights": "Analizler"
   },
   "topbar": {
     "search": "Ara…",
-    "language": "Dil"
+    "language": "Dil",
+    "newRepair": "Yeni onarım"
   },
   "dashboard": {
     "title": "Kontrol paneli",
@@ -138,7 +147,11 @@
     "condCamera": "Kamera hasarlı",
     "condButtons": "Düğmeler",
     "condPort": "Şarj konektörü",
-    "condWater": "Su hasarı"
+    "condWater": "Su hasarı",
+    "deleteRepair": "Onarımı sil",
+    "deleteConfirmTitle": "Bu onarım silinsin mi?",
+    "deleteConfirmBody": "Bu işlem onarımı; kalemleri, fotoğrafları ve tanı bilgileriyle birlikte kalıcı olarak siler. Geri alınamaz.",
+    "repairDeleted": "Onarım silindi"
   },
   "repairSub": {
     "typePart": "Parça",
@@ -165,7 +178,17 @@
     "registerPayment": "Ödeme kaydet",
     "noActiveTerms": "Aktif kullanım koşulları yok — imzalatabilmek için Ayarlar'dan bir tane ekleyin.",
     "letCustomerSign": "Müşteriye imzalat",
-    "signTitle": "İmzala"
+    "signTitle": "İmzala",
+    "statusUpdated": "Durum güncellendi",
+    "itemAdded": "Kalem eklendi",
+    "itemRemoved": "Kalem kaldırıldı",
+    "paymentRecorded": "Ödeme kaydedildi",
+    "refundIssued": "İade işlendi",
+    "signatureSaved": "İmza kaydedildi",
+    "confirmStatusChange": "Durum {status} olarak değiştirilsin mi?",
+    "refundTitle": "Ödemeyi iade et",
+    "refundAmountLabel": "İade edilecek tutar",
+    "refundMax": "En fazla {max}"
   },
   "repairErrors": {
     "selectCustomerOrFillName": "Bir müşteri seçin veya ad ve soyad girin.",
@@ -178,7 +201,8 @@
     "createRepairFailed": "Onarım oluşturulamadı.",
     "repairNotFound": "Onarım bulunamadı.",
     "statusNotFound": "Durum bulunamadı.",
-    "descriptionAndPriceRequired": "Açıklama ve fiyat zorunludur."
+    "descriptionAndPriceRequired": "Açıklama ve fiyat zorunludur.",
+    "cannotDeleteHasRecords": "Bu onarım silinemez — zaten bir ödeme, fatura, imza veya garanti talebi ekli."
   },
   "repairTabs": {
     "diagnostics": "Diagnostik",
@@ -218,7 +242,11 @@
     "statusApproved": "Onaylandı",
     "statusRejected": "Reddedildi",
     "statusRepairing": "Onarımda",
-    "statusResolved": "Çözüldü"
+    "statusResolved": "Çözüldü",
+    "claimCreated": "Garanti talebi oluşturuldu",
+    "photoUploaded": "Fotoğraf yüklendi",
+    "photoDeleted": "Fotoğraf silindi",
+    "activity": "Etkinlik"
   },
   "warrantyPage": {
     "title": "Garanti",
@@ -391,7 +419,11 @@
     "notes": "Notlar",
     "totals": "Toplamlar",
     "totalSpent": "Toplam harcama",
-    "outstanding": "Bekleyen"
+    "outstanding": "Bekleyen",
+    "overview": "Genel Bakış",
+    "invoices": "Faturalar",
+    "newSale": "Yeni satış",
+    "noInvoicesYet": "Bu müşteri için henüz fatura yok."
   },
   "deviceHistory": {
     "knownDamage": "Bilinen hasar",

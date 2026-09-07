@@ -1,6 +1,11 @@
 {
   "common": {
-    "notLoggedIn": "Non connecté."
+    "notLoggedIn": "Non connecté.",
+    "confirm": "Confirmer",
+    "errorTitle": "Impossible de charger cette page.",
+    "errorTryAgain": "Réessayer",
+    "errorDetails": "Détails",
+    "cancel": "Annuler"
   },
   "nav": {
     "dashboard": "Tableau de bord",
@@ -15,11 +20,15 @@
     "reports": "Rapports",
     "settings": "Paramètres",
     "loggedInAs": "Connecté en tant que {name}",
-    "logout": "Déconnexion"
+    "logout": "Déconnexion",
+    "groupWorkspace": "Espace de travail",
+    "groupOperations": "Opérations",
+    "groupInsights": "Analyses"
   },
   "topbar": {
     "search": "Rechercher…",
-    "language": "Langue"
+    "language": "Langue",
+    "newRepair": "Nouvelle réparation"
   },
   "dashboard": {
     "title": "Tableau de bord",
@@ -138,7 +147,11 @@
     "condCamera": "Caméra endommagée",
     "condButtons": "Boutons",
     "condPort": "Connecteur de charge",
-    "condWater": "Dégât des eaux"
+    "condWater": "Dégât des eaux",
+    "deleteRepair": "Supprimer la réparation",
+    "deleteConfirmTitle": "Supprimer cette réparation ?",
+    "deleteConfirmBody": "Cela supprime définitivement la réparation ainsi que ses lignes, photos et diagnostics. Action irréversible.",
+    "repairDeleted": "Réparation supprimée"
   },
   "repairSub": {
     "typePart": "Pièce",
@@ -165,7 +178,17 @@
     "registerPayment": "Enregistrer un paiement",
     "noActiveTerms": "Aucunes conditions générales actives — ajoutez-en une dans les Paramètres pour permettre la signature.",
     "letCustomerSign": "Faire signer le client",
-    "signTitle": "Signer"
+    "signTitle": "Signer",
+    "statusUpdated": "Statut mis à jour",
+    "itemAdded": "Ligne ajoutée",
+    "itemRemoved": "Ligne supprimée",
+    "paymentRecorded": "Paiement enregistré",
+    "refundIssued": "Remboursement effectué",
+    "signatureSaved": "Signature enregistrée",
+    "confirmStatusChange": "Changer le statut en {status} ?",
+    "refundTitle": "Rembourser le paiement",
+    "refundAmountLabel": "Montant à rembourser",
+    "refundMax": "Maximum {max}"
   },
   "repairErrors": {
     "selectCustomerOrFillName": "Sélectionnez un client ou saisissez un prénom et un nom.",
@@ -178,7 +201,8 @@
     "createRepairFailed": "Échec de la création de la réparation.",
     "repairNotFound": "Réparation introuvable.",
     "statusNotFound": "Statut introuvable.",
-    "descriptionAndPriceRequired": "La description et le prix sont obligatoires."
+    "descriptionAndPriceRequired": "La description et le prix sont obligatoires.",
+    "cannotDeleteHasRecords": "Cette réparation ne peut pas être supprimée — un paiement, une facture, une signature ou une réclamation de garantie y est déjà associé."
   },
   "repairTabs": {
     "diagnostics": "Diagnostic",
@@ -218,7 +242,11 @@
     "statusApproved": "Approuvée",
     "statusRejected": "Rejetée",
     "statusRepairing": "En réparation",
-    "statusResolved": "Résolue"
+    "statusResolved": "Résolue",
+    "claimCreated": "Réclamation de garantie créée",
+    "photoUploaded": "Photo ajoutée",
+    "photoDeleted": "Photo supprimée",
+    "activity": "Activité"
   },
   "warrantyPage": {
     "title": "Garantie",
@@ -391,7 +419,11 @@
     "notes": "Remarques",
     "totals": "Totaux",
     "totalSpent": "Total dépensé",
-    "outstanding": "En attente"
+    "outstanding": "En attente",
+    "overview": "Aperçu",
+    "invoices": "Factures",
+    "newSale": "Nouvelle vente",
+    "noInvoicesYet": "Pas encore de factures pour ce client."
   },
   "deviceHistory": {
     "knownDamage": "Dommages connus",

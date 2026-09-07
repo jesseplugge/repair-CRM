@@ -1,16 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
 import { Card } from '@/components/ui/primitives';
+import { Tabs, TabList, Tab, TabPanel } from '@/components/ui/tabs';
 import { DiagnosticsPanel } from './DiagnosticsPanel';
 import { PhotosPanel } from './PhotosPanel';
 import { WarrantyPanel, type WarrantyClaim } from './WarrantyPanel';
 
 type Result = 'pass' | 'fail' | 'not_tested' | 'na';
-
-const TABS = ['diagnostics', 'photos', 'warranty'] as const;
-type Tab = (typeof TABS)[number];
 
 export function RepairExtraTabs({
   repairId,
@@ -18,37 +16,43 @@ export function RepairExtraTabs({
   diagnosticResults,
   photos,
   claims,
+  activityContent,
 }: {
   repairId: string;
   diagnosticItems: string[];
   diagnosticResults: Record<string, { pre: Result; post: Result }>;
   photos: { id: string; url: string; label: string | null }[];
   claims: WarrantyClaim[];
+  activityContent: ReactNode;
 }) {
-  const [tab, setTab] = useState<Tab>('diagnostics');
+  const [tab, setTab] = useState('diagnostics');
   const t = useTranslations('repairTabs');
 
   return (
     <Card className="p-4">
-      <div className="mb-4 flex gap-1 border-b border-ink-100">
-        {TABS.map((tabKey) => (
-          <button
-            key={tabKey}
-            onClick={() => setTab(tabKey)}
-            className={`px-3 py-2 text-sm font-medium transition-colors ${
-              tab === tabKey ? 'border-b-2 border-[var(--accent)] text-[var(--accent)]' : 'text-ink-500 hover:text-ink-800'
-            }`}
-          >
-            {t(tabKey)}
-            {tabKey === 'photos' && photos.length > 0 && <span className="ml-1 text-ink-400">({photos.length})</span>}
-            {tabKey === 'warranty' && claims.length > 0 && <span className="ml-1 text-ink-400">({claims.length})</span>}
-          </button>
-        ))}
-      </div>
+      <Tabs value={tab} onChange={setTab}>
+        <TabList>
+          <Tab value="diagnostics">{t('diagnostics')}</Tab>
+          <Tab value="photos" badge={photos.length}>
+            {t('photos')}
+          </Tab>
+          <Tab value="warranty" badge={claims.length}>
+            {t('warranty')}
+          </Tab>
+          <Tab value="activity">{t('activity')}</Tab>
+        </TabList>
 
-      {tab === 'diagnostics' && <DiagnosticsPanel repairId={repairId} items={diagnosticItems} initial={diagnosticResults} />}
-      {tab === 'photos' && <PhotosPanel repairId={repairId} photos={photos} />}
-      {tab === 'warranty' && <WarrantyPanel repairId={repairId} claims={claims} />}
+        <TabPanel value="diagnostics">
+          <DiagnosticsPanel repairId={repairId} items={diagnosticItems} initial={diagnosticResults} />
+        </TabPanel>
+        <TabPanel value="photos">
+          <PhotosPanel repairId={repairId} photos={photos} />
+        </TabPanel>
+        <TabPanel value="warranty">
+          <WarrantyPanel repairId={repairId} claims={claims} />
+        </TabPanel>
+        <TabPanel value="activity">{activityContent}</TabPanel>
+      </Tabs>
     </Card>
   );
 }

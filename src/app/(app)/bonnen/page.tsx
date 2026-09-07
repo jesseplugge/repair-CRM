@@ -2,10 +2,12 @@ import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import { searchReceipts } from '@/lib/actions/receipts';
 import { Card } from '@/components/ui/primitives';
+import { Table, Thead, Tbody, Tr, Th, Td } from '@/components/ui/table';
+import { EmptyState } from '@/components/ui/empty-state';
 import { StatusBadge } from '@/components/StatusBadge';
 import { formatDateTime } from '@/lib/utils/format';
 import { SearchBox } from './SearchBox';
-import { Download } from 'lucide-react';
+import { Download, Receipt } from 'lucide-react';
 
 const TYPE_COLORS: Record<string, string> = {
   intake: '#0C7C82',
@@ -45,18 +47,18 @@ export default async function BonnenPage({ searchParams }: { searchParams: { q?:
       <SearchBox defaultValue={searchParams.q ?? ''} />
 
       <Card>
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-ink-100 text-left text-xs uppercase tracking-wide text-ink-400">
-              <th className="px-4 py-3 font-medium">{t('colNumber')}</th>
-              <th className="px-4 py-3 font-medium">{t('colType')}</th>
-              <th className="px-4 py-3 font-medium">{t('colCustomer')}</th>
-              <th className="px-4 py-3 font-medium">{t('colReference')}</th>
-              <th className="px-4 py-3 font-medium">{t('colDate')}</th>
-              <th className="px-4 py-3 text-right font-medium">{t('colAction')}</th>
+        <Table>
+          <Thead>
+            <tr>
+              <Th>{t('colNumber')}</Th>
+              <Th>{t('colType')}</Th>
+              <Th>{t('colCustomer')}</Th>
+              <Th>{t('colReference')}</Th>
+              <Th>{t('colDate')}</Th>
+              <Th align="right">{t('colAction')}</Th>
             </tr>
-          </thead>
-          <tbody>
+          </Thead>
+          <Tbody>
             {receipts.map((r) => {
               const typeLabel = TYPE_KEYS[r.type] ? t(TYPE_KEYS[r.type] as any) : r.type;
               const typeColor = TYPE_COLORS[r.type] ?? '#495164';
@@ -64,13 +66,13 @@ export default async function BonnenPage({ searchParams }: { searchParams: { q?:
               const reference = r.repairNumber ?? r.saleNumber;
               const referenceHref = r.repairId ? `/reparaties/${r.repairId}` : null;
               return (
-                <tr key={r.id} className="border-b border-ink-100 last:border-0 hover:bg-ink-50">
-                  <td className="px-4 py-3 font-medium text-ink-900">{r.receiptNumber}</td>
-                  <td className="px-4 py-3">
+                <Tr key={r.id}>
+                  <Td className="font-medium text-ink-900">{r.receiptNumber}</Td>
+                  <Td>
                     <StatusBadge name={typeLabel} color={typeColor} />
-                  </td>
-                  <td className="px-4 py-3 text-ink-700">{r.customerName ?? t('cash')}</td>
-                  <td className="px-4 py-3 text-ink-600">
+                  </Td>
+                  <Td className="text-ink-700">{r.customerName ?? t('cash')}</Td>
+                  <Td className="text-ink-600">
                     {reference ? (
                       referenceHref ? (
                         <Link href={referenceHref} className="text-[var(--accent)] hover:underline">
@@ -82,32 +84,32 @@ export default async function BonnenPage({ searchParams }: { searchParams: { q?:
                     ) : (
                       '—'
                     )}
-                  </td>
-                  <td className="px-4 py-3 text-ink-600">{formatDateTime(r.createdAt)}</td>
-                  <td className="px-4 py-3 text-right">
+                  </Td>
+                  <Td className="text-ink-600">{formatDateTime(r.createdAt)}</Td>
+                  <Td align="right">
                     {url && (
                       <a
                         href={url}
                         target="_blank"
                         rel="noreferrer"
-                        className="inline-flex items-center gap-1.5 rounded border border-ink-200 px-2.5 py-1.5 text-xs font-medium text-ink-700 hover:bg-ink-50"
+                        className="focus-ring inline-flex items-center gap-1.5 rounded border border-ink-200 px-2.5 py-1.5 text-xs font-medium text-ink-700 hover:bg-ink-50"
                       >
                         <Download size={13} /> {t('view')}
                       </a>
                     )}
-                  </td>
-                </tr>
+                  </Td>
+                </Tr>
               );
             })}
             {receipts.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-4 py-10 text-center text-ink-400">
-                  {searchParams.q ? t('emptySearch') : t('emptyNone')}
+                <td colSpan={6}>
+                  <EmptyState icon={Receipt} title={searchParams.q ? t('emptySearch') : t('emptyNone')} />
                 </td>
               </tr>
             )}
-          </tbody>
-        </table>
+          </Tbody>
+        </Table>
       </Card>
     </div>
   );

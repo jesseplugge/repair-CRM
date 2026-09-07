@@ -2,8 +2,10 @@ import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import { searchCustomers } from '@/lib/actions/customers';
 import { Card, Button } from '@/components/ui/primitives';
+import { Table, Thead, Tbody, Tr, Th, Td } from '@/components/ui/table';
+import { EmptyState } from '@/components/ui/empty-state';
 import { SearchBox } from './SearchBox';
-import { Plus } from 'lucide-react';
+import { Plus, Users } from 'lucide-react';
 
 export default async function KlantenPage({ searchParams }: { searchParams: { q?: string } }) {
   const customers = await searchCustomers(searchParams.q ?? '');
@@ -26,38 +28,38 @@ export default async function KlantenPage({ searchParams }: { searchParams: { q?
       <SearchBox defaultValue={searchParams.q ?? ''} />
 
       <Card>
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-ink-100 text-left text-xs uppercase tracking-wide text-ink-400">
-              <th className="px-4 py-3 font-medium">{t('colCustomer')}</th>
-              <th className="px-4 py-3 font-medium">{t('colNumber')}</th>
-              <th className="px-4 py-3 font-medium">{t('colPhone')}</th>
-              <th className="px-4 py-3 font-medium">{t('colEmail')}</th>
+        <Table>
+          <Thead>
+            <tr>
+              <Th>{t('colCustomer')}</Th>
+              <Th>{t('colNumber')}</Th>
+              <Th>{t('colPhone')}</Th>
+              <Th>{t('colEmail')}</Th>
             </tr>
-          </thead>
-          <tbody>
+          </Thead>
+          <Tbody>
             {customers.map((c) => (
-              <tr key={c.id} className="border-b border-ink-100 last:border-0 hover:bg-ink-50">
-                <td className="px-4 py-3">
+              <Tr key={c.id}>
+                <Td>
                   <Link href={`/klanten/${c.id}`} className="font-medium text-ink-900 hover:text-[var(--accent)]">
                     {c.first_name} {c.last_name}
                   </Link>
                   {c.company_name && <div className="text-xs text-ink-400">{c.company_name}</div>}
-                </td>
-                <td className="px-4 py-3 tabular-nums text-ink-600">{c.customer_number}</td>
-                <td className="px-4 py-3 text-ink-600">{c.phone ?? '—'}</td>
-                <td className="px-4 py-3 text-ink-600">{c.email ?? '—'}</td>
-              </tr>
+                </Td>
+                <Td className="tabular-nums text-ink-600">{c.customer_number}</Td>
+                <Td className="text-ink-600">{c.phone ?? '—'}</Td>
+                <Td className="text-ink-600">{c.email ?? '—'}</Td>
+              </Tr>
             ))}
             {customers.length === 0 && (
               <tr>
-                <td colSpan={4} className="px-4 py-10 text-center text-ink-400">
-                  {t('empty')}
+                <td colSpan={4}>
+                  <EmptyState icon={Users} title={t('empty')} />
                 </td>
               </tr>
             )}
-          </tbody>
-        </table>
+          </Tbody>
+        </Table>
       </Card>
     </div>
   );

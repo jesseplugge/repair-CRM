@@ -1,11 +1,12 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useFormState, useFormStatus } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { uploadRepairPhoto, deleteRepairPhoto, PHOTO_LABELS } from '@/lib/actions/photos';
 import { Button } from '@/components/ui/primitives';
+import { useToast } from '@/components/ui/toast';
 import { Trash2, Upload } from 'lucide-react';
 
 const LABEL_KEYS: Record<string, string> = {
@@ -40,9 +41,23 @@ export function PhotosPanel({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const t = useTranslations('repairTabs');
+  const toast = useToast();
+  const isFirstRender = useRef(true);
+
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    if (!state?.error) {
+      toast({ variant: 'success', title: t('photoUploaded') });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state]);
 
   async function handleDelete(id: string) {
     await deleteRepairPhoto(id, repairId);
+    toast({ variant: 'success', title: t('photoDeleted') });
     router.refresh();
   }
 
