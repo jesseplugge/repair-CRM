@@ -152,7 +152,7 @@
     "condWater": "Su hasarı",
     "deleteRepair": "Onarımı sil",
     "deleteConfirmTitle": "Bu onarım silinsin mi?",
-    "deleteConfirmBody": "Bu işlem onarımı; kalemleri, fotoğrafları ve tanı bilgileriyle birlikte kalıcı olarak siler. Geri alınamaz.",
+    "deleteConfirmBody": "Bu işlem onarımı; kalemleri, fotoğrafları, tanı bilgilerini, ödemelerini, imzasını ve garanti taleplerini kalıcı olarak siler. Bağlı bir fatura korunur ancak bağlantısı kaldırılır. Geri alınamaz.",
     "repairDeleted": "Onarım silindi"
   },
   "repairSub": {
@@ -203,8 +203,7 @@
     "createRepairFailed": "Onarım oluşturulamadı.",
     "repairNotFound": "Onarım bulunamadı.",
     "statusNotFound": "Durum bulunamadı.",
-    "descriptionAndPriceRequired": "Açıklama ve fiyat zorunludur.",
-    "cannotDeleteHasRecords": "Bu onarım silinemez — zaten bir ödeme, fatura, imza veya garanti talebi ekli."
+    "descriptionAndPriceRequired": "Açıklama ve fiyat zorunludur."
   },
   "repairTabs": {
     "diagnostics": "Diagnostik",

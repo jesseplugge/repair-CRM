@@ -152,7 +152,7 @@
     "condWater": "Dégât des eaux",
     "deleteRepair": "Supprimer la réparation",
     "deleteConfirmTitle": "Supprimer cette réparation ?",
-    "deleteConfirmBody": "Cela supprime définitivement la réparation ainsi que ses lignes, photos et diagnostics. Action irréversible.",
+    "deleteConfirmBody": "Cela supprime définitivement la réparation ainsi que ses lignes, photos, diagnostics, paiements, signature et réclamations de garantie. Une facture liée est conservée mais dissociée. Action irréversible.",
     "repairDeleted": "Réparation supprimée"
   },
   "repairSub": {
@@ -203,8 +203,7 @@
     "createRepairFailed": "Échec de la création de la réparation.",
     "repairNotFound": "Réparation introuvable.",
     "statusNotFound": "Statut introuvable.",
-    "descriptionAndPriceRequired": "La description et le prix sont obligatoires.",
-    "cannotDeleteHasRecords": "Cette réparation ne peut pas être supprimée — un paiement, une facture, une signature ou une réclamation de garantie y est déjà associé."
+    "descriptionAndPriceRequired": "La description et le prix sont obligatoires."
   },
   "repairTabs": {
     "diagnostics": "Diagnostic",

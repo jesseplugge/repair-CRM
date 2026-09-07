@@ -152,7 +152,7 @@
     "condWater": "Water damage",
     "deleteRepair": "Delete repair",
     "deleteConfirmTitle": "Delete this repair?",
-    "deleteConfirmBody": "This removes the repair along with its line items, photos, and diagnostics. This can't be undone.",
+    "deleteConfirmBody": "This removes the repair along with its line items, photos, diagnostics, payments, signature, and warranty claims. A linked invoice is kept but unlinked. This can't be undone.",
     "repairDeleted": "Repair deleted"
   },
   "repairSub": {
@@ -203,8 +203,7 @@
     "createRepairFailed": "Failed to create repair.",
     "repairNotFound": "Repair not found.",
     "statusNotFound": "Status not found.",
-    "descriptionAndPriceRequired": "Description and price are required.",
-    "cannotDeleteHasRecords": "This repair can't be deleted — it already has a payment, invoice, signature, or warranty claim attached."
+    "descriptionAndPriceRequired": "Description and price are required."
   },
   "repairTabs": {
     "diagnostics": "Diagnostics",

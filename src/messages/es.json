@@ -152,7 +152,7 @@
     "condWater": "Daño por agua",
     "deleteRepair": "Eliminar reparación",
     "deleteConfirmTitle": "¿Eliminar esta reparación?",
-    "deleteConfirmBody": "Esto elimina la reparación junto con sus líneas, fotos y diagnósticos. Esta acción no se puede deshacer.",
+    "deleteConfirmBody": "Esto elimina la reparación junto con sus líneas, fotos, diagnósticos, pagos, firma y reclamaciones de garantía. Una factura vinculada se conserva pero se desvincula. Esta acción no se puede deshacer.",
     "repairDeleted": "Reparación eliminada"
   },
   "repairSub": {
@@ -203,8 +203,7 @@
     "createRepairFailed": "No se pudo crear la reparación.",
     "repairNotFound": "Reparación no encontrada.",
     "statusNotFound": "Estado no encontrado.",
-    "descriptionAndPriceRequired": "La descripción y el precio son obligatorios.",
-    "cannotDeleteHasRecords": "Esta reparación no se puede eliminar: ya tiene un pago, factura, firma o reclamación de garantía asociados."
+    "descriptionAndPriceRequired": "La descripción y el precio son obligatorios."
   },
   "repairTabs": {
     "diagnostics": "Diagnóstico",

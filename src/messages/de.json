@@ -152,7 +152,7 @@
     "condWater": "Wasserschaden",
     "deleteRepair": "Reparatur löschen",
     "deleteConfirmTitle": "Diese Reparatur löschen?",
-    "deleteConfirmBody": "Dies entfernt die Reparatur samt Positionen, Fotos und Diagnosen dauerhaft. Kann nicht rückgängig gemacht werden.",
+    "deleteConfirmBody": "Dies entfernt die Reparatur samt Positionen, Fotos, Diagnosen, Zahlungen, Unterschrift und Garantiefällen dauerhaft. Eine verknüpfte Rechnung bleibt erhalten, wird aber entkoppelt. Kann nicht rückgängig gemacht werden.",
     "repairDeleted": "Reparatur gelöscht"
   },
   "repairSub": {
@@ -203,8 +203,7 @@
     "createRepairFailed": "Reparatur konnte nicht angelegt werden.",
     "repairNotFound": "Reparatur nicht gefunden.",
     "statusNotFound": "Status nicht gefunden.",
-    "descriptionAndPriceRequired": "Beschreibung und Preis sind Pflichtfelder.",
-    "cannotDeleteHasRecords": "Diese Reparatur kann nicht gelöscht werden — es ist bereits eine Zahlung, Rechnung, Unterschrift oder Garantiefall vorhanden."
+    "descriptionAndPriceRequired": "Beschreibung und Preis sind Pflichtfelder."
   },
   "repairTabs": {
     "diagnostics": "Diagnose",

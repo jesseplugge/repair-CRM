@@ -152,7 +152,7 @@
     "condWater": "Waterschade",
     "deleteRepair": "Reparatie verwijderen",
     "deleteConfirmTitle": "Deze reparatie verwijderen?",
-    "deleteConfirmBody": "Dit verwijdert de reparatie inclusief de regels, foto's en diagnostiek. Dit kan niet ongedaan worden gemaakt.",
+    "deleteConfirmBody": "Dit verwijdert de reparatie inclusief de regels, foto's, diagnostiek, betalingen, handtekening en garantieclaims. Een gekoppelde factuur blijft bestaan maar wordt losgekoppeld. Dit kan niet ongedaan worden gemaakt.",
     "repairDeleted": "Reparatie verwijderd"
   },
   "repairSub": {
@@ -203,8 +203,7 @@
     "createRepairFailed": "Aanmaken reparatie mislukt.",
     "repairNotFound": "Reparatie niet gevonden.",
     "statusNotFound": "Status niet gevonden.",
-    "descriptionAndPriceRequired": "Omschrijving en prijs zijn verplicht.",
-    "cannotDeleteHasRecords": "Deze reparatie kan niet worden verwijderd — er is al een betaling, factuur, handtekening of garantieclaim aan gekoppeld."
+    "descriptionAndPriceRequired": "Omschrijving en prijs zijn verplicht."
   },
   "repairTabs": {
     "diagnostics": "Diagnose",
