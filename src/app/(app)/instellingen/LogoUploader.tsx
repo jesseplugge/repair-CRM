@@ -2,15 +2,17 @@
 
 import { useState } from 'react';
 import { useFormState, useFormStatus } from 'react-dom';
+import { useTranslations } from 'next-intl';
 import { uploadLogo } from '@/lib/actions/settings';
 import { Button } from '@/components/ui/primitives';
 import { Upload } from 'lucide-react';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
+  const t = useTranslations('logoUploader');
   return (
     <Button type="submit" variant="secondary" disabled={pending}>
-      {pending ? 'Uploaden…' : 'Uploaden'}
+      {pending ? t('uploading') : t('upload')}
     </Button>
   );
 }
@@ -18,6 +20,7 @@ function SubmitButton() {
 export function LogoUploader({ currentLogoUrl }: { currentLogoUrl: string | null }) {
   const [state, formAction] = useFormState(uploadLogo, { error: '' });
   const [preview, setPreview] = useState<string | null>(null);
+  const t = useTranslations('logoUploader');
 
   return (
     <form action={formAction} className="flex items-center gap-4">
@@ -42,7 +45,7 @@ export function LogoUploader({ currentLogoUrl }: { currentLogoUrl: string | null
         />
         <div className="flex items-center gap-2">
           <SubmitButton />
-          <span className="text-xs text-ink-400">PNG/JPG/SVG, max 2MB. Verschijnt op bonnen en facturen.</span>
+          <span className="text-xs text-ink-400">{t('hint')}</span>
         </div>
         {state?.error && <p className="mt-1 text-xs text-red-700">{state.error}</p>}
       </div>

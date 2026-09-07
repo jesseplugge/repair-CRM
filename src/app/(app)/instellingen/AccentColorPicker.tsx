@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { updateAccentColor } from '@/lib/actions/settings';
 
 const PRESETS = ['#0C7C82', '#2D5DF0', '#C97A22', '#2F8F5B', '#C4453A', '#6B4EE6'];
@@ -10,6 +11,7 @@ export function AccentColorPicker({ businessId, currentColor }: { businessId: st
   const [color, setColor] = useState(currentColor);
   const [pending, startTransition] = useTransition();
   const router = useRouter();
+  const t = useTranslations('accentColorPicker');
 
   function apply(hex: string) {
     setColor(hex);
@@ -41,7 +43,7 @@ export function AccentColorPicker({ businessId, currentColor }: { businessId: st
           />
         ))}
       </div>
-      <span className="text-xs text-ink-400">Kleurt knoppen, actieve menu-items en documenten.</span>
+      <span className="text-xs text-ink-400">{t('hint')}</span>
     </div>
   );
 }

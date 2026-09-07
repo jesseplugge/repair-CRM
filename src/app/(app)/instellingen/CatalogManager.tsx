@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useFormState, useFormStatus } from 'react-dom';
+import { useTranslations } from 'next-intl';
 import { createCatalogItem, toggleCatalogItem } from '@/lib/actions/settings';
 import { Button, Card, Field, Input } from '@/components/ui/primitives';
 import { formatEuro } from '@/lib/utils/currency';
@@ -23,9 +24,10 @@ type CatalogItem = {
 
 function SubmitButton() {
   const { pending } = useFormStatus();
+  const t = useTranslations('catalogManager');
   return (
     <Button type="submit" variant="primary" disabled={pending}>
-      {pending ? 'Bezig…' : 'Toevoegen'}
+      {pending ? t('busy') : t('add')}
     </Button>
   );
 }
@@ -33,6 +35,7 @@ function SubmitButton() {
 export function CatalogManager({ items }: { items: CatalogItem[] }) {
   const [open, setOpen] = useState(false);
   const [state, formAction] = useFormState(createCatalogItem, { error: '' });
+  const t = useTranslations('catalogManager');
 
   return (
     <div className="space-y-3">
@@ -40,12 +43,12 @@ export function CatalogManager({ items }: { items: CatalogItem[] }) {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-ink-100 text-left text-xs uppercase tracking-wide text-ink-400">
-              <th className="px-4 py-2.5 font-medium">Naam</th>
-              <th className="px-4 py-2.5 font-medium">Merk / model</th>
-              <th className="px-4 py-2.5 text-right font-medium">Prijs excl. BTW</th>
-              <th className="px-4 py-2.5 text-right font-medium">BTW</th>
-              <th className="px-4 py-2.5 text-right font-medium">Garantie</th>
-              <th className="px-4 py-2.5 font-medium">Actief</th>
+              <th className="px-4 py-2.5 font-medium">{t('colName')}</th>
+              <th className="px-4 py-2.5 font-medium">{t('colBrandModel')}</th>
+              <th className="px-4 py-2.5 text-right font-medium">{t('colPriceExcl')}</th>
+              <th className="px-4 py-2.5 text-right font-medium">{t('colVat')}</th>
+              <th className="px-4 py-2.5 text-right font-medium">{t('colWarranty')}</th>
+              <th className="px-4 py-2.5 font-medium">{t('colActive')}</th>
             </tr>
           </thead>
           <tbody>
@@ -57,7 +60,7 @@ export function CatalogManager({ items }: { items: CatalogItem[] }) {
                 </td>
                 <td className="px-4 py-2.5 text-right tabular-nums text-ink-900">{formatEuro(item.selling_price)}</td>
                 <td className="px-4 py-2.5 text-right tabular-nums text-ink-600">{item.vat_rate}%</td>
-                <td className="px-4 py-2.5 text-right text-ink-600">{item.warranty_months ?? '–'} mnd</td>
+                <td className="px-4 py-2.5 text-right text-ink-600">{item.warranty_months ?? '–'} {t('months')}</td>
                 <td className="px-4 py-2.5">
                   <button
                     onClick={() => toggleCatalogItem(item.id, !item.active)}
@@ -65,7 +68,7 @@ export function CatalogManager({ items }: { items: CatalogItem[] }) {
                       item.active ? 'bg-green-100 text-green-700' : 'bg-ink-100 text-ink-500'
                     }`}
                   >
-                    {item.active ? 'Actief' : 'Inactief'}
+                    {item.active ? t('active') : t('inactive')}
                   </button>
                 </td>
               </tr>
@@ -73,7 +76,7 @@ export function CatalogManager({ items }: { items: CatalogItem[] }) {
             {items.length === 0 && (
               <tr>
                 <td colSpan={6} className="px-4 py-8 text-center text-ink-400">
-                  Nog geen reparatietypes. Voeg er hieronder een toe.
+                  {t('empty')}
                 </td>
               </tr>
             )}
@@ -85,36 +88,36 @@ export function CatalogManager({ items }: { items: CatalogItem[] }) {
         <Card className="p-4">
           <form action={formAction} className="space-y-3">
             <div className="grid grid-cols-2 gap-3">
-              <Field label="Naam">
-                <Input name="name" required placeholder="iPhone 13 - Scherm vervangen" />
+              <Field label={t('name')}>
+                <Input name="name" required placeholder={t('namePlaceholder')} />
               </Field>
-              <Field label="Categorie">
-                <Input name="category" placeholder="Scherm" />
+              <Field label={t('category')}>
+                <Input name="category" placeholder={t('categoryPlaceholder')} />
               </Field>
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <Field label="Merk">
+              <Field label={t('brand')}>
                 <Input name="brand" placeholder="Apple" />
               </Field>
-              <Field label="Model">
+              <Field label={t('model')}>
                 <Input name="model" placeholder="iPhone 13" />
               </Field>
             </div>
             <div className="grid grid-cols-4 gap-3">
-              <Field label="Verkoopprijs (excl. BTW)">
+              <Field label={t('sellingPrice')}>
                 <Input name="selling_price" type="number" step="0.01" required />
               </Field>
-              <Field label="BTW-tarief">
+              <Field label={t('vatRate')}>
                 <select name="vat_rate" defaultValue="21" className="w-full rounded border border-ink-200 bg-white px-3 py-2 text-sm">
                   <option value="21">21%</option>
                   <option value="9">9%</option>
                   <option value="0">0%</option>
                 </select>
               </Field>
-              <Field label="Onderdeelkosten">
+              <Field label={t('partCost')}>
                 <Input name="part_cost" type="number" step="0.01" defaultValue="0" />
               </Field>
-              <Field label="Garantie (mnd)">
+              <Field label={t('warrantyMonths')}>
                 <Input name="warranty_months" type="number" defaultValue="3" />
               </Field>
             </div>
@@ -124,7 +127,7 @@ export function CatalogManager({ items }: { items: CatalogItem[] }) {
             <div className="flex gap-2">
               <SubmitButton />
               <Button type="button" variant="ghost" onClick={() => setOpen(false)}>
-                Annuleren
+                {t('cancel')}
               </Button>
             </div>
           </form>
@@ -134,7 +137,7 @@ export function CatalogManager({ items }: { items: CatalogItem[] }) {
           onClick={() => setOpen(true)}
           className="flex items-center gap-1.5 text-sm font-medium text-[var(--accent)] hover:underline"
         >
-          <Plus size={15} /> Reparatietype toevoegen
+          <Plus size={15} /> {t('addRepairType')}
         </button>
       )}
     </div>

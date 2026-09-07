@@ -1,3 +1,4 @@
+import { getTranslations } from 'next-intl/server';
 import { createClient, getCurrentUser } from '@/lib/supabase/server';
 import { BusinessForm } from './BusinessForm';
 import { CatalogManager } from './CatalogManager';
@@ -12,6 +13,7 @@ import { getTemplateContent, TEMPLATE_TYPES } from '@/lib/pdf/templates';
 export default async function InstellingenPage() {
   const user = await getCurrentUser();
   const supabase = createClient();
+  const t = await getTranslations('settingsPage');
 
   const [{ data: business }, { data: catalog }, { data: statuses }, { data: terms }, { data: businessUsers }, { data: invites }, templateEntries] =
     await Promise.all([
@@ -38,52 +40,47 @@ export default async function InstellingenPage() {
   return (
     <div className="max-w-4xl space-y-10">
       <div>
-        <h1 className="font-display text-2xl font-semibold text-ink-950">Instellingen</h1>
-        <p className="text-sm text-ink-600">Bedrijfsgegevens, reparatiecatalogus en statussen.</p>
+        <h1 className="font-display text-2xl font-semibold text-ink-950">{t('title')}</h1>
+        <p className="text-sm text-ink-600">{t('subtitle')}</p>
       </div>
 
       <section>
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-400">Merk &amp; huisstijl</h2>
+        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-400">{t('brandingSection')}</h2>
         <div className="space-y-4 rounded-lg border border-ink-100 bg-white p-5 shadow-card">
           <div>
-            <p className="mb-2 text-sm font-medium text-ink-900">Logo</p>
+            <p className="mb-2 text-sm font-medium text-ink-900">{t('logo')}</p>
             <LogoUploader currentLogoUrl={business!.logo_url} />
           </div>
           <div className="border-t border-ink-100 pt-4">
-            <p className="mb-2 text-sm font-medium text-ink-900">Accentkleur</p>
+            <p className="mb-2 text-sm font-medium text-ink-900">{t('accentColor')}</p>
             <AccentColorPicker businessId={business!.id} currentColor={business!.accent_color} />
           </div>
         </div>
       </section>
 
       <section>
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-400">Bedrijf</h2>
+        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-400">{t('businessSection')}</h2>
         <BusinessForm business={business!} />
       </section>
 
       <section>
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-400">Reparatiecatalogus</h2>
-        <p className="mb-3 text-sm text-ink-600">
-          Voorgedefinieerde reparaties met vaste prijs, zodat je bij intake alleen hoeft te selecteren (§8).
-        </p>
+        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-400">{t('catalogSection')}</h2>
+        <p className="mb-3 text-sm text-ink-600">{t('catalogSubtitle')}</p>
         <CatalogManager items={catalog ?? []} />
       </section>
 
       <section>
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-400">Algemene Voorwaarden</h2>
-        <p className="mb-3 text-sm text-ink-600">
-          Gekoppeld aan elke ondertekende intake (§15A). Een nieuwe versie deactiveert de vorige — al ondertekende
-          reparaties blijven naar hun eigen versie verwijzen.
-        </p>
+        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-400">{t('termsSection')}</h2>
+        <p className="mb-3 text-sm text-ink-600">{t('termsSubtitle')}</p>
         <TermsManager versions={terms ?? []} />
       </section>
 
       <section>
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-400">Reparatiestatussen</h2>
+        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-400">{t('statusesSection')}</h2>
         <StatusManager statuses={statuses ?? []} />
       </section>
       <section>
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-400">Gebruikers</h2>
+        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-400">{t('usersSection')}</h2>
         <UserInviteManager
           members={businessUsers ?? []}
           invites={invites ?? []}
@@ -92,11 +89,8 @@ export default async function InstellingenPage() {
       </section>
 
       <section>
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-400">Documentsjablonen</h2>
-        <p className="mb-3 text-sm text-ink-600">
-          Pas de opmerkingen en voetteksten aan die op je PDF-documenten verschijnen. Lay-out en berekende bedragen
-          blijven vast — alleen deze teksten zijn aanpasbaar.
-        </p>
+        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-400">{t('templatesSection')}</h2>
+        <p className="mb-3 text-sm text-ink-600">{t('templatesSubtitle')}</p>
         <TemplateManager templates={templates} canEdit={user!.role === 'owner'} />
       </section>
     </div>

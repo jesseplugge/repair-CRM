@@ -3,6 +3,7 @@
 import { createClient, getCurrentUser } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { getTranslations } from 'next-intl/server';
 
 export async function updateBusiness(
   _prevState: { error?: string; success?: boolean },
@@ -43,7 +44,10 @@ export async function createCatalogItem(_prevState: { error?: string }, formData
 
   const name = (formData.get('name') as string)?.trim();
   const sellingPrice = parseFloat(formData.get('selling_price') as string);
-  if (!name || isNaN(sellingPrice)) return { error: 'Naam en verkoopprijs zijn verplicht.' };
+  if (!name || isNaN(sellingPrice)) {
+    const t = await getTranslations('settingsErrors');
+    return { error: t('nameAndPriceRequired') };
+  }
 
   const { error } = await supabase.from('catalog_repair_types').insert({
     business_id: user.business_id,
@@ -76,8 +80,14 @@ export async function uploadLogo(_prevState: { error?: string }, formData: FormD
   const supabase = createClient();
 
   const file = formData.get('logo') as File | null;
-  if (!file || file.size === 0) return { error: 'Kies een afbeelding.' };
-  if (file.size > 2 * 1024 * 1024) return { error: 'Bestand is te groot (max 2MB).' };
+  if (!file || file.size === 0) {
+    const t = await getTranslations('settingsErrors');
+    return { error: t('chooseImage') };
+  }
+  if (file.size > 2 * 1024 * 1024) {
+    const t = await getTranslations('settingsErrors');
+    return { error: t('fileTooLarge') };
+  }
 
   const ext = file.name.split('.').pop() || 'png';
   const path = `${user.business_id}/logo.${ext}`;
@@ -111,7 +121,10 @@ export async function createStatus(_prevState: { error?: string }, formData: For
   const supabase = createClient();
 
   const name = (formData.get('name') as string)?.trim();
-  if (!name) return { error: 'Naam is verplicht.' };
+  if (!name) {
+    const t = await getTranslations('settingsErrors');
+    return { error: t('nameRequired') };
+  }
 
   const { data: existing } = await supabase
     .from('repair_statuses')
@@ -184,7 +197,10 @@ export async function createTermsVersion(_prevState: { error?: string }, formDat
   const content = (formData.get('content') as string)?.trim();
   const effectiveDate = (formData.get('effective_date') as string) || new Date().toISOString().slice(0, 10);
 
-  if (!versionLabel || !content) return { error: 'Versienummer en tekst zijn verplicht.' };
+  if (!versionLabel || !content) {
+    const t = await getTranslations('settingsErrors');
+    return { error: t('versionAndTextRequired') };
+  }
 
   await supabase
     .from('terms_versions')

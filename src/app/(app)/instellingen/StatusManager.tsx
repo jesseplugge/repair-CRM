@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { useFormState, useFormStatus } from 'react-dom';
+import { useTranslations } from 'next-intl';
 import { createStatus, updateStatus, toggleStatusActive, moveStatus } from '@/lib/actions/settings';
 import { Button, Card, Field, Input } from '@/components/ui/primitives';
 import { ArrowUp, ArrowDown, Plus } from 'lucide-react';
@@ -11,9 +12,10 @@ type Status = { id: string; name: string; color: string | null; is_terminal: boo
 
 function SubmitButton() {
   const { pending } = useFormStatus();
+  const t = useTranslations('statusManager');
   return (
     <Button type="submit" variant="primary" disabled={pending}>
-      {pending ? 'Bezig…' : 'Status toevoegen'}
+      {pending ? t('busy') : t('addStatus')}
     </Button>
   );
 }
@@ -23,6 +25,7 @@ function StatusRow({ status, isFirst, isLast }: { status: Status; isFirst: boole
   const [color, setColor] = useState(status.color ?? '#495164');
   const [pending, startTransition] = useTransition();
   const router = useRouter();
+  const t = useTranslations('statusManager');
 
   function saveIfChanged() {
     if (name !== status.name || color !== status.color) {
@@ -45,12 +48,12 @@ function StatusRow({ status, isFirst, isLast }: { status: Status; isFirst: boole
       </div>
       <input type="color" value={color} onChange={(e) => setColor(e.target.value)} onBlur={saveIfChanged} className="h-7 w-7 shrink-0 cursor-pointer rounded border border-ink-200" />
       <Input value={name} onChange={(e) => setName(e.target.value)} onBlur={saveIfChanged} className="flex-1" disabled={pending} />
-      {status.is_terminal && <span className="rounded-full bg-ink-100 px-2 py-0.5 text-xs text-ink-500">Eind</span>}
+      {status.is_terminal && <span className="rounded-full bg-ink-100 px-2 py-0.5 text-xs text-ink-500">{t('endStatus')}</span>}
       <button
         onClick={() => startTransition(async () => { await toggleStatusActive(status.id, !status.active); router.refresh(); })}
         className={`rounded-full px-2 py-0.5 text-xs font-medium ${status.active ? 'bg-green-100 text-green-700' : 'bg-ink-100 text-ink-500'}`}
       >
-        {status.active ? 'Actief' : 'Inactief'}
+        {status.active ? t('active') : t('inactive')}
       </button>
     </div>
   );
@@ -59,6 +62,7 @@ function StatusRow({ status, isFirst, isLast }: { status: Status; isFirst: boole
 export function StatusManager({ statuses }: { statuses: Status[] }) {
   const [open, setOpen] = useState(false);
   const [state, formAction] = useFormState(createStatus, { error: '' });
+  const t = useTranslations('statusManager');
 
   return (
     <div className="space-y-2">
@@ -70,28 +74,28 @@ export function StatusManager({ statuses }: { statuses: Status[] }) {
         <Card className="p-4">
           <form action={formAction} className="space-y-3">
             <div className="grid grid-cols-2 gap-3">
-              <Field label="Naam">
-                <Input name="name" required placeholder="Wacht op verzending" />
+              <Field label={t('name')}>
+                <Input name="name" required placeholder={t('namePlaceholder')} />
               </Field>
-              <Field label="Kleur">
+              <Field label={t('color')}>
                 <input type="color" name="color" defaultValue="#0C7C82" className="h-9 w-full cursor-pointer rounded border border-ink-200" />
               </Field>
             </div>
             <label className="flex items-center gap-2 text-sm text-ink-700">
-              <input type="checkbox" name="is_terminal" /> Dit is een eindstatus (zoals Opgehaald / Geannuleerd)
+              <input type="checkbox" name="is_terminal" /> {t('isEndStatus')}
             </label>
             {state?.error && <p className="rounded bg-red-50 px-3 py-2 text-sm text-red-700">{state.error}</p>}
             <div className="flex gap-2">
               <SubmitButton />
               <Button type="button" variant="ghost" onClick={() => setOpen(false)}>
-                Annuleren
+                {t('cancel')}
               </Button>
             </div>
           </form>
         </Card>
       ) : (
         <button onClick={() => setOpen(true)} className="flex items-center gap-1.5 text-sm font-medium text-[var(--accent)] hover:underline">
-          <Plus size={15} /> Status toevoegen
+          <Plus size={15} /> {t('addStatus')}
         </button>
       )}
     </div>
