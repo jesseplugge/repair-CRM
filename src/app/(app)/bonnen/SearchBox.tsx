@@ -2,6 +2,7 @@
 
 import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/primitives';
 
@@ -10,6 +11,7 @@ export function SearchBox({ defaultValue }: { defaultValue: string }) {
   const router = useRouter();
   const pathname = usePathname();
   const timer = useRef<ReturnType<typeof setTimeout>>();
+  const t = useTranslations('receiptsPage');
 
   useEffect(() => {
     clearTimeout(timer.current);
@@ -28,7 +30,7 @@ export function SearchBox({ defaultValue }: { defaultValue: string }) {
       <Input
         value={value}
         onChange={(e) => setValue(e.target.value)}
-        placeholder="Bonnummer, klant, reparatie- of verkoopnummer…"
+        placeholder={t('searchPlaceholder')}
         className="pl-9"
         autoFocus
       />

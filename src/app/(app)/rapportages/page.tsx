@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { getTranslations } from 'next-intl/server';
 import { getCurrentUser } from '@/lib/supabase/server';
 import { Card } from '@/components/ui/primitives';
 import { StatusBadge } from '@/components/StatusBadge';
@@ -16,14 +17,16 @@ function today() {
   return new Date().toISOString().slice(0, 10);
 }
 
-const INVOICE_STATUS_LABELS: Record<string, { label: string; color: string }> = {
-  sent: { label: 'Verzonden', color: '#0C7C82' },
-  partially_paid: { label: 'Gedeeltelijk betaald', color: '#C97A22' },
-  overdue: { label: 'Vervallen', color: '#C4453A' },
+const STATUS_COLORS: Record<string, string> = {
+  sent: '#0C7C82',
+  partially_paid: '#C97A22',
+  overdue: '#C4453A',
 };
 
 export default async function RapportagesPage({ searchParams }: { searchParams: { from?: string; to?: string } }) {
   const user = await getCurrentUser();
+  const t = await getTranslations('reportsPage');
+  const tStatus = await getTranslations('invoiceStatus');
 
   const from = searchParams.from || startOfMonth();
   const to = searchParams.to || today();
@@ -34,21 +37,21 @@ export default async function RapportagesPage({ searchParams }: { searchParams: 
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-display text-2xl font-semibold text-ink-950">Rapportages</h1>
-          <p className="text-sm text-ink-600">Omzet, BTW en winst — berekend uit werkelijke transacties.</p>
+          <h1 className="font-display text-2xl font-semibold text-ink-950">{t('title')}</h1>
+          <p className="text-sm text-ink-600">{t('subtitle')}</p>
         </div>
         <div className="flex items-center gap-2">
           <a
             href={`/api/reports/csv?from=${from}&to=${to}`}
             className="flex items-center gap-1.5 rounded border border-ink-200 px-3 py-2 text-sm font-medium text-ink-700 hover:bg-ink-50"
           >
-            <Download size={15} /> CSV export
+            <Download size={15} /> {t('csvExport')}
           </a>
           <a
             href={`/api/reports/pdf?from=${from}&to=${to}`}
             className="flex items-center gap-1.5 rounded border border-ink-200 px-3 py-2 text-sm font-medium text-ink-700 hover:bg-ink-50"
           >
-            <Download size={15} /> PDF export
+            <Download size={15} /> {t('pdfExport')}
           </a>
         </div>
       </div>
@@ -56,29 +59,29 @@ export default async function RapportagesPage({ searchParams }: { searchParams: 
       <DateRangeFilter from={from} to={to} />
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatCard label="Omzet" value={formatEuro(data.totalOmzet)} />
-        <StatCard label="BTW" value={formatEuro(data.totalBtw)} />
-        <StatCard label="Onderdelenkosten" value={formatEuro(data.partsCost)} />
-        <StatCard label="Brutowinst" value={formatEuro(data.grossProfit)} />
+        <StatCard label={t('revenue')} value={formatEuro(data.totalOmzet)} />
+        <StatCard label={t('vat')} value={formatEuro(data.totalBtw)} />
+        <StatCard label={t('partsCost')} value={formatEuro(data.partsCost)} />
+        <StatCard label={t('grossProfit')} value={formatEuro(data.grossProfit)} />
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <Card className="p-4">
-          <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink-400">Omzet naar bron</h3>
+          <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink-400">{t('revenueBySource')}</h3>
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
-              <span className="text-ink-600">Reparaties</span>
+              <span className="text-ink-600">{t('repairs')}</span>
               <span className="tabular-nums font-medium">{formatEuro(data.repairRevenueIncl)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-ink-600">Producten (kassa)</span>
+              <span className="text-ink-600">{t('productsPos')}</span>
               <span className="tabular-nums font-medium">{formatEuro(data.productRevenueIncl)}</span>
             </div>
           </div>
         </Card>
 
         <Card className="p-4">
-          <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink-400">Populaire reparaties</h3>
+          <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink-400">{t('popularRepairs')}</h3>
           <div className="space-y-2 text-sm">
             {data.popular.map(([label, count]) => (
               <div key={label} className="flex justify-between">
@@ -86,12 +89,12 @@ export default async function RapportagesPage({ searchParams }: { searchParams: 
                 <span className="tabular-nums font-medium">{count}x</span>
               </div>
             ))}
-            {data.popular.length === 0 && <p className="text-ink-400">Geen data in deze periode.</p>}
+            {data.popular.length === 0 && <p className="text-ink-400">{t('noDataInPeriod')}</p>}
           </div>
         </Card>
 
         <Card className="p-4">
-          <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink-400">BTW per tarief</h3>
+          <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink-400">{t('vatByRate')}</h3>
           <div className="space-y-2 text-sm">
             {data.vatBreakdown.map(([rate, vat]) => (
               <div key={rate} className="flex justify-between">
@@ -99,7 +102,7 @@ export default async function RapportagesPage({ searchParams }: { searchParams: 
                 <span className="tabular-nums font-medium">{formatEuro(vat)}</span>
               </div>
             ))}
-            {data.vatBreakdown.length === 0 && <p className="text-ink-400">Geen data in deze periode.</p>}
+            {data.vatBreakdown.length === 0 && <p className="text-ink-400">{t('noDataInPeriod')}</p>}
           </div>
         </Card>
       </div>
@@ -107,29 +110,30 @@ export default async function RapportagesPage({ searchParams }: { searchParams: 
       <Card className="p-4">
         <div className="mb-3 flex items-center justify-between">
           <h3 className="text-xs font-semibold uppercase tracking-wide text-ink-400">
-            Openstaande facturen ({data.outstandingInvoices.length})
+            {t('outstandingInvoices', { count: data.outstandingInvoices.length })}
           </h3>
           <span className="text-sm font-medium tabular-nums text-ink-900">
-            Totaal: {formatEuro(data.totalOutstanding)}
+            {t('total', { amount: formatEuro(data.totalOutstanding) })}
           </span>
         </div>
         {data.outstandingInvoices.length === 0 ? (
-          <p className="text-sm text-ink-400">Geen openstaande facturen.</p>
+          <p className="text-sm text-ink-400">{t('noOutstandingInvoices')}</p>
         ) : (
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-ink-100 text-left text-xs uppercase tracking-wide text-ink-400">
-                <th className="py-2 font-medium">Nummer</th>
-                <th className="py-2 font-medium">Klant</th>
-                <th className="py-2 font-medium">Factuurdatum</th>
-                <th className="py-2 font-medium">Vervaldatum</th>
-                <th className="py-2 font-medium">Status</th>
-                <th className="py-2 text-right font-medium">Openstaand</th>
+                <th className="py-2 font-medium">{t('colNumber')}</th>
+                <th className="py-2 font-medium">{t('colCustomer')}</th>
+                <th className="py-2 font-medium">{t('colInvoiceDate')}</th>
+                <th className="py-2 font-medium">{t('colDueDate')}</th>
+                <th className="py-2 font-medium">{t('colStatus')}</th>
+                <th className="py-2 text-right font-medium">{t('colOutstanding')}</th>
               </tr>
             </thead>
             <tbody>
               {data.outstandingInvoices.map((inv) => {
-                const status = INVOICE_STATUS_LABELS[inv.status] ?? { label: inv.status, color: '#495164' };
+                const label = STATUS_COLORS[inv.status] ? tStatus(inv.status as any) : inv.status;
+                const color = STATUS_COLORS[inv.status] ?? '#495164';
                 return (
                   <tr key={inv.id} className="border-b border-ink-100 last:border-0 hover:bg-ink-50">
                     <td className="py-2">
@@ -141,10 +145,10 @@ export default async function RapportagesPage({ searchParams }: { searchParams: 
                     <td className="py-2 text-ink-600">{formatDate(inv.invoiceDate)}</td>
                     <td className={`py-2 ${inv.overdue ? 'font-medium text-red-600' : 'text-ink-600'}`}>
                       {formatDate(inv.dueDate)}
-                      {inv.overdue ? ' · vervallen' : ''}
+                      {inv.overdue ? ` · ${t('overdue')}` : ''}
                     </td>
                     <td className="py-2">
-                      <StatusBadge name={status.label} color={status.color} />
+                      <StatusBadge name={label} color={color} />
                     </td>
                     <td className="py-2 text-right tabular-nums text-ink-900">{formatEuro(inv.outstanding)}</td>
                   </tr>
