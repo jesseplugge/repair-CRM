@@ -46,7 +46,10 @@ export function Sidebar({ userName, logoUrl, businessName }: { userName: string;
   }
 
   return (
-    <aside className="flex w-60 shrink-0 flex-col bg-ink-950 text-ink-200">
+    <aside
+      className="flex w-60 shrink-0 flex-col text-ink-200"
+      style={{ background: 'linear-gradient(180deg, #211D19 0%, #1C1917 100%)' }}
+    >
       <div className="flex items-center gap-2.5 px-5 py-5">
         {logoUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -62,10 +65,13 @@ export function Sidebar({ userName, logoUrl, businessName }: { userName: string;
             <Link
               key={href}
               href={href}
-              className={`flex items-center gap-3 rounded px-3 py-2 text-sm font-medium transition-colors ${
+              className={`relative flex items-center gap-3 rounded px-3 py-2 text-sm font-medium transition-colors ${
                 active ? 'bg-[var(--accent-soft)] text-[var(--accent-light)]' : 'text-ink-200 hover:bg-ink-900 hover:text-white'
               }`}
             >
+              {active && (
+                <span className="absolute -left-3 top-1.5 bottom-1.5 w-[3px] rounded-full bg-[var(--accent)]" />
+              )}
               <Icon size={17} strokeWidth={2} />
               {t(key)}
             </Link>

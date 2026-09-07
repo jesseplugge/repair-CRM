@@ -9,6 +9,16 @@ export function Card({ children, className }: { children: ReactNode; className?:
   );
 }
 
+/** Card with a small accent-colored rule along the top edge — for a section that should read as a distinct, intentional block rather than another uniform gray box. */
+export function AccentCard({ children, className }: { children: ReactNode; className?: string }) {
+  return (
+    <div className={clsx('rounded-lg border border-ink-100 bg-white shadow-card relative overflow-hidden', className)}>
+      <div className="absolute inset-x-0 top-0 h-[3px] bg-[var(--accent)]" />
+      {children}
+    </div>
+  );
+}
+
 type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
 type ButtonSize = 'md' | 'lg';
 
@@ -24,8 +34,8 @@ export function Button({
         'inline-flex items-center justify-center gap-2 rounded font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] disabled:opacity-50 disabled:pointer-events-none',
         size === 'md' && 'px-3.5 py-2 text-sm',
         size === 'lg' && 'px-5 py-3 text-base',
-        variant === 'primary' && 'bg-[var(--accent)] text-white hover:bg-[var(--accent-hover)]',
-        variant === 'secondary' && 'bg-white border border-ink-200 text-ink-900 hover:bg-ink-50',
+        variant === 'primary' && 'bg-[var(--accent)] text-white shadow-sm hover:bg-[var(--accent-hover)]',
+        variant === 'secondary' && 'bg-white border border-ink-200 text-ink-900 shadow-sm hover:bg-ink-50',
         variant === 'ghost' && 'text-ink-600 hover:bg-ink-100',
         variant === 'danger' && 'bg-red-600 text-white hover:bg-red-700',
         className

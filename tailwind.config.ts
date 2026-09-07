@@ -1,23 +1,24 @@
 import type { Config } from 'tailwindcss';
 
 // Design tokens — see src/app/globals.css for the rationale.
-// Palette: graphite/ink neutrals + "diagnostic teal" primary + amber/green/red status colors.
-// Avoids the generic cream/terracotta and default-SaaS-blue looks; built for a dense,
-// fast-moving repair-shop counter tool rather than a marketing site.
+// Palette: warm stone neutrals + "diagnostic teal" primary + amber/green/red status colors.
+// Avoids the generic cold-gray/blue "AI SaaS" look; a serif display face (Fraunces) paired
+// with a plain-spoken sans body gives the counter tool an editorial, hand-built feel rather
+// than a template one.
 const config: Config = {
   content: ['./src/**/*.{ts,tsx}'],
   theme: {
     extend: {
       colors: {
         ink: {
-          950: '#14171C',
-          900: '#1E2229',
-          800: '#2A2F38',
-          600: '#495164',
-          400: '#8A93A6',
-          200: '#C7CCD6',
-          100: '#EDEFF3',
-          50: '#F7F8FA',
+          950: '#1C1917',
+          900: '#292420',
+          800: '#3A332C',
+          600: '#5C5346',
+          400: '#948A79',
+          200: '#DDD6C7',
+          100: '#F0EBE1',
+          50: '#FAF7F1',
         },
         teal: {
           700: '#0A5F64',
@@ -47,19 +48,20 @@ const config: Config = {
       },
       fontFamily: {
         sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
-        display: ['var(--font-space-grotesk)', 'system-ui', 'sans-serif'],
+        display: ['var(--font-fraunces)', 'Georgia', 'serif'],
       },
       fontFeatureSettings: {
         tabular: '"tnum" 1, "lnum" 1',
       },
       borderRadius: {
         sm: '4px',
-        DEFAULT: '6px',
-        md: '8px',
-        lg: '12px',
+        DEFAULT: '5px',
+        md: '7px',
+        lg: '10px',
       },
       boxShadow: {
-        card: '0 1px 2px 0 rgb(20 23 28 / 0.04)',
+        card: '0 1px 2px 0 rgb(28 25 23 / 0.05), 0 1px 1px -1px rgb(28 25 23 / 0.04)',
+        crafted: '0 4px 16px -4px rgb(28 25 23 / 0.10), 0 1px 2px 0 rgb(28 25 23 / 0.05)',
       },
     },
   },
