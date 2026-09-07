@@ -2,7 +2,8 @@ import Link from 'next/link';
 import { createClient, getCurrentUser } from '@/lib/supabase/server';
 import { Card } from '@/components/ui/primitives';
 import { formatEuro } from '@/lib/utils/currency';
-import { PlusCircle, UserPlus, ShoppingCart, FileText, Search } from 'lucide-react';
+import { formatDate } from '@/lib/utils/format';
+import { PlusCircle, UserPlus, ShoppingCart, FileText, Search, AlertTriangle, Package, Euro, Clock } from 'lucide-react';
 
 const QUICK_ACTIONS = [
   { href: '/reparaties/nieuw', label: 'Nieuwe reparatie', icon: PlusCircle },
@@ -18,13 +19,48 @@ export default async function DashboardPage() {
 
   const startOfToday = new Date();
   startOfToday.setHours(0, 0, 0, 0);
+  const now = new Date();
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const fiveDaysAgo = new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString();
 
-  const [{ data: statuses }, { data: repairs }] = await Promise.all([
+  const [
+    { data: statuses },
+    { data: repairs },
+    { data: posSalesToday },
+    { data: readyRepair },
+    { data: products },
+    { data: outstandingInvoices },
+    { data: openClaims },
+  ] = await Promise.all([
     supabase.from('repair_statuses').select('*').eq('business_id', user!.business_id).order('sort_order'),
     supabase
       .from('repairs')
-      .select('id, status_id, payment_status, final_price, date_received, date_completed')
+      .select('id, status_id, payment_status, final_price, date_received, date_completed, repair_type_label')
       .eq('business_id', user!.business_id),
+    supabase
+      .from('pos_sales')
+      .select('total_incl_vat')
+      .eq('business_id', user!.business_id)
+      .eq('status', 'paid')
+      .gte('created_at', startOfToday.toISOString()),
+    supabase
+      .from('repairs')
+      .select('id, repair_number, date_completed, customer:customers(first_name, last_name), status:repair_statuses(name)')
+      .eq('business_id', user!.business_id)
+      .lt('date_completed', fiveDaysAgo)
+      .is('date_picked_up', null),
+    supabase.from('products').select('id, name, stock_quantity, minimum_stock').eq('business_id', user!.business_id).eq('active', true),
+    supabase
+      .from('invoices')
+      .select('id, invoice_number, invoice_date, payment_terms_days, total_incl_vat')
+      .eq('business_id', user!.business_id)
+      .in('status', ['sent', 'overdue']),
+    supabase
+      .from('warranty_claims')
+      .select('id, claim_number, repair:repairs(repair_number)')
+      .eq('business_id', user!.business_id)
+      .in('status', ['new', 'investigating', 'approved', 'repairing']),
   ]);
 
   const allRepairs = repairs ?? [];
@@ -37,15 +73,86 @@ export default async function DashboardPage() {
   const inProgress = allRepairs.filter((r) => r.status_id === byName('In behandeling')?.id).length;
   const unpaid = allRepairs.filter((r) => r.payment_status !== 'paid').length;
 
-  const paidToday = allRepairs.filter(
+  const paidRepairsToday = allRepairs.filter(
     (r) => r.payment_status === 'paid' && r.date_completed && new Date(r.date_completed) >= startOfToday
   );
-  const revenueToday = paidToday.reduce((sum, r) => sum + (r.final_price ?? 0), 0);
+  const repairRevenueToday = paidRepairsToday.reduce((sum, r) => sum + (r.final_price ?? 0), 0);
+  const posRevenueToday = (posSalesToday ?? []).reduce((sum, s) => sum + s.total_incl_vat, 0);
+  const revenueToday = repairRevenueToday + posRevenueToday;
+  const transactionsToday = paidRepairsToday.length + (posSalesToday ?? []).length;
 
   const statusCounts = allStatuses.map((status) => ({
     ...status,
     count: allRepairs.filter((r) => r.status_id === status.id).length,
   }));
+
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const overdueInvoices = (outstandingInvoices ?? []).filter((inv) => {
+    const due = new Date(new Date(inv.invoice_date).getTime() + (inv.payment_terms_days ?? 14) * 24 * 60 * 60 * 1000);
+    return due.toISOString().slice(0, 10) < todayStr;
+  });
+
+  const lowStock = (products ?? []).filter((p) => p.stock_quantity <= (p.minimum_stock ?? 0));
+
+  // Insight: completed repairs this month vs last month
+  const completedThisMonth = allRepairs.filter((r) => r.date_completed && new Date(r.date_completed) >= startOfMonth).length;
+  const completedLastMonth = allRepairs.filter(
+    (r) => r.date_completed && new Date(r.date_completed) >= startOfLastMonth && new Date(r.date_completed) < startOfMonth
+  ).length;
+  const monthDelta = completedLastMonth > 0 ? Math.round(((completedThisMonth - completedLastMonth) / completedLastMonth) * 100) : null;
+
+  // Insight: highest-margin repair type this month
+  const paidThisMonthIds = allRepairs
+    .filter((r) => r.payment_status === 'paid' && r.date_completed && new Date(r.date_completed) >= startOfMonth)
+    .map((r) => r.id);
+  const { data: repairItemsThisMonth } = paidThisMonthIds.length
+    ? await supabase.from('repair_items').select('description, selling_price_excl_vat, cost_price_excl_vat, quantity').in('repair_id', paidThisMonthIds)
+    : { data: [] as { description: string; selling_price_excl_vat: number; cost_price_excl_vat: number | null; quantity: number }[] };
+
+  const marginByType = new Map<string, { profit: number; revenue: number }>();
+  for (const row of repairItemsThisMonth ?? []) {
+    const label = row.description;
+    const revenue = row.selling_price_excl_vat * row.quantity;
+    const cost = (row.cost_price_excl_vat ?? 0) * row.quantity;
+    const entry = marginByType.get(label) ?? { profit: 0, revenue: 0 };
+    entry.profit += revenue - cost;
+    entry.revenue += revenue;
+    marginByType.set(label, entry);
+  }
+  const topMarginType = [...marginByType.entries()]
+    .filter(([, v]) => v.revenue > 0)
+    .sort((a, b) => b[1].profit / b[1].revenue - a[1].profit / a[1].revenue)[0];
+
+  const needsAttention = [
+    ...(openClaims ?? []).map((c) => ({
+      key: `claim-${c.id}`,
+      icon: '🔴',
+      text: `Garantieclaim ${c.claim_number} (${(c.repair as any)?.repair_number ?? ''}) staat open`,
+      href: '/garantie',
+    })),
+    ...(readyRepair ?? []).map((r) => {
+      const customer = r.customer as any;
+      const days = Math.floor((Date.now() - new Date(r.date_completed!).getTime()) / (24 * 60 * 60 * 1000));
+      return {
+        key: `ready-${r.id}`,
+        icon: '🟠',
+        text: `${r.repair_number} (${customer?.first_name} ${customer?.last_name}) wacht al ${days} dagen op ophalen`,
+        href: `/reparaties/${r.id}`,
+      };
+    }),
+    ...lowStock.map((p) => ({
+      key: `stock-${p.id}`,
+      icon: '📦',
+      text: `${p.name} bijna op (${p.stock_quantity} over)`,
+      href: '/voorraad',
+    })),
+    ...overdueInvoices.map((inv) => ({
+      key: `inv-${inv.id}`,
+      icon: '💶',
+      text: `Factuur ${inv.invoice_number} is vervallen (${formatEuro(inv.total_incl_vat)})`,
+      href: `/facturen/${inv.id}`,
+    })),
+  ];
 
   return (
     <div className="space-y-8">
@@ -64,13 +171,58 @@ export default async function DashboardPage() {
           <StatCard label="In behandeling" value={inProgress} />
           <StatCard label="Openstaande betalingen" value={unpaid} />
           <StatCard label="Omzet vandaag" value={formatEuro(revenueToday)} />
-          <StatCard label="Transacties vandaag" value={paidToday.length} />
+          <StatCard label="Transacties vandaag" value={transactionsToday} />
         </div>
-        <p className="mt-2 text-xs text-ink-400">
-          Omzet- en transactiecijfers zijn gebaseerd op afgeronde, betaalde reparaties. Kassa- en factuurverkopen
-          tellen mee zodra de Kassa-module live is.
-        </p>
       </section>
+
+      {/* Needs attention */}
+      {needsAttention.length > 0 && (
+        <section>
+          <h2 className="mb-3 flex items-center gap-1.5 text-sm font-semibold uppercase tracking-wide text-ink-400">
+            <AlertTriangle size={14} /> Verdient aandacht
+          </h2>
+          <Card className="divide-y divide-ink-100">
+            {needsAttention.slice(0, 8).map((item) => (
+              <Link
+                key={item.key}
+                href={item.href}
+                className="flex items-center gap-3 px-4 py-2.5 text-sm text-ink-700 transition-colors hover:bg-ink-50"
+              >
+                <span>{item.icon}</span>
+                <span>{item.text}</span>
+              </Link>
+            ))}
+          </Card>
+        </section>
+      )}
+
+      {/* Insights */}
+      {(monthDelta !== null || topMarginType) && (
+        <section>
+          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-400">Inzichten</h2>
+          <div className="grid grid-cols-2 gap-4">
+            {monthDelta !== null && (
+              <Card className="flex items-start gap-3 p-4">
+                <Clock size={18} className="mt-0.5 text-[var(--accent)]" />
+                <p className="text-sm text-ink-700">
+                  Je hebt <span className="font-semibold">{completedThisMonth}</span> reparaties afgerond deze
+                  maand, {monthDelta >= 0 ? `${monthDelta}% meer` : `${Math.abs(monthDelta)}% minder`} dan vorige
+                  maand.
+                </p>
+              </Card>
+            )}
+            {topMarginType && (
+              <Card className="flex items-start gap-3 p-4">
+                <Euro size={18} className="mt-0.5 text-[var(--accent)]" />
+                <p className="text-sm text-ink-700">
+                  <span className="font-semibold">{topMarginType[0]}</span> heeft deze maand je hoogste marge
+                  ({Math.round((topMarginType[1].profit / topMarginType[1].revenue) * 100)}%).
+                </p>
+              </Card>
+            )}
+          </div>
+        </section>
+      )}
 
       {/* Quick actions */}
       <section>
