@@ -429,5 +429,36 @@
   },
   "posErrors": {
     "cartEmpty": "Winkelmandje is leeg."
+  },
+  "cashDrawer": {
+    "title": "Kassalade",
+    "subtitle": "Openen, muteren en afsluiten van de contante kassa.",
+    "previousSessions": "Eerdere sessies",
+    "openDrawer": "Kassa openen",
+    "busy": "Bezig…",
+    "openingAmount": "Startbedrag in kassa",
+    "add": "Toevoegen",
+    "drawerClosed": "Kassa afgesloten",
+    "expected": "Verwacht",
+    "counted": "Geteld",
+    "difference": "Verschil",
+    "startingAmount": "Startbedrag",
+    "openedOn": "Geopend {date}",
+    "addMovement": "Mutatie toevoegen",
+    "typeWithdrawal": "Opname",
+    "typeDeposit": "Storting",
+    "typeRefund": "Terugbetaling",
+    "amount": "Bedrag",
+    "closeDrawer": "Kassa afsluiten",
+    "countedAmount": "Geteld bedrag",
+    "confirm": "Bevestigen",
+    "cancel": "Annuleren",
+    "countAndClose": "Kassa tellen & afsluiten"
+  },
+  "cashErrors": {
+    "invalidOpeningAmount": "Vul een geldig startbedrag in.",
+    "alreadyOpen": "Er is al een open kassasessie.",
+    "invalidAmount": "Vul een geldig bedrag in.",
+    "sessionNotFound": "Sessie niet gevonden."
   }
 }

@@ -3,6 +3,7 @@
 import { createClient, getCurrentUser } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { getTranslations } from 'next-intl/server';
 
 export async function getOpenCashSession() {
   const user = await getCurrentUser();
@@ -23,8 +24,9 @@ export async function openCashSession(_prevState: { error?: string }, formData: 
   if (!user) redirect('/login');
   const supabase = createClient();
 
+  const t = await getTranslations('cashErrors');
   const opening = parseFloat(formData.get('opening_amount') as string);
-  if (isNaN(opening)) return { error: 'Vul een geldig startbedrag in.' };
+  if (isNaN(opening)) return { error: t('invalidOpeningAmount') };
 
   const { data: existing } = await supabase
     .from('cash_sessions')
@@ -32,7 +34,7 @@ export async function openCashSession(_prevState: { error?: string }, formData: 
     .eq('business_id', user.business_id)
     .is('closed_at', null)
     .maybeSingle();
-  if (existing) return { error: 'Er is al een open kassasessie.' };
+  if (existing) return { error: t('alreadyOpen') };
 
   const { error } = await supabase.from('cash_sessions').insert({
     business_id: user.business_id,
@@ -53,7 +55,10 @@ export async function addCashMovement(_prevState: { error?: string }, formData: 
   const sessionId = formData.get('session_id') as string;
   const type = formData.get('type') as string;
   const amount = parseFloat(formData.get('amount') as string);
-  if (isNaN(amount) || amount <= 0) return { error: 'Vul een geldig bedrag in.' };
+  if (isNaN(amount) || amount <= 0) {
+    const t = await getTranslations('cashErrors');
+    return { error: t('invalidAmount') };
+  }
 
   const { error } = await supabase.from('cash_movements').insert({
     cash_session_id: sessionId,
@@ -77,7 +82,10 @@ export async function closeCashSession(
   const supabase = createClient();
 
   const { data: session } = await supabase.from('cash_sessions').select('*').eq('id', sessionId).single();
-  if (!session) return { error: 'Sessie niet gevonden.' };
+  if (!session) {
+    const t = await getTranslations('cashErrors');
+    return { error: t('sessionNotFound') };
+  }
 
   const { data: movements } = await supabase.from('cash_movements').select('*').eq('cash_session_id', sessionId);
   const { data: cashPayments } = await supabase

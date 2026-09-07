@@ -1,3 +1,4 @@
+import { getTranslations } from 'next-intl/server';
 import { createClient, getCurrentUser } from '@/lib/supabase/server';
 import { getOpenCashSession } from '@/lib/actions/cash';
 import { Card } from '@/components/ui/primitives';
@@ -10,6 +11,7 @@ export default async function KassaladePage() {
   const user = await getCurrentUser();
   const supabase = createClient();
   const session = await getOpenCashSession();
+  const t = await getTranslations('cashDrawer');
 
   let movements: any[] = [];
   if (session) {
@@ -28,8 +30,8 @@ export default async function KassaladePage() {
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <div>
-        <h1 className="font-display text-2xl font-semibold text-ink-950">Kassalade</h1>
-        <p className="text-sm text-ink-600">Openen, muteren en afsluiten van de contante kassa.</p>
+        <h1 className="font-display text-2xl font-semibold text-ink-950">{t('title')}</h1>
+        <p className="text-sm text-ink-600">{t('subtitle')}</p>
       </div>
 
       {session ? (
@@ -40,7 +42,7 @@ export default async function KassaladePage() {
 
       {recentClosed && recentClosed.length > 0 && (
         <Card className="p-4">
-          <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink-400">Eerdere sessies</h3>
+          <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink-400">{t('previousSessions')}</h3>
           <div className="space-y-2 text-sm">
             {recentClosed.map((s) => (
               <div key={s.id} className="flex items-center justify-between border-b border-ink-100 pb-2 last:border-0">
