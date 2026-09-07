@@ -17,7 +17,7 @@ export type GeneratedPdf = {
   customerName: string;
 };
 
-async function findOrCreateReceipt(
+export async function findOrCreateReceipt(
   businessId: string,
   userId: string,
   type: string,

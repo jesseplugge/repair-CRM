@@ -4,6 +4,7 @@ import { createClient, getCurrentUser } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { calculateFromExclVat, calculateFromInclVat, formatPaymentDescription } from '@/lib/utils/currency';
+import { findOrCreateReceipt } from '@/lib/pdf/generate';
 import type { Database, Json } from '@/lib/types/database';
 
 export type RepairFormState = { error?: string };
@@ -223,7 +224,12 @@ export async function createRepair(_prevState: RepairFormState, formData: FormDa
   // 7. Line item
   await supabase.from('repair_items').insert({ repair_id: repair.id, ...item, quantity: 1, discount: 0 });
 
-  // 8. Timeline entry
+  // 8. Intake bon — logged immediately (not just lazily on first print/email) so it
+  // shows up in Bonnen right away. The PDF itself is still rendered on demand from
+  // live data whenever someone actually views/prints/emails it.
+  await findOrCreateReceipt(businessId, user.id, 'intake', 'a4', { customer_id: customerId, repair_id: repair.id });
+
+  // 9. Timeline entry
   await logActivity(supabase, businessId, repair.id, 'created', 'Reparatie aangemaakt', user.id);
 
   revalidatePath('/reparaties');
@@ -236,7 +242,7 @@ export async function updateRepairStatus(repairId: string, newStatusId: string) 
   if (!user) redirect('/login');
   const supabase = createClient();
 
-  const { data: repair } = await supabase.from('repairs').select('id, business_id, status_id').eq('id', repairId).single();
+  const { data: repair } = await supabase.from('repairs').select('id, business_id, customer_id, status_id').eq('id', repairId).single();
   if (!repair) return { error: 'Reparatie niet gevonden.' };
 
   const [{ data: oldStatus }, { data: newStatus }] = await Promise.all([
@@ -255,6 +261,16 @@ export async function updateRepairStatus(repairId: string, newStatusId: string) 
 
   const { error } = await supabase.from('repairs').update(patch).eq('id', repairId);
   if (error) return { error: error.message };
+
+  if (newStatus.name === 'Gereed') {
+    // Kassabon — logged as soon as the repair is ready for pickup, same reasoning
+    // as the intake bon above: it should show up in Bonnen without anyone having
+    // to manually print/email it first.
+    await findOrCreateReceipt(repair.business_id, user.id, 'repair_completion', 'a4', {
+      customer_id: repair.customer_id,
+      repair_id: repair.id,
+    });
+  }
 
   await logActivity(
     supabase,
