@@ -1,6 +1,7 @@
 'use server';
 
 import { getCurrentUser, createClient } from '@/lib/supabase/server';
+import { getTranslations } from 'next-intl/server';
 
 export type Notification = {
   key: string;
@@ -13,6 +14,7 @@ export async function getNotifications(): Promise<Notification[]> {
   const user = await getCurrentUser();
   if (!user) return [];
   const supabase = createClient();
+  const t = await getTranslations('notifications');
   const businessId = user.business_id;
   const fiveDaysAgo = new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString();
 
@@ -47,7 +49,7 @@ export async function getNotifications(): Promise<Notification[]> {
     ...(openClaims ?? []).map((c) => ({
       key: `claim-${c.id}`,
       icon: '🔴',
-      text: `Garantieclaim ${c.claim_number} (${(c.repair as any)?.repair_number ?? ''}) staat open`,
+      text: t('warrantyClaimOpen', { claimNumber: c.claim_number, repairNumber: (c.repair as any)?.repair_number ?? '' }),
       href: '/garantie',
     })),
     ...(readyRepairs ?? []).map((r) => {
@@ -56,20 +58,20 @@ export async function getNotifications(): Promise<Notification[]> {
       return {
         key: `ready-${r.id}`,
         icon: '🟠',
-        text: `${r.repair_number} (${customer?.first_name} ${customer?.last_name}) wacht al ${days} dagen op ophalen`,
+        text: t('readyWaiting', { repairNumber: r.repair_number, customerName: `${customer?.first_name} ${customer?.last_name}`, days }),
         href: `/reparaties/${r.id}`,
       };
     }),
     ...lowStock.map((p) => ({
       key: `stock-${p.id}`,
       icon: '📦',
-      text: `${p.name} bijna op (${p.stock_quantity} over)`,
+      text: t('lowStock', { productName: p.name, quantity: p.stock_quantity }),
       href: '/voorraad',
     })),
     ...overdueInvoices.map((inv) => ({
       key: `inv-${inv.id}`,
       icon: '💶',
-      text: `Factuur ${inv.invoice_number} is vervallen`,
+      text: t('invoiceOverdue', { invoiceNumber: inv.invoice_number }),
       href: `/facturen/${inv.id}`,
     })),
   ];

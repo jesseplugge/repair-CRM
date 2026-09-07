@@ -1,21 +1,23 @@
 import Link from 'next/link';
+import { getTranslations } from 'next-intl/server';
 import { createClient, getCurrentUser } from '@/lib/supabase/server';
 import { Card } from '@/components/ui/primitives';
 import { formatEuro } from '@/lib/utils/currency';
 import { getNotifications } from '@/lib/actions/notifications';
 import { PlusCircle, UserPlus, ShoppingCart, FileText, Search, AlertTriangle, Euro, Clock } from 'lucide-react';
 
-const QUICK_ACTIONS = [
-  { href: '/reparaties/nieuw', label: 'Nieuwe reparatie', icon: PlusCircle },
-  { href: '/klanten/nieuw', label: 'Nieuwe klant', icon: UserPlus },
-  { href: '/kassa', label: 'Verkoop', icon: ShoppingCart },
-  { href: '/facturen', label: 'Factuur', icon: FileText },
-  { href: '/klanten', label: 'Klant zoeken', icon: Search },
-];
-
 export default async function DashboardPage() {
   const user = await getCurrentUser();
   const supabase = createClient();
+  const t = await getTranslations('dashboard');
+
+  const QUICK_ACTIONS = [
+    { href: '/reparaties/nieuw', label: t('quickNewRepair'), icon: PlusCircle },
+    { href: '/klanten/nieuw', label: t('quickNewCustomer'), icon: UserPlus },
+    { href: '/kassa', label: t('quickSale'), icon: ShoppingCart },
+    { href: '/facturen', label: t('quickInvoice'), icon: FileText },
+    { href: '/klanten', label: t('quickFindCustomer'), icon: Search },
+  ];
 
   const startOfToday = new Date();
   startOfToday.setHours(0, 0, 0, 0);
@@ -94,21 +96,21 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="font-display text-2xl font-semibold text-ink-950">Dashboard</h1>
-        <p className="text-sm text-ink-600">Welkom terug{user ? `, ${user.full_name}` : ''}.</p>
+        <h1 className="font-display text-2xl font-semibold text-ink-950">{t('title')}</h1>
+        <p className="text-sm text-ink-600">{user ? t('welcomeBackName', { name: user.full_name }) : t('welcomeBack')}</p>
       </div>
 
       {/* Today */}
       <section>
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-400">Vandaag</h2>
+        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-400">{t('today')}</h2>
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-          <StatCard label="Ontvangen vandaag" value={receivedToday} />
-          <StatCard label="Klaar om op te halen" value={readyForPickup} />
-          <StatCard label="Wacht op onderdeel" value={waitingForParts} />
-          <StatCard label="In behandeling" value={inProgress} />
-          <StatCard label="Openstaande betalingen" value={unpaid} />
-          <StatCard label="Omzet vandaag" value={formatEuro(revenueToday)} />
-          <StatCard label="Transacties vandaag" value={transactionsToday} />
+          <StatCard label={t('receivedToday')} value={receivedToday} />
+          <StatCard label={t('readyForPickup')} value={readyForPickup} />
+          <StatCard label={t('waitingForParts')} value={waitingForParts} />
+          <StatCard label={t('inProgress')} value={inProgress} />
+          <StatCard label={t('outstandingPayments')} value={unpaid} />
+          <StatCard label={t('revenueToday')} value={formatEuro(revenueToday)} />
+          <StatCard label={t('transactionsToday')} value={transactionsToday} />
         </div>
       </section>
 
@@ -116,7 +118,7 @@ export default async function DashboardPage() {
       {needsAttention.length > 0 && (
         <section>
           <h2 className="mb-3 flex items-center gap-1.5 text-sm font-semibold uppercase tracking-wide text-ink-400">
-            <AlertTriangle size={14} /> Verdient aandacht
+            <AlertTriangle size={14} /> {t('needsAttention')}
           </h2>
           <Card className="divide-y divide-ink-100">
             {needsAttention.slice(0, 8).map((item) => (
@@ -136,15 +138,15 @@ export default async function DashboardPage() {
       {/* Insights */}
       {(monthDelta !== null || topMarginType) && (
         <section>
-          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-400">Inzichten</h2>
+          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-400">{t('insights')}</h2>
           <div className="grid grid-cols-2 gap-4">
             {monthDelta !== null && (
               <Card className="flex items-start gap-3 p-4">
                 <Clock size={18} className="mt-0.5 text-[var(--accent)]" />
                 <p className="text-sm text-ink-700">
-                  Je hebt <span className="font-semibold">{completedThisMonth}</span> reparaties afgerond deze
-                  maand, {monthDelta >= 0 ? `${monthDelta}% meer` : `${Math.abs(monthDelta)}% minder`} dan vorige
-                  maand.
+                  {monthDelta >= 0
+                    ? t('insightCompletedThisMonthMore', { count: completedThisMonth, percent: monthDelta })
+                    : t('insightCompletedThisMonthLess', { count: completedThisMonth, percent: Math.abs(monthDelta) })}
                 </p>
               </Card>
             )}
@@ -152,8 +154,10 @@ export default async function DashboardPage() {
               <Card className="flex items-start gap-3 p-4">
                 <Euro size={18} className="mt-0.5 text-[var(--accent)]" />
                 <p className="text-sm text-ink-700">
-                  <span className="font-semibold">{topMarginType[0]}</span> heeft deze maand je hoogste marge
-                  ({Math.round((topMarginType[1].profit / topMarginType[1].revenue) * 100)}%).
+                  {t('insightTopMargin', {
+                    type: topMarginType[0],
+                    percent: Math.round((topMarginType[1].profit / topMarginType[1].revenue) * 100),
+                  })}
                 </p>
               </Card>
             )}
@@ -163,7 +167,7 @@ export default async function DashboardPage() {
 
       {/* Quick actions */}
       <section>
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-400">Snel starten</h2>
+        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-400">{t('quickStart')}</h2>
         <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
           {QUICK_ACTIONS.map(({ href, label, icon: Icon }) => (
             <Link key={href} href={href}>
@@ -178,7 +182,7 @@ export default async function DashboardPage() {
 
       {/* Status overview */}
       <section>
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-400">Reparatiestatus</h2>
+        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-400">{t('repairStatus')}</h2>
         <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
           {statusCounts.map((status) => (
             <Link key={status.id} href={`/reparaties?status=${status.id}`}>

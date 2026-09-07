@@ -17,5 +17,38 @@
   "topbar": {
     "search": "Zoeken…",
     "language": "Taal"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcomeBack": "Welkom terug.",
+    "welcomeBackName": "Welkom terug, {name}.",
+    "today": "Vandaag",
+    "receivedToday": "Ontvangen vandaag",
+    "readyForPickup": "Klaar om op te halen",
+    "waitingForParts": "Wacht op onderdeel",
+    "inProgress": "In behandeling",
+    "outstandingPayments": "Openstaande betalingen",
+    "revenueToday": "Omzet vandaag",
+    "transactionsToday": "Transacties vandaag",
+    "needsAttention": "Verdient aandacht",
+    "insights": "Inzichten",
+    "insightCompletedThisMonthMore": "Je hebt {count} reparaties afgerond deze maand, {percent}% meer dan vorige maand.",
+    "insightCompletedThisMonthLess": "Je hebt {count} reparaties afgerond deze maand, {percent}% minder dan vorige maand.",
+    "insightTopMargin": "{type} heeft deze maand je hoogste marge ({percent}%).",
+    "quickStart": "Snel starten",
+    "quickNewRepair": "Nieuwe reparatie",
+    "quickNewCustomer": "Nieuwe klant",
+    "quickSale": "Verkoop",
+    "quickInvoice": "Factuur",
+    "quickFindCustomer": "Klant zoeken",
+    "repairStatus": "Reparatiestatus"
+  },
+  "notifications": {
+    "title": "Meldingen",
+    "empty": "Geen meldingen.",
+    "warrantyClaimOpen": "Garantieclaim {claimNumber} ({repairNumber}) staat open",
+    "readyWaiting": "{repairNumber} ({customerName}) wacht al {days} dagen op ophalen",
+    "lowStock": "{productName} bijna op ({quantity} over)",
+    "invoiceOverdue": "Factuur {invoiceNumber} is vervallen"
   }
 }

@@ -2,11 +2,13 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { Bell } from 'lucide-react';
 import type { Notification } from '@/lib/actions/notifications';
 
 export function NotificationsBell({ notifications }: { notifications: Notification[] }) {
   const [open, setOpen] = useState(false);
+  const t = useTranslations('notifications');
 
   return (
     <div className="relative">
@@ -27,11 +29,11 @@ export function NotificationsBell({ notifications }: { notifications: Notificati
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
           <div className="absolute right-0 z-50 mt-2 w-80 rounded-lg border border-ink-200 bg-white shadow-xl">
             <div className="border-b border-ink-100 px-4 py-2.5 text-xs font-semibold uppercase tracking-wide text-ink-400">
-              Meldingen
+              {t('title')}
             </div>
             <div className="max-h-96 overflow-y-auto">
               {notifications.length === 0 ? (
-                <p className="px-4 py-6 text-center text-sm text-ink-400">Geen meldingen.</p>
+                <p className="px-4 py-6 text-center text-sm text-ink-400">{t('empty')}</p>
               ) : (
                 notifications.map((n) => (
                   <Link
