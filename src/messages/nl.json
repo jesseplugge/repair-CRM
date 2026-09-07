@@ -676,7 +676,11 @@
     "presetQuarter": "Dit kwartaal",
     "presetYear": "Dit jaar",
     "through": "t/m",
-    "apply": "Toepassen"
+    "apply": "Toepassen",
+    "revenueHint": "Totale omzet incl. BTW uit betaalde reparaties en kassaverkopen in deze periode.",
+    "vatHint": "Totaal berekende BTW over deze omzet.",
+    "partsCostHint": "Inkoopprijs van onderdelen gebruikt bij reparaties in deze periode.",
+    "grossProfitHint": "Omzet excl. BTW, min onderdelenkosten."
   },
   "settingsPage": {
     "title": "Instellingen",

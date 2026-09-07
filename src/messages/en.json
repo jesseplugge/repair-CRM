@@ -676,7 +676,11 @@
     "presetQuarter": "This quarter",
     "presetYear": "This year",
     "through": "through",
-    "apply": "Apply"
+    "apply": "Apply",
+    "revenueHint": "Total revenue incl. VAT from paid repairs and POS sales in this period.",
+    "vatHint": "Total VAT charged on this revenue.",
+    "partsCostHint": "Purchase cost of parts used on repairs in this period.",
+    "grossProfitHint": "Revenue excl. VAT, minus parts cost."
   },
   "settingsPage": {
     "title": "Settings",

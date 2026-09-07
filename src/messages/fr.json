@@ -676,7 +676,11 @@
     "presetQuarter": "Ce trimestre",
     "presetYear": "Cette année",
     "through": "au",
-    "apply": "Appliquer"
+    "apply": "Appliquer",
+    "revenueHint": "Chiffre d'affaires total TTC des réparations payées et ventes en caisse sur cette période.",
+    "vatHint": "TVA totale facturée sur ce chiffre d'affaires.",
+    "partsCostHint": "Prix d'achat des pièces utilisées pour les réparations sur cette période.",
+    "grossProfitHint": "Chiffre d'affaires HT, moins le coût des pièces."
   },
   "settingsPage": {
     "title": "Paramètres",

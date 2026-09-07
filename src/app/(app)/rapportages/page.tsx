@@ -62,54 +62,56 @@ export default async function RapportagesPage({ searchParams }: { searchParams: 
 
       <MetricStrip
         items={[
-          { label: t('revenue'), value: formatEuro(data.totalOmzet) },
-          { label: t('vat'), value: formatEuro(data.totalBtw) },
-          { label: t('partsCost'), value: formatEuro(data.partsCost) },
-          { label: t('grossProfit'), value: formatEuro(data.grossProfit) },
+          { label: t('revenue'), value: formatEuro(data.totalOmzet), hint: t('revenueHint') },
+          { label: t('vat'), value: formatEuro(data.totalBtw), hint: t('vatHint') },
+          { label: t('partsCost'), value: formatEuro(data.partsCost), hint: t('partsCostHint') },
+          { label: t('grossProfit'), value: formatEuro(data.grossProfit), hint: t('grossProfitHint') },
         ]}
       />
 
-      <div className="grid grid-cols-2 gap-4">
-        <Card className="p-4">
-          <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink-400">{t('revenueBySource')}</h3>
-          <div className="space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span className="text-ink-600">{t('repairs')}</span>
-              <span className="tabular-nums font-medium">{formatEuro(data.repairRevenueIncl)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-ink-600">{t('productsPos')}</span>
-              <span className="tabular-nums font-medium">{formatEuro(data.productRevenueIncl)}</span>
-            </div>
-          </div>
-        </Card>
-
-        <Card className="p-4">
-          <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink-400">{t('popularRepairs')}</h3>
-          <div className="space-y-2 text-sm">
-            {data.popular.map(([label, count]) => (
-              <div key={label} className="flex justify-between">
-                <span className="text-ink-600">{label}</span>
-                <span className="tabular-nums font-medium">{count}x</span>
+      <Card>
+        <div className="grid grid-cols-1 divide-y divide-ink-100 sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+          <div className="p-4">
+            <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink-400">{t('revenueBySource')}</h3>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-ink-600">{t('repairs')}</span>
+                <span className="tabular-nums font-medium">{formatEuro(data.repairRevenueIncl)}</span>
               </div>
-            ))}
-            {data.popular.length === 0 && <p className="text-ink-400">{t('noDataInPeriod')}</p>}
-          </div>
-        </Card>
-
-        <Card className="p-4">
-          <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink-400">{t('vatByRate')}</h3>
-          <div className="space-y-2 text-sm">
-            {data.vatBreakdown.map(([rate, vat]) => (
-              <div key={rate} className="flex justify-between">
-                <span className="text-ink-600">{rate}%</span>
-                <span className="tabular-nums font-medium">{formatEuro(vat)}</span>
+              <div className="flex justify-between">
+                <span className="text-ink-600">{t('productsPos')}</span>
+                <span className="tabular-nums font-medium">{formatEuro(data.productRevenueIncl)}</span>
               </div>
-            ))}
-            {data.vatBreakdown.length === 0 && <p className="text-ink-400">{t('noDataInPeriod')}</p>}
+            </div>
           </div>
-        </Card>
-      </div>
+
+          <div className="p-4">
+            <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink-400">{t('popularRepairs')}</h3>
+            <div className="space-y-2 text-sm">
+              {data.popular.map(([label, count]) => (
+                <div key={label} className="flex justify-between">
+                  <span className="text-ink-600">{label}</span>
+                  <span className="tabular-nums font-medium">{count}x</span>
+                </div>
+              ))}
+              {data.popular.length === 0 && <p className="text-ink-400">{t('noDataInPeriod')}</p>}
+            </div>
+          </div>
+
+          <div className="p-4">
+            <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink-400">{t('vatByRate')}</h3>
+            <div className="space-y-2 text-sm">
+              {data.vatBreakdown.map(([rate, vat]) => (
+                <div key={rate} className="flex justify-between">
+                  <span className="text-ink-600">{rate}%</span>
+                  <span className="tabular-nums font-medium">{formatEuro(vat)}</span>
+                </div>
+              ))}
+              {data.vatBreakdown.length === 0 && <p className="text-ink-400">{t('noDataInPeriod')}</p>}
+            </div>
+          </div>
+        </div>
+      </Card>
 
       <Card className="p-4">
         <div className="mb-3 flex items-center justify-between">

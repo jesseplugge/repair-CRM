@@ -676,7 +676,11 @@
     "presetQuarter": "Este trimestre",
     "presetYear": "Este año",
     "through": "hasta",
-    "apply": "Aplicar"
+    "apply": "Aplicar",
+    "revenueHint": "Ingresos totales con IVA de reparaciones pagadas y ventas de caja en este periodo.",
+    "vatHint": "IVA total cobrado sobre estos ingresos.",
+    "partsCostHint": "Precio de compra de las piezas usadas en reparaciones durante este periodo.",
+    "grossProfitHint": "Ingresos sin IVA, menos el coste de piezas."
   },
   "settingsPage": {
     "title": "Ajustes",

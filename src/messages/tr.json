@@ -676,7 +676,11 @@
     "presetQuarter": "Bu çeyrek",
     "presetYear": "Bu yıl",
     "through": "-",
-    "apply": "Uygula"
+    "apply": "Uygula",
+    "revenueHint": "Bu dönemde ödenen onarımlar ve kasa satışlarından elde edilen KDV dahil toplam ciro.",
+    "vatHint": "Bu ciro üzerinden hesaplanan toplam KDV.",
+    "partsCostHint": "Bu dönemde onarımlarda kullanılan parçaların alış maliyeti.",
+    "grossProfitHint": "KDV hariç ciro eksi parça maliyeti."
   },
   "settingsPage": {
     "title": "Ayarlar",

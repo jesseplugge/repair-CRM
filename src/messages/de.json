@@ -676,7 +676,11 @@
     "presetQuarter": "Dieses Quartal",
     "presetYear": "Dieses Jahr",
     "through": "bis",
-    "apply": "Anwenden"
+    "apply": "Anwenden",
+    "revenueHint": "Gesamtumsatz inkl. MwSt. aus bezahlten Reparaturen und Kassenverkäufen in diesem Zeitraum.",
+    "vatHint": "Insgesamt berechnete MwSt. auf diesen Umsatz.",
+    "partsCostHint": "Einkaufspreis der bei Reparaturen in diesem Zeitraum verwendeten Teile.",
+    "grossProfitHint": "Umsatz exkl. MwSt., abzüglich Teilekosten."
   },
   "settingsPage": {
     "title": "Einstellungen",
