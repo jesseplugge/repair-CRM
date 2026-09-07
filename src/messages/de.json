@@ -5,7 +5,9 @@
     "errorTitle": "Diese Seite konnte nicht geladen werden.",
     "errorTryAgain": "Erneut versuchen",
     "errorDetails": "Details",
-    "cancel": "Abbrechen"
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "busy": "Wird bearbeitet…"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -527,7 +529,9 @@
   },
   "productErrors": {
     "nameAndPriceRequired": "Name und Verkaufspreis sind Pflichtfelder.",
-    "nameRequired": "Name ist Pflichtfeld."
+    "nameRequired": "Name ist Pflichtfeld.",
+    "categoryInUse": "Kann nicht gelöscht werden: noch mit {count, plural, one {# Produkt} other {# Produkten}} verknüpft.",
+    "supplierInUse": "Kann nicht gelöscht werden: noch mit {count, plural, one {# Produkt} other {# Produkten}} verknüpft."
   },
   "inventoryPage": {
     "title": "Lager",
@@ -688,7 +692,10 @@
     "statusesSection": "Reparaturstatus",
     "usersSection": "Benutzer",
     "templatesSection": "Dokumentvorlagen",
-    "templatesSubtitle": "Passe die Notizen und Fußzeilen an, die auf deinen PDF-Dokumenten erscheinen. Layout und berechnete Beträge bleiben fest — nur diese Texte sind änderbar."
+    "templatesSubtitle": "Passe die Notizen und Fußzeilen an, die auf deinen PDF-Dokumenten erscheinen. Layout und berechnete Beträge bleiben fest — nur diese Texte sind änderbar.",
+    "categoriesSuppliersSection": "Kategorien & Lieferanten",
+    "categoriesSubsection": "Produktkategorien",
+    "suppliersSubsection": "Lieferanten"
   },
   "businessForm": {
     "legalName": "Offizieller Name",
@@ -961,5 +968,29 @@
   "pdfErrors": {
     "couldNotGenerateReceiptNumber": "Belegnummer konnte nicht generiert werden.",
     "createReceiptFailed": "Beleg konnte nicht angelegt werden."
+  },
+  "categoryManager": {
+    "add": "Kategorie hinzufügen",
+    "busy": "Wird bearbeitet…",
+    "empty": "Noch keine Kategorien.",
+    "namePlaceholder": "z. B. Displays",
+    "cancel": "Abbrechen",
+    "productCount": "{count, plural, one {# Produkt} other {# Produkte}}",
+    "deleteConfirmTitle": "Kategorie löschen?",
+    "deleteConfirmBody": "Möchtest du „{name}“ wirklich löschen? Dies kann nicht rückgängig gemacht werden."
+  },
+  "supplierManager": {
+    "add": "Lieferant hinzufügen",
+    "busy": "Wird bearbeitet…",
+    "empty": "Noch keine Lieferanten.",
+    "name": "Name",
+    "namePlaceholder": "Name des Lieferanten",
+    "contact": "Ansprechpartner",
+    "phone": "Telefon",
+    "email": "E-Mail",
+    "cancel": "Abbrechen",
+    "productCount": "{count, plural, one {# Produkt} other {# Produkte}}",
+    "deleteConfirmTitle": "Lieferant löschen?",
+    "deleteConfirmBody": "Möchtest du „{name}“ wirklich löschen? Dies kann nicht rückgängig gemacht werden."
   }
 }

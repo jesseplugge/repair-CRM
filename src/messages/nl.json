@@ -5,7 +5,9 @@
     "errorTitle": "Deze pagina kon niet worden geladen.",
     "errorTryAgain": "Opnieuw proberen",
     "errorDetails": "Details",
-    "cancel": "Annuleren"
+    "cancel": "Annuleren",
+    "delete": "Verwijderen",
+    "busy": "Bezig…"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -527,7 +529,9 @@
   },
   "productErrors": {
     "nameAndPriceRequired": "Naam en verkoopprijs zijn verplicht.",
-    "nameRequired": "Naam is verplicht."
+    "nameRequired": "Naam is verplicht.",
+    "categoryInUse": "Kan niet verwijderen: nog gekoppeld aan {count, plural, one {# product} other {# producten}}.",
+    "supplierInUse": "Kan niet verwijderen: nog gekoppeld aan {count, plural, one {# product} other {# producten}}."
   },
   "inventoryPage": {
     "title": "Voorraad",
@@ -688,7 +692,10 @@
     "statusesSection": "Reparatiestatussen",
     "usersSection": "Gebruikers",
     "templatesSection": "Documentsjablonen",
-    "templatesSubtitle": "Pas de opmerkingen en voetteksten aan die op je PDF-documenten verschijnen. Lay-out en berekende bedragen blijven vast — alleen deze teksten zijn aanpasbaar."
+    "templatesSubtitle": "Pas de opmerkingen en voetteksten aan die op je PDF-documenten verschijnen. Lay-out en berekende bedragen blijven vast — alleen deze teksten zijn aanpasbaar.",
+    "categoriesSuppliersSection": "Categorieën & leveranciers",
+    "categoriesSubsection": "Productcategorieën",
+    "suppliersSubsection": "Leveranciers"
   },
   "businessForm": {
     "legalName": "Statutaire naam",
@@ -961,5 +968,29 @@
   "pdfErrors": {
     "couldNotGenerateReceiptNumber": "Kon geen bonnummer genereren.",
     "createReceiptFailed": "Aanmaken bon mislukt."
+  },
+  "categoryManager": {
+    "add": "Categorie toevoegen",
+    "busy": "Bezig…",
+    "empty": "Nog geen categorieën.",
+    "namePlaceholder": "Bijv. Schermen",
+    "cancel": "Annuleren",
+    "productCount": "{count, plural, one {# product} other {# producten}}",
+    "deleteConfirmTitle": "Categorie verwijderen?",
+    "deleteConfirmBody": "Weet je zeker dat je “{name}” wilt verwijderen? Dit kan niet ongedaan worden gemaakt."
+  },
+  "supplierManager": {
+    "add": "Leverancier toevoegen",
+    "busy": "Bezig…",
+    "empty": "Nog geen leveranciers.",
+    "name": "Naam",
+    "namePlaceholder": "Naam leverancier",
+    "contact": "Contactpersoon",
+    "phone": "Telefoon",
+    "email": "E-mail",
+    "cancel": "Annuleren",
+    "productCount": "{count, plural, one {# product} other {# producten}}",
+    "deleteConfirmTitle": "Leverancier verwijderen?",
+    "deleteConfirmBody": "Weet je zeker dat je “{name}” wilt verwijderen? Dit kan niet ongedaan worden gemaakt."
   }
 }

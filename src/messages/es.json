@@ -5,7 +5,9 @@
     "errorTitle": "No se pudo cargar esta página.",
     "errorTryAgain": "Intentar de nuevo",
     "errorDetails": "Detalles",
-    "cancel": "Cancelar"
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "busy": "Procesando…"
   },
   "nav": {
     "dashboard": "Panel",
@@ -527,7 +529,9 @@
   },
   "productErrors": {
     "nameAndPriceRequired": "El nombre y el precio de venta son obligatorios.",
-    "nameRequired": "El nombre es obligatorio."
+    "nameRequired": "El nombre es obligatorio.",
+    "categoryInUse": "No se puede eliminar: todavía vinculada a {count, plural, one {# producto} other {# productos}}.",
+    "supplierInUse": "No se puede eliminar: todavía vinculado a {count, plural, one {# producto} other {# productos}}."
   },
   "inventoryPage": {
     "title": "Inventario",
@@ -688,7 +692,10 @@
     "statusesSection": "Estados de reparación",
     "usersSection": "Usuarios",
     "templatesSection": "Plantillas de documentos",
-    "templatesSubtitle": "Personaliza las notas y pies de página que aparecen en tus documentos PDF. El diseño y los importes calculados permanecen fijos — solo estos textos son editables."
+    "templatesSubtitle": "Personaliza las notas y pies de página que aparecen en tus documentos PDF. El diseño y los importes calculados permanecen fijos — solo estos textos son editables.",
+    "categoriesSuppliersSection": "Categorías y proveedores",
+    "categoriesSubsection": "Categorías de productos",
+    "suppliersSubsection": "Proveedores"
   },
   "businessForm": {
     "legalName": "Razón social",
@@ -961,5 +968,29 @@
   "pdfErrors": {
     "couldNotGenerateReceiptNumber": "No se pudo generar un número de recibo.",
     "createReceiptFailed": "No se pudo crear el recibo."
+  },
+  "categoryManager": {
+    "add": "Añadir categoría",
+    "busy": "Procesando…",
+    "empty": "Aún no hay categorías.",
+    "namePlaceholder": "P. ej. Pantallas",
+    "cancel": "Cancelar",
+    "productCount": "{count, plural, one {# producto} other {# productos}}",
+    "deleteConfirmTitle": "¿Eliminar categoría?",
+    "deleteConfirmBody": "¿Seguro que quieres eliminar “{name}”? Esta acción no se puede deshacer."
+  },
+  "supplierManager": {
+    "add": "Añadir proveedor",
+    "busy": "Procesando…",
+    "empty": "Aún no hay proveedores.",
+    "name": "Nombre",
+    "namePlaceholder": "Nombre del proveedor",
+    "contact": "Persona de contacto",
+    "phone": "Teléfono",
+    "email": "Correo electrónico",
+    "cancel": "Cancelar",
+    "productCount": "{count, plural, one {# producto} other {# productos}}",
+    "deleteConfirmTitle": "¿Eliminar proveedor?",
+    "deleteConfirmBody": "¿Seguro que quieres eliminar “{name}”? Esta acción no se puede deshacer."
   }
 }

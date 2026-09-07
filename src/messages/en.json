@@ -5,7 +5,9 @@
     "errorTitle": "We couldn't load this page.",
     "errorTryAgain": "Try again",
     "errorDetails": "Details",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "busy": "Working…"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -527,7 +529,9 @@
   },
   "productErrors": {
     "nameAndPriceRequired": "Name and sale price are required.",
-    "nameRequired": "Name is required."
+    "nameRequired": "Name is required.",
+    "categoryInUse": "Can't delete: still linked to {count, plural, one {# product} other {# products}}.",
+    "supplierInUse": "Can't delete: still linked to {count, plural, one {# product} other {# products}}."
   },
   "inventoryPage": {
     "title": "Inventory",
@@ -688,7 +692,10 @@
     "statusesSection": "Repair statuses",
     "usersSection": "Users",
     "templatesSection": "Document templates",
-    "templatesSubtitle": "Customise the notes and footers that appear on your PDF documents. Layout and calculated amounts stay fixed — only this text is editable."
+    "templatesSubtitle": "Customise the notes and footers that appear on your PDF documents. Layout and calculated amounts stay fixed — only this text is editable.",
+    "categoriesSuppliersSection": "Categories & suppliers",
+    "categoriesSubsection": "Product categories",
+    "suppliersSubsection": "Suppliers"
   },
   "businessForm": {
     "legalName": "Legal name",
@@ -961,5 +968,29 @@
   "pdfErrors": {
     "couldNotGenerateReceiptNumber": "Could not generate a receipt number.",
     "createReceiptFailed": "Failed to create receipt."
+  },
+  "categoryManager": {
+    "add": "Add category",
+    "busy": "Working…",
+    "empty": "No categories yet.",
+    "namePlaceholder": "e.g. Screens",
+    "cancel": "Cancel",
+    "productCount": "{count, plural, one {# product} other {# products}}",
+    "deleteConfirmTitle": "Delete category?",
+    "deleteConfirmBody": "Are you sure you want to delete “{name}”? This can't be undone."
+  },
+  "supplierManager": {
+    "add": "Add supplier",
+    "busy": "Working…",
+    "empty": "No suppliers yet.",
+    "name": "Name",
+    "namePlaceholder": "Supplier name",
+    "contact": "Contact person",
+    "phone": "Phone",
+    "email": "Email",
+    "cancel": "Cancel",
+    "productCount": "{count, plural, one {# product} other {# products}}",
+    "deleteConfirmTitle": "Delete supplier?",
+    "deleteConfirmBody": "Are you sure you want to delete “{name}”? This can't be undone."
   }
 }

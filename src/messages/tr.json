@@ -5,7 +5,9 @@
     "errorTitle": "Bu sayfa yüklenemedi.",
     "errorTryAgain": "Tekrar dene",
     "errorDetails": "Ayrıntılar",
-    "cancel": "İptal"
+    "cancel": "İptal",
+    "delete": "Sil",
+    "busy": "İşleniyor…"
   },
   "nav": {
     "dashboard": "Kontrol paneli",
@@ -527,7 +529,9 @@
   },
   "productErrors": {
     "nameAndPriceRequired": "Ad ve satış fiyatı zorunludur.",
-    "nameRequired": "Ad zorunludur."
+    "nameRequired": "Ad zorunludur.",
+    "categoryInUse": "Silinemiyor: hâlâ {count, plural, one {# ürüne} other {# ürüne}} bağlı.",
+    "supplierInUse": "Silinemiyor: hâlâ {count, plural, one {# ürüne} other {# ürüne}} bağlı."
   },
   "inventoryPage": {
     "title": "Stok",
@@ -688,7 +692,10 @@
     "statusesSection": "Onarım durumları",
     "usersSection": "Kullanıcılar",
     "templatesSection": "Belge şablonları",
-    "templatesSubtitle": "PDF belgelerinizde görünen notları ve alt bilgileri özelleştirin. Tasarım ve hesaplanan tutarlar sabit kalır — yalnızca bu metinler düzenlenebilir."
+    "templatesSubtitle": "PDF belgelerinizde görünen notları ve alt bilgileri özelleştirin. Tasarım ve hesaplanan tutarlar sabit kalır — yalnızca bu metinler düzenlenebilir.",
+    "categoriesSuppliersSection": "Kategoriler ve tedarikçiler",
+    "categoriesSubsection": "Ürün kategorileri",
+    "suppliersSubsection": "Tedarikçiler"
   },
   "businessForm": {
     "legalName": "Ticari unvan",
@@ -961,5 +968,29 @@
   "pdfErrors": {
     "couldNotGenerateReceiptNumber": "Fiş numarası oluşturulamadı.",
     "createReceiptFailed": "Fiş oluşturulamadı."
+  },
+  "categoryManager": {
+    "add": "Kategori ekle",
+    "busy": "İşleniyor…",
+    "empty": "Henüz kategori yok.",
+    "namePlaceholder": "Örn. Ekranlar",
+    "cancel": "İptal",
+    "productCount": "{count, plural, one {# ürün} other {# ürün}}",
+    "deleteConfirmTitle": "Kategori silinsin mi?",
+    "deleteConfirmBody": "“{name}” silinsin mi? Bu işlem geri alınamaz."
+  },
+  "supplierManager": {
+    "add": "Tedarikçi ekle",
+    "busy": "İşleniyor…",
+    "empty": "Henüz tedarikçi yok.",
+    "name": "Ad",
+    "namePlaceholder": "Tedarikçi adı",
+    "contact": "İlgili kişi",
+    "phone": "Telefon",
+    "email": "E-posta",
+    "cancel": "İptal",
+    "productCount": "{count, plural, one {# ürün} other {# ürün}}",
+    "deleteConfirmTitle": "Tedarikçi silinsin mi?",
+    "deleteConfirmBody": "“{name}” silinsin mi? Bu işlem geri alınamaz."
   }
 }

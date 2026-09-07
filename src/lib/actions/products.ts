@@ -53,6 +53,7 @@ export async function createCategory(_prevState: { error?: string }, formData: F
   const { error } = await supabase.from('product_categories').insert({ business_id: user.business_id, name });
   if (error) return { error: error.message };
   revalidatePath('/producten');
+  revalidatePath('/instellingen');
   return { error: undefined };
 }
 
@@ -74,7 +75,96 @@ export async function createSupplier(_prevState: { error?: string }, formData: F
   });
   if (error) return { error: error.message };
   revalidatePath('/producten');
+  revalidatePath('/instellingen');
   return { error: undefined };
+}
+
+export async function updateCategory(id: string, name: string): Promise<{ error?: string }> {
+  const user = await getCurrentUser();
+  if (!user) redirect('/login');
+  const supabase = createClient();
+  const trimmed = name.trim();
+  if (!trimmed) {
+    const t = await getTranslations('productErrors');
+    return { error: t('nameRequired') };
+  }
+  const { error } = await supabase
+    .from('product_categories')
+    .update({ name: trimmed })
+    .eq('id', id)
+    .eq('business_id', user.business_id);
+  if (error) return { error: error.message };
+  revalidatePath('/producten');
+  revalidatePath('/instellingen');
+  return {};
+}
+
+export async function deleteCategory(id: string): Promise<{ error?: string }> {
+  const user = await getCurrentUser();
+  if (!user) redirect('/login');
+  const supabase = createClient();
+  const t = await getTranslations('productErrors');
+
+  const { count } = await supabase
+    .from('products')
+    .select('id', { count: 'exact', head: true })
+    .eq('business_id', user.business_id)
+    .eq('category_id', id);
+  if (count && count > 0) return { error: t('categoryInUse', { count }) };
+
+  const { error } = await supabase.from('product_categories').delete().eq('id', id).eq('business_id', user.business_id);
+  if (error) return { error: error.message };
+  revalidatePath('/producten');
+  revalidatePath('/instellingen');
+  return {};
+}
+
+export async function updateSupplier(
+  id: string,
+  fields: { name: string; contact_name?: string | null; phone?: string | null; email?: string | null }
+): Promise<{ error?: string }> {
+  const user = await getCurrentUser();
+  if (!user) redirect('/login');
+  const supabase = createClient();
+  const trimmedName = fields.name.trim();
+  if (!trimmedName) {
+    const t = await getTranslations('productErrors');
+    return { error: t('nameRequired') };
+  }
+  const { error } = await supabase
+    .from('suppliers')
+    .update({
+      name: trimmedName,
+      contact_name: fields.contact_name || null,
+      phone: fields.phone || null,
+      email: fields.email || null,
+    })
+    .eq('id', id)
+    .eq('business_id', user.business_id);
+  if (error) return { error: error.message };
+  revalidatePath('/producten');
+  revalidatePath('/instellingen');
+  return {};
+}
+
+export async function deleteSupplier(id: string): Promise<{ error?: string }> {
+  const user = await getCurrentUser();
+  if (!user) redirect('/login');
+  const supabase = createClient();
+  const t = await getTranslations('productErrors');
+
+  const { count } = await supabase
+    .from('products')
+    .select('id', { count: 'exact', head: true })
+    .eq('business_id', user.business_id)
+    .eq('supplier_id', id);
+  if (count && count > 0) return { error: t('supplierInUse', { count }) };
+
+  const { error } = await supabase.from('suppliers').delete().eq('id', id).eq('business_id', user.business_id);
+  if (error) return { error: error.message };
+  revalidatePath('/producten');
+  revalidatePath('/instellingen');
+  return {};
 }
 
 export async function adjustStock(productId: string, delta: number) {
