@@ -31,21 +31,25 @@ export async function findOrCreateReceipt(
   let { data: receipt } = await query.maybeSingle();
 
   if (!receipt) {
-    const { data: receiptNumber } = await supabase.rpc('next_number', {
+    const { data: receiptNumber, error: numberError } = await supabase.rpc('next_number', {
       p_business_id: businessId,
       p_type: 'receipt',
       p_year: new Date().getFullYear(),
       p_prefix: 'BON-',
       p_pad: 5,
     });
-    const { data: created } = await supabase
+    if (numberError || !receiptNumber) throw new Error(numberError?.message ?? 'Kon geen bonnummer genereren.');
+
+    const { data: created, error: insertError } = await supabase
       .from('receipts')
-      .insert({ business_id: businessId, receipt_number: receiptNumber!, type, format, created_by: userId, ...fields })
+      .insert({ business_id: businessId, receipt_number: receiptNumber, type, format, created_by: userId, ...fields })
       .select('receipt_number')
       .single();
+
+    if (insertError || !created) throw new Error(insertError?.message ?? 'Aanmaken bon mislukt.');
     receipt = created;
   }
-  return receipt!.receipt_number;
+  return receipt.receipt_number;
 }
 
 export async function generateIntakePdf(repairId: string, businessId: string, userId: string, format: DocFormat): Promise<GeneratedPdf | null> {
