@@ -2,7 +2,8 @@ import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import { createClient, getCurrentUser } from '@/lib/supabase/server';
 import { Card, Button } from '@/components/ui/primitives';
-import { Table, Thead, Tbody, Tr, Th, Td } from '@/components/ui/table';
+import { Table, Thead, Tbody, Th, Td } from '@/components/ui/table';
+import { ClickableTr } from '@/components/ui/clickable-tr';
 import { EmptyState } from '@/components/ui/empty-state';
 import { StatusBadge, PaymentStatusBadge } from '@/components/StatusBadge';
 import { formatDate } from '@/lib/utils/format';
@@ -97,7 +98,7 @@ export default async function ReparatiesPage({ searchParams }: { searchParams: {
           </Thead>
           <Tbody>
             {(repairs ?? []).map((r: any) => (
-              <Tr key={r.id}>
+              <ClickableTr key={r.id} href={`/reparaties/${r.id}`}>
                 <Td>
                   <Link href={`/reparaties/${r.id}`} className="font-medium text-[var(--accent)] hover:underline">
                     {r.repair_number}
@@ -118,7 +119,7 @@ export default async function ReparatiesPage({ searchParams }: { searchParams: {
                 <Td align="right" className="tabular-nums text-ink-900">
                   {formatEuro(r.final_price ?? r.estimated_price)}
                 </Td>
-              </Tr>
+              </ClickableTr>
             ))}
             {(repairs ?? []).length === 0 && (
               <tr>
