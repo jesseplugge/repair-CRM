@@ -3,6 +3,7 @@
 import { createClient, getCurrentUser } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { getTranslations } from 'next-intl/server';
 
 export type DeviceFormState = { error?: string };
 
@@ -14,7 +15,10 @@ export async function createDevice(_prevState: DeviceFormState, formData: FormDa
   const customerId = formData.get('customer_id') as string;
   const brand = (formData.get('brand') as string)?.trim();
   const model = (formData.get('model') as string)?.trim();
-  if (!customerId || !brand || !model) return { error: 'Merk en model zijn verplicht.' };
+  if (!customerId || !brand || !model) {
+    const t = await getTranslations('deviceErrors');
+    return { error: t('brandModelRequired') };
+  }
 
   const { data: device, error } = await supabase
     .from('devices')

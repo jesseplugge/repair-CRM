@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { getTranslations } from 'next-intl/server';
 import { createClient, getCurrentUser } from '@/lib/supabase/server';
 import { Card, Button } from '@/components/ui/primitives';
 import { StatusBadge, PaymentStatusBadge } from '@/components/StatusBadge';
@@ -11,6 +12,7 @@ import { AddDeviceForm } from './AddDeviceForm';
 export default async function KlantProfielPage({ params }: { params: { id: string } }) {
   const user = await getCurrentUser();
   const supabase = createClient();
+  const t = await getTranslations('customerDetail');
 
   const { data: customer } = await supabase
     .from('customers')
@@ -49,13 +51,13 @@ export default async function KlantProfielPage({ params }: { params: { id: strin
               {customer.first_name} {customer.last_name}
             </h1>
             <div className="text-sm text-ink-400">
-              {customer.customer_number} &middot; Klant sinds {formatDate(customer.customer_since)}
+              {customer.customer_number} &middot; {t('customerSince', { date: formatDate(customer.customer_since) })}
             </div>
           </div>
         </div>
         <Link href={`/reparaties/nieuw?customer_id=${customer.id}`}>
           <Button variant="primary">
-            <Wrench size={16} /> Nieuwe reparatie
+            <Wrench size={16} /> {t('newRepair')}
           </Button>
         </Link>
       </div>
@@ -65,7 +67,7 @@ export default async function KlantProfielPage({ params }: { params: { id: strin
           {/* Devices */}
           <section>
             <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-400">Apparaten</h2>
+              <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-400">{t('devices')}</h2>
             </div>
             <div className="space-y-3">
               {(devices ?? []).map((d) => (
@@ -77,13 +79,13 @@ export default async function KlantProfielPage({ params }: { params: { id: strin
                     <div className="mt-0.5 text-xs text-ink-400">
                       {d.color && <>{d.color} &middot; </>}
                       {d.storage_capacity && <>{d.storage_capacity} &middot; </>}
-                      {d.imei ? `IMEI ${d.imei}` : 'Geen IMEI geregistreerd'}
+                      {d.imei ? `IMEI ${d.imei}` : t('noImei')}
                     </div>
                   </Card>
                 </Link>
               ))}
               {(devices ?? []).length === 0 && (
-                <p className="text-sm text-ink-400">Nog geen apparaten geregistreerd.</p>
+                <p className="text-sm text-ink-400">{t('noDevicesYet')}</p>
               )}
               <AddDeviceForm customerId={customer.id} />
             </div>
@@ -91,17 +93,17 @@ export default async function KlantProfielPage({ params }: { params: { id: strin
 
           {/* Repair history */}
           <section>
-            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-400">Reparaties</h2>
+            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-400">{t('repairs')}</h2>
             <Card>
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-ink-100 text-left text-xs uppercase tracking-wide text-ink-400">
-                    <th className="px-4 py-3 font-medium">Nummer</th>
-                    <th className="px-4 py-3 font-medium">Type</th>
-                    <th className="px-4 py-3 font-medium">Datum</th>
-                    <th className="px-4 py-3 font-medium">Status</th>
-                    <th className="px-4 py-3 font-medium">Betaling</th>
-                    <th className="px-4 py-3 text-right font-medium">Bedrag</th>
+                    <th className="px-4 py-3 font-medium">{t('colNumber')}</th>
+                    <th className="px-4 py-3 font-medium">{t('colType')}</th>
+                    <th className="px-4 py-3 font-medium">{t('colDate')}</th>
+                    <th className="px-4 py-3 font-medium">{t('colStatus')}</th>
+                    <th className="px-4 py-3 font-medium">{t('colPayment')}</th>
+                    <th className="px-4 py-3 text-right font-medium">{t('colAmount')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -128,7 +130,7 @@ export default async function KlantProfielPage({ params }: { params: { id: strin
                   {allRepairs.length === 0 && (
                     <tr>
                       <td colSpan={6} className="px-4 py-10 text-center text-ink-400">
-                        Nog geen reparaties voor deze klant.
+                        {t('noRepairsYet')}
                       </td>
                     </tr>
                   )}
@@ -140,7 +142,7 @@ export default async function KlantProfielPage({ params }: { params: { id: strin
 
         <div className="space-y-6">
           <Card className="p-4">
-            <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-400">Contact</h3>
+            <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-400">{t('contact')}</h3>
             <div className="space-y-2 text-sm">
               {customer.phone && (
                 <div className="flex items-center gap-2 text-ink-700">
@@ -161,25 +163,25 @@ export default async function KlantProfielPage({ params }: { params: { id: strin
                 </div>
               )}
               {!customer.phone && !customer.email && !customer.address && (
-                <p className="text-ink-400">Geen contactgegevens geregistreerd.</p>
+                <p className="text-ink-400">{t('noContactInfo')}</p>
               )}
             </div>
             {customer.notes && (
               <>
-                <h3 className="mb-1 mt-4 text-sm font-semibold uppercase tracking-wide text-ink-400">Opmerkingen</h3>
+                <h3 className="mb-1 mt-4 text-sm font-semibold uppercase tracking-wide text-ink-400">{t('notes')}</h3>
                 <p className="text-sm text-ink-700">{customer.notes}</p>
               </>
             )}
           </Card>
 
           <Card className="p-4">
-            <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-400">Totalen</h3>
+            <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-400">{t('totals')}</h3>
             <div className="flex items-center justify-between py-1.5 text-sm">
-              <span className="text-ink-600">Totaal besteed</span>
+              <span className="text-ink-600">{t('totalSpent')}</span>
               <span className="font-display tabular-nums font-semibold text-ink-950">{formatEuro(totalSpent)}</span>
             </div>
             <div className="flex items-center justify-between py-1.5 text-sm">
-              <span className="text-ink-600">Openstaand</span>
+              <span className="text-ink-600">{t('outstanding')}</span>
               <span className="font-display tabular-nums font-semibold text-red-600">{formatEuro(outstanding)}</span>
             </div>
           </Card>

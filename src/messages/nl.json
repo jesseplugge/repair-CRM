@@ -327,5 +327,81 @@
     "signatureMissing": "Handtekening ontbreekt.",
     "repairNotFound": "Reparatie niet gevonden.",
     "noActiveTerms": "Geen actieve Algemene Voorwaarden ingesteld — ga naar Instellingen."
+  },
+  "customersList": {
+    "title": "Klanten",
+    "subtitle": "Zoek op naam, telefoonnummer, e-mail of klantnummer.",
+    "newCustomer": "Nieuwe klant",
+    "searchPlaceholder": "Naam, telefoonnummer, e-mail…",
+    "colCustomer": "Klant",
+    "colNumber": "Klantnummer",
+    "colPhone": "Telefoon",
+    "colEmail": "E-mail",
+    "empty": "Geen klanten gevonden."
+  },
+  "newCustomer": {
+    "pageTitle": "Nieuwe klant",
+    "pageSubtitle": "Alleen naam is verplicht — de rest kan later worden aangevuld.",
+    "busy": "Bezig…",
+    "save": "Klant opslaan",
+    "firstName": "Voornaam",
+    "lastName": "Achternaam",
+    "companyOptional": "Bedrijfsnaam (optioneel)",
+    "phone": "Telefoonnummer",
+    "email": "E-mail",
+    "possibleDuplicate": "Mogelijk bestaat deze klant al: ",
+    "checkBeforeCreating": ". Controleer voordat je een nieuwe klant aanmaakt.",
+    "address": "Adres",
+    "postcode": "Postcode",
+    "city": "Plaats",
+    "notes": "Opmerkingen",
+    "cancel": "Annuleren"
+  },
+  "addDevice": {
+    "addDevice": "Apparaat toevoegen",
+    "busy": "Bezig…",
+    "save": "Apparaat opslaan",
+    "brand": "Merk",
+    "model": "Model",
+    "color": "Kleur",
+    "storage": "Opslagcapaciteit",
+    "imeiOptional": "IMEI (optioneel)",
+    "serialOptional": "Serienummer (optioneel)",
+    "conditionDamage": "Staat / bestaande schade",
+    "conditionPlaceholder": "Bijv. barst rechtsboven op scherm",
+    "notes": "Opmerkingen",
+    "cancel": "Annuleren"
+  },
+  "customerDetail": {
+    "customerSince": "Klant sinds {date}",
+    "newRepair": "Nieuwe reparatie",
+    "devices": "Apparaten",
+    "noDevicesYet": "Nog geen apparaten geregistreerd.",
+    "noImei": "Geen IMEI geregistreerd",
+    "repairs": "Reparaties",
+    "colNumber": "Nummer",
+    "colType": "Type",
+    "colDate": "Datum",
+    "colStatus": "Status",
+    "colPayment": "Betaling",
+    "colAmount": "Bedrag",
+    "noRepairsYet": "Nog geen reparaties voor deze klant.",
+    "contact": "Contact",
+    "noContactInfo": "Geen contactgegevens geregistreerd.",
+    "notes": "Opmerkingen",
+    "totals": "Totalen",
+    "totalSpent": "Totaal besteed",
+    "outstanding": "Openstaand"
+  },
+  "deviceHistory": {
+    "knownDamage": "Bekende schade",
+    "repairHistory": "Reparatiegeschiedenis ({count})",
+    "noRepairsYet": "Nog geen reparaties voor dit apparaat."
+  },
+  "customerErrors": {
+    "firstLastNameRequired": "Voornaam en achternaam zijn verplicht."
+  },
+  "deviceErrors": {
+    "brandModelRequired": "Merk en model zijn verplicht."
   }
 }

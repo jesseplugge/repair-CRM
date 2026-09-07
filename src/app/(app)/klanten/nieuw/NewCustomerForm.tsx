@@ -3,15 +3,17 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useFormState, useFormStatus } from 'react-dom';
+import { useTranslations } from 'next-intl';
 import { createCustomer, type CustomerSearchResult } from '@/lib/actions/customers';
 import { Button, Card, Field, Input, Textarea } from '@/components/ui/primitives';
 import { AlertTriangle } from 'lucide-react';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
+  const t = useTranslations('newCustomer');
   return (
     <Button type="submit" variant="primary" size="lg" disabled={pending}>
-      {pending ? 'Bezig…' : 'Klant opslaan'}
+      {pending ? t('busy') : t('save')}
     </Button>
   );
 }
@@ -21,6 +23,7 @@ export function NewCustomerForm({ redirectTo }: { redirectTo?: string }) {
   const [phone, setPhone] = useState('');
   const [matches, setMatches] = useState<CustomerSearchResult[]>([]);
   const timer = useRef<ReturnType<typeof setTimeout>>();
+  const t = useTranslations('newCustomer');
 
   useEffect(() => {
     clearTimeout(timer.current);
@@ -41,23 +44,23 @@ export function NewCustomerForm({ redirectTo }: { redirectTo?: string }) {
         {redirectTo && <input type="hidden" name="redirect_to" value={redirectTo} />}
 
         <div className="grid grid-cols-2 gap-4">
-          <Field label="Voornaam">
+          <Field label={t('firstName')}>
             <Input name="first_name" required />
           </Field>
-          <Field label="Achternaam">
+          <Field label={t('lastName')}>
             <Input name="last_name" required />
           </Field>
         </div>
 
-        <Field label="Bedrijfsnaam (optioneel)">
+        <Field label={t('companyOptional')}>
           <Input name="company_name" />
         </Field>
 
         <div className="grid grid-cols-2 gap-4">
-          <Field label="Telefoonnummer">
+          <Field label={t('phone')}>
             <Input name="phone" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="06 12345678" />
           </Field>
-          <Field label="E-mail">
+          <Field label={t('email')}>
             <Input name="email" type="email" />
           </Field>
         </div>
@@ -66,7 +69,7 @@ export function NewCustomerForm({ redirectTo }: { redirectTo?: string }) {
           <div className="flex items-start gap-2 rounded border border-amber-100 bg-amber-50 px-3 py-2 text-sm text-amber-700">
             <AlertTriangle size={16} className="mt-0.5 shrink-0" />
             <div>
-              Mogelijk bestaat deze klant al:{' '}
+              {t('possibleDuplicate')}
               {matches.slice(0, 3).map((m, i) => (
                 <span key={m.id}>
                   {i > 0 && ', '}
@@ -75,25 +78,25 @@ export function NewCustomerForm({ redirectTo }: { redirectTo?: string }) {
                   </Link>
                 </span>
               ))}
-              . Controleer voordat je een nieuwe klant aanmaakt.
+              {t('checkBeforeCreating')}
             </div>
           </div>
         )}
 
         <div className="grid grid-cols-3 gap-4">
           <div className="col-span-2">
-            <Field label="Adres">
+            <Field label={t('address')}>
               <Input name="address" />
             </Field>
           </div>
-          <Field label="Postcode">
+          <Field label={t('postcode')}>
             <Input name="postcode" />
           </Field>
         </div>
-        <Field label="Plaats">
+        <Field label={t('city')}>
           <Input name="city" />
         </Field>
-        <Field label="Opmerkingen">
+        <Field label={t('notes')}>
           <Textarea name="notes" rows={3} />
         </Field>
 
@@ -103,7 +106,7 @@ export function NewCustomerForm({ redirectTo }: { redirectTo?: string }) {
           <SubmitButton />
           <Link href="/klanten">
             <Button type="button" variant="ghost">
-              Annuleren
+              {t('cancel')}
             </Button>
           </Link>
         </div>

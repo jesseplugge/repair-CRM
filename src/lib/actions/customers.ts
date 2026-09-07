@@ -3,6 +3,7 @@
 import { createClient, getCurrentUser } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { getTranslations } from 'next-intl/server';
 
 export type CustomerFormState = { error?: string };
 
@@ -13,7 +14,10 @@ export async function createCustomer(_prevState: CustomerFormState, formData: Fo
 
   const firstName = (formData.get('first_name') as string)?.trim();
   const lastName = (formData.get('last_name') as string)?.trim();
-  if (!firstName || !lastName) return { error: 'Voornaam en achternaam zijn verplicht.' };
+  if (!firstName || !lastName) {
+    const t = await getTranslations('customerErrors');
+    return { error: t('firstLastNameRequired') };
+  }
 
   const { data: customerNumber, error: numberError } = await supabase.rpc('next_number', {
     p_business_id: user.business_id,

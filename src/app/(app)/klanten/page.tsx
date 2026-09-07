@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { getTranslations } from 'next-intl/server';
 import { searchCustomers } from '@/lib/actions/customers';
 import { Card, Button } from '@/components/ui/primitives';
 import { SearchBox } from './SearchBox';
@@ -6,17 +7,18 @@ import { Plus } from 'lucide-react';
 
 export default async function KlantenPage({ searchParams }: { searchParams: { q?: string } }) {
   const customers = await searchCustomers(searchParams.q ?? '');
+  const t = await getTranslations('customersList');
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-display text-2xl font-semibold text-ink-950">Klanten</h1>
-          <p className="text-sm text-ink-600">Zoek op naam, telefoonnummer, e-mail of klantnummer.</p>
+          <h1 className="font-display text-2xl font-semibold text-ink-950">{t('title')}</h1>
+          <p className="text-sm text-ink-600">{t('subtitle')}</p>
         </div>
         <Link href="/klanten/nieuw">
           <Button variant="primary">
-            <Plus size={16} /> Nieuwe klant
+            <Plus size={16} /> {t('newCustomer')}
           </Button>
         </Link>
       </div>
@@ -27,10 +29,10 @@ export default async function KlantenPage({ searchParams }: { searchParams: { q?
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-ink-100 text-left text-xs uppercase tracking-wide text-ink-400">
-              <th className="px-4 py-3 font-medium">Klant</th>
-              <th className="px-4 py-3 font-medium">Klantnummer</th>
-              <th className="px-4 py-3 font-medium">Telefoon</th>
-              <th className="px-4 py-3 font-medium">E-mail</th>
+              <th className="px-4 py-3 font-medium">{t('colCustomer')}</th>
+              <th className="px-4 py-3 font-medium">{t('colNumber')}</th>
+              <th className="px-4 py-3 font-medium">{t('colPhone')}</th>
+              <th className="px-4 py-3 font-medium">{t('colEmail')}</th>
             </tr>
           </thead>
           <tbody>
@@ -50,7 +52,7 @@ export default async function KlantenPage({ searchParams }: { searchParams: { q?
             {customers.length === 0 && (
               <tr>
                 <td colSpan={4} className="px-4 py-10 text-center text-ink-400">
-                  Geen klanten gevonden.
+                  {t('empty')}
                 </td>
               </tr>
             )}

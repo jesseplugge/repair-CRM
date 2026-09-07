@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { getTranslations } from 'next-intl/server';
 import { createClient, getCurrentUser } from '@/lib/supabase/server';
 import { Card } from '@/components/ui/primitives';
 import { StatusBadge, PaymentStatusBadge } from '@/components/StatusBadge';
@@ -10,6 +11,7 @@ import { ArrowLeft, Smartphone } from 'lucide-react';
 export default async function DeviceHistoryPage({ params }: { params: { id: string; deviceId: string } }) {
   const user = await getCurrentUser();
   const supabase = createClient();
+  const t = await getTranslations('deviceHistory');
 
   const { data: device } = await supabase
     .from('devices')
@@ -49,14 +51,14 @@ export default async function DeviceHistoryPage({ params }: { params: { id: stri
 
       {device.existing_damage && (
         <Card className="p-4">
-          <h3 className="mb-1 text-xs font-semibold uppercase tracking-wide text-ink-400">Bekende schade</h3>
+          <h3 className="mb-1 text-xs font-semibold uppercase tracking-wide text-ink-400">{t('knownDamage')}</h3>
           <p className="text-sm text-ink-700">{device.existing_damage}</p>
         </Card>
       )}
 
       <div>
         <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-400">
-          Reparatiegeschiedenis ({(repairs ?? []).length})
+          {t('repairHistory', { count: (repairs ?? []).length })}
         </h2>
         <div className="space-y-3">
           {(repairs ?? []).map((r) => {
@@ -83,7 +85,7 @@ export default async function DeviceHistoryPage({ params }: { params: { id: stri
               </Link>
             );
           })}
-          {(repairs ?? []).length === 0 && <p className="text-sm text-ink-400">Nog geen reparaties voor dit apparaat.</p>}
+          {(repairs ?? []).length === 0 && <p className="text-sm text-ink-400">{t('noRepairsYet')}</p>}
         </div>
       </div>
     </div>
