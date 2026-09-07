@@ -175,3 +175,47 @@ Supabase project requires email confirmation, the "confirm then return to the li
 a document template and confirming it shows up on the relevant PDF, and the outstanding-invoices
 report/PDF export. Report back what breaks.
 
+## Installable web app (PWA)
+
+The app is installable straight from the browser — no store, no account needed. Visit the site on
+a phone and use "Add to Home Screen" (iOS Safari) or the install prompt (Android Chrome); on
+desktop Chrome/Edge there's an install icon in the address bar. It opens fullscreen with its own
+icon, like a native app. The service worker (`public/sw.js`) deliberately caches nothing but a
+static offline screen — this app shows live business data (repairs, stock, invoices, money), so it
+never serves a stale cached page while offline, only a clear "you're offline" message.
+
+## Native app (iOS / Android via Capacitor)
+
+The web app is wrapped for the App Store / Play Store using [Capacitor](https://capacitorjs.com) —
+the native shell just loads the deployed site directly (`capacitor.config.ts` → `server.url`), the
+same way a browser would, since this app relies on server actions and cookie-based auth that can't
+be statically exported into the native bundle. `ios/` and `android/` are real, checked-in native
+projects.
+
+**What's already done:** both platforms scaffolded, app icon + splash screen generated for both
+(from `assets/icon.png` / `assets/splash.png` — regenerate everything after changing those with
+`npx capacitor-assets generate`), camera/photo-library usage strings added to `ios/App/App/Info.plist`
+(needed for the repair-photo capture feature).
+
+**What only you can do from here** (needs your own accounts/hardware, not something that can be
+scripted):
+
+1. **iOS** — open `ios/App/App.xcworkspace` in Xcode (`npm run cap:open:ios`), sign in with your
+   Apple ID under Signing & Capabilities, and you can run it on the Simulator or your own device
+   immediately with a free account. Submitting to the App Store needs an **Apple Developer Program**
+   membership ($99/year).
+2. **Android** — open the `android/` folder in Android Studio (`npm run cap:open:android`) — you'll
+   need Android Studio installed, which wasn't available in the environment this was built in, so
+   the Android build has not actually been run/tested yet. Publishing to the Play Store needs a
+   **Google Play Console** account ($25 one-time).
+3. Whenever you change web app code, run `npm run cap:sync` before rebuilding in Xcode/Android
+   Studio — Capacitor only picks up native-relevant config changes (like `capacitor.config.ts`) on
+   sync, though since the app loads the live site at `server.url` your day-to-day web changes go
+   live immediately without a native rebuild at all.
+4. The app icon is a placeholder teal "R" monogram — swap `assets/icon.png` (1024×1024),
+   `assets/icon-foreground.png` / `icon-background.png` (Android adaptive icon), and
+   `assets/splash.png` for real artwork whenever you have a logo, then re-run
+   `npx capacitor-assets generate`.
+5. Both app stores require a privacy policy URL and store listing (screenshots, description) before
+   they'll accept a submission — worth drafting once you're ready to actually publish.
+
