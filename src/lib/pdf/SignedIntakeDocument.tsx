@@ -2,8 +2,10 @@ import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/render
 import { pageSizeFor } from './format';
 import { formatEuro } from '@/lib/utils/currency';
 import { formatDateTime } from '@/lib/utils/format';
+import type { PdfTranslator } from './i18n';
 
 export type SignedIntakeProps = {
+  t: PdfTranslator;
   repairNumber: string;
   business: {
     name: string;
@@ -36,13 +38,14 @@ const s = StyleSheet.create({
   signatureImg: { width: 220, height: 90, objectFit: 'contain' },
 });
 
-const DOC_LABELS: Record<string, string> = {
-  algemene_voorwaarden: 'Algemene Voorwaarden',
-  reparatievoorwaarden: 'Reparatievoorwaarden',
-  privacy: 'Privacyverklaring',
-};
-
 export function SignedIntakeDocument(props: SignedIntakeProps) {
+  const { t } = props;
+  const DOC_LABELS: Record<string, string> = {
+    algemene_voorwaarden: t('docAlgemeneVoorwaarden'),
+    reparatievoorwaarden: t('docReparatievoorwaarden'),
+    privacy: t('docPrivacy'),
+  };
+
   return (
     <Document>
       <Page size={pageSizeFor('a4')} style={s.page}>
@@ -60,40 +63,44 @@ export function SignedIntakeDocument(props: SignedIntakeProps) {
           {props.business.vatNumber ? `BTW ${props.business.vatNumber}` : ''}
         </Text>
 
-        <Text style={s.title}>Ondertekend innamebewijs — {props.repairNumber}</Text>
+        <Text style={s.title}>{t('title', { repairNumber: props.repairNumber })}</Text>
 
-        <Text style={s.sectionTitle}>Klant</Text>
+        <Text style={s.sectionTitle}>{t('customer')}</Text>
         <Text>{props.customer.name}</Text>
         {props.customer.phone && <Text style={s.small}>{props.customer.phone}</Text>}
 
-        <Text style={s.sectionTitle}>Apparaat</Text>
+        <Text style={s.sectionTitle}>{t('device')}</Text>
         <Text>
           {props.device.brand} {props.device.model}
         </Text>
-        <Text style={s.small}>{props.device.imei ? `IMEI ${props.device.imei}` : 'Geen IMEI geregistreerd'}</Text>
-        {props.device.conditionNotes && <Text style={s.small}>Staat bij intake: {props.device.conditionNotes}</Text>}
+        <Text style={s.small}>{props.device.imei ? `IMEI ${props.device.imei}` : t('noImei')}</Text>
+        {props.device.conditionNotes && <Text style={s.small}>{t('conditionAtIntake', { notes: props.device.conditionNotes })}</Text>}
 
-        <Text style={s.sectionTitle}>Reparatie</Text>
+        <Text style={s.sectionTitle}>{t('repair')}</Text>
         <Text>{props.repairTypeLabel}</Text>
-        {props.estimatedPrice != null && <Text style={s.small}>Geschatte prijs: {formatEuro(props.estimatedPrice)}</Text>}
+        {props.estimatedPrice != null && <Text style={s.small}>{t('estimatedPrice', { price: formatEuro(props.estimatedPrice) })}</Text>}
 
         <View style={s.declaration}>
-          <Text>Door hieronder te ondertekenen bevestigt de klant:</Text>
-          <Text>• Dat het apparaat in de beschreven staat is afgegeven.</Text>
-          <Text>• Dat de gegevens van het apparaat correct zijn.</Text>
-          <Text>• Dat de geschatte prijs is begrepen, indien van toepassing.</Text>
-          <Text>• Kennis te hebben genomen van en akkoord te gaan met de volgende voorwaarden:</Text>
-          {props.termsVersions.map((t) => (
-            <Text key={t.documentType} style={{ marginLeft: 8 }}>
-              – {DOC_LABELS[t.documentType] ?? t.documentType} {t.versionLabel} (geldig vanaf {t.effectiveDate})
+          <Text>{t('declarationIntro')}</Text>
+          <Text>• {t('declaration1')}</Text>
+          <Text>• {t('declaration2')}</Text>
+          <Text>• {t('declaration3')}</Text>
+          <Text>• {t('declaration4')}</Text>
+          {props.termsVersions.map((tv) => (
+            <Text key={tv.documentType} style={{ marginLeft: 8 }}>
+              {t('termsLine', {
+                label: DOC_LABELS[tv.documentType] ?? tv.documentType,
+                version: tv.versionLabel,
+                date: tv.effectiveDate,
+              })}
             </Text>
           ))}
         </View>
 
         <View style={s.signatureBox}>
-          <Text style={s.small}>Handtekening klant</Text>
+          <Text style={s.small}>{t('signature')}</Text>
           <Image src={props.signatureImage} style={s.signatureImg} />
-          <Text style={s.small}>Ondertekend op {formatDateTime(props.signedAt)}</Text>
+          <Text style={s.small}>{t('signedOn', { date: formatDateTime(props.signedAt) })}</Text>
         </View>
       </Page>
     </Document>

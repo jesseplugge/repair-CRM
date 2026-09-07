@@ -2,8 +2,10 @@ import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
 import { formatEuro } from '@/lib/utils/currency';
 import { formatDate } from '@/lib/utils/format';
 import type { ReportData } from '@/lib/reports/data';
+import type { PdfTranslator } from './i18n';
 
 export type ReportDocumentProps = {
+  t: PdfTranslator;
   businessName: string;
   data: ReportData;
 };
@@ -38,13 +40,13 @@ const s = StyleSheet.create({
   overdue: { color: '#C4453A' },
 });
 
-export function ReportDocument({ businessName, data }: ReportDocumentProps) {
+export function ReportDocument({ t, businessName, data }: ReportDocumentProps) {
   return (
     <Document>
       <Page size="A4" style={s.page}>
         <View style={s.header}>
           <Text style={s.businessName}>{businessName}</Text>
-          <Text style={s.title}>Rapportage</Text>
+          <Text style={s.title}>{t('title')}</Text>
           <Text style={s.period}>
             {formatDate(data.from)} — {formatDate(data.to)}
           </Text>
@@ -53,59 +55,61 @@ export function ReportDocument({ businessName, data }: ReportDocumentProps) {
         <View style={s.statsRow}>
           <View style={s.statBox}>
             <Text style={s.statValue}>{formatEuro(data.totalOmzet)}</Text>
-            <Text style={s.statLabel}>OMZET</Text>
+            <Text style={s.statLabel}>{t('revenue')}</Text>
           </View>
           <View style={s.statBox}>
             <Text style={s.statValue}>{formatEuro(data.totalBtw)}</Text>
-            <Text style={s.statLabel}>BTW</Text>
+            <Text style={s.statLabel}>{t('vat')}</Text>
           </View>
           <View style={s.statBox}>
             <Text style={s.statValue}>{formatEuro(data.partsCost)}</Text>
-            <Text style={s.statLabel}>ONDERDELENKOSTEN</Text>
+            <Text style={s.statLabel}>{t('partsCost')}</Text>
           </View>
           <View style={s.statBox}>
             <Text style={s.statValue}>{formatEuro(data.grossProfit)}</Text>
-            <Text style={s.statLabel}>BRUTOWINST</Text>
+            <Text style={s.statLabel}>{t('grossProfit')}</Text>
           </View>
         </View>
 
-        <Text style={s.sectionTitle}>Omzet naar bron</Text>
+        <Text style={s.sectionTitle}>{t('revenueBySource')}</Text>
         <View style={s.row}>
-          <Text>Reparaties</Text>
+          <Text>{t('repairs')}</Text>
           <Text>{formatEuro(data.repairRevenueIncl)}</Text>
         </View>
         <View style={s.row}>
-          <Text>Producten (kassa)</Text>
+          <Text>{t('products')}</Text>
           <Text>{formatEuro(data.productRevenueIncl)}</Text>
         </View>
 
-        <Text style={s.sectionTitle}>BTW per tarief</Text>
+        <Text style={s.sectionTitle}>{t('vatByRate')}</Text>
         {data.vatBreakdown.map(([rate, vat]) => (
           <View style={s.row} key={rate}>
             <Text>{rate}%</Text>
             <Text>{formatEuro(vat)}</Text>
           </View>
         ))}
-        {data.vatBreakdown.length === 0 && <Text style={{ color: '#8A93A6' }}>Geen data in deze periode.</Text>}
+        {data.vatBreakdown.length === 0 && <Text style={{ color: '#8A93A6' }}>{t('noDataPeriod')}</Text>}
 
-        <Text style={s.sectionTitle}>Populaire reparaties</Text>
+        <Text style={s.sectionTitle}>{t('popularRepairs')}</Text>
         {data.popular.map(([label, count]) => (
           <View style={s.row} key={label}>
             <Text>{label}</Text>
             <Text>{count}x</Text>
           </View>
         ))}
-        {data.popular.length === 0 && <Text style={{ color: '#8A93A6' }}>Geen data in deze periode.</Text>}
+        {data.popular.length === 0 && <Text style={{ color: '#8A93A6' }}>{t('noDataPeriod')}</Text>}
 
-        <Text style={s.sectionTitle}>Openstaande facturen ({data.outstandingInvoices.length}) — totaal {formatEuro(data.totalOutstanding)}</Text>
+        <Text style={s.sectionTitle}>
+          {t('outstandingInvoices', { count: data.outstandingInvoices.length, total: formatEuro(data.totalOutstanding) })}
+        </Text>
         {data.outstandingInvoices.length > 0 ? (
           <>
             <View style={s.tableHeader}>
-              <Text style={s.colNum}>Nummer</Text>
-              <Text style={s.colCustomer}>Klant</Text>
-              <Text style={s.colDate}>Vervaldatum</Text>
-              <Text style={s.colStatus}>Status</Text>
-              <Text style={s.colAmount}>Openstaand</Text>
+              <Text style={s.colNum}>{t('colNumber')}</Text>
+              <Text style={s.colCustomer}>{t('colCustomer')}</Text>
+              <Text style={s.colDate}>{t('colDueDate')}</Text>
+              <Text style={s.colStatus}>{t('colStatus')}</Text>
+              <Text style={s.colAmount}>{t('colOutstanding')}</Text>
             </View>
             {data.outstandingInvoices.map((inv) => (
               <View style={s.tableRow} key={inv.id}>
@@ -113,7 +117,7 @@ export function ReportDocument({ businessName, data }: ReportDocumentProps) {
                 <Text style={s.colCustomer}>{inv.customerName}</Text>
                 <Text style={[s.colDate, inv.overdue ? s.overdue : {}]}>
                   {formatDate(inv.dueDate)}
-                  {inv.overdue ? ' (vervallen)' : ''}
+                  {inv.overdue ? t('overdueSuffix') : ''}
                 </Text>
                 <Text style={s.colStatus}>{inv.status}</Text>
                 <Text style={s.colAmount}>{formatEuro(inv.outstanding)}</Text>
@@ -121,7 +125,7 @@ export function ReportDocument({ businessName, data }: ReportDocumentProps) {
             ))}
           </>
         ) : (
-          <Text style={{ color: '#8A93A6' }}>Geen openstaande facturen.</Text>
+          <Text style={{ color: '#8A93A6' }}>{t('noOutstanding')}</Text>
         )}
       </Page>
     </Document>

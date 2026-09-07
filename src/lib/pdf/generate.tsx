@@ -6,6 +6,7 @@ import { SignedIntakeDocument } from './SignedIntakeDocument';
 import { ReportDocument } from './ReportDocument';
 import { businessForPdf } from './data';
 import { getTemplateContent } from './templates';
+import { getPdfTranslator } from './i18n';
 import { getReportData } from '@/lib/reports/data';
 import type { DocFormat } from './format';
 
@@ -31,6 +32,7 @@ export async function findOrCreateReceipt(
   let { data: receipt } = await query.maybeSingle();
 
   if (!receipt) {
+    const t = await getPdfTranslator('pdfErrors');
     const { data: receiptNumber, error: numberError } = await supabase.rpc('next_number', {
       p_business_id: businessId,
       p_type: 'receipt',
@@ -38,7 +40,7 @@ export async function findOrCreateReceipt(
       p_prefix: 'BON-',
       p_pad: 5,
     });
-    if (numberError || !receiptNumber) throw new Error(numberError?.message ?? 'Kon geen bonnummer genereren.');
+    if (numberError || !receiptNumber) throw new Error(numberError?.message ?? t('couldNotGenerateReceiptNumber'));
 
     const { data: created, error: insertError } = await supabase
       .from('receipts')
@@ -46,7 +48,7 @@ export async function findOrCreateReceipt(
       .select('receipt_number')
       .single();
 
-    if (insertError || !created) throw new Error(insertError?.message ?? 'Aanmaken bon mislukt.');
+    if (insertError || !created) throw new Error(insertError?.message ?? t('createReceiptFailed'));
     receipt = created;
   }
   return receipt.receipt_number;
@@ -62,10 +64,11 @@ export async function generateIntakePdf(repairId: string, businessId: string, us
     .single();
   if (!repair) return null;
 
-  const [{ data: business }, { data: items }, template] = await Promise.all([
+  const [{ data: business }, { data: items }, template, t] = await Promise.all([
     supabase.from('businesses').select('*').eq('id', businessId).single(),
     supabase.from('repair_items').select('*').eq('repair_id', repair.id),
     getTemplateContent(businessId, 'dropoff'),
+    getPdfTranslator('pdfReceipt'),
   ]);
   const customer = repair.customer as any;
   const device = repair.device as any;
@@ -80,6 +83,7 @@ export async function generateIntakePdf(repairId: string, businessId: string, us
 
   const buffer = await renderToBuffer(
     <ReceiptDocument
+      t={t}
       format={format}
       kind="intake"
       documentNumber={documentNumber}
@@ -130,11 +134,12 @@ export async function generateCompletionPdf(repairId: string, businessId: string
     .single();
   if (!repair) return null;
 
-  const [{ data: business }, { data: items }, { data: payments }, template] = await Promise.all([
+  const [{ data: business }, { data: items }, { data: payments }, template, t] = await Promise.all([
     supabase.from('businesses').select('*').eq('id', businessId).single(),
     supabase.from('repair_items').select('*').eq('repair_id', repair.id),
     supabase.from('payments').select('*').eq('repair_id', repair.id).order('paid_at', { ascending: false }),
     getTemplateContent(businessId, 'completion'),
+    getPdfTranslator('pdfReceipt'),
   ]);
   const customer = repair.customer as any;
   const device = repair.device as any;
@@ -150,6 +155,7 @@ export async function generateCompletionPdf(repairId: string, businessId: string
 
   const buffer = await renderToBuffer(
     <ReceiptDocument
+      t={t}
       format={format}
       kind="completion"
       documentNumber={documentNumber}
@@ -193,15 +199,17 @@ export async function generateInvoicePdf(invoiceId: string, businessId: string):
     .single();
   if (!invoice) return null;
 
-  const [{ data: business }, { data: items }, template] = await Promise.all([
+  const [{ data: business }, { data: items }, template, t] = await Promise.all([
     supabase.from('businesses').select('*').eq('id', businessId).single(),
     supabase.from('invoice_items').select('*').eq('invoice_id', invoice.id),
     getTemplateContent(businessId, 'invoice'),
+    getPdfTranslator('pdfInvoice'),
   ]);
   const customer = invoice.customer as any;
 
   const buffer = await renderToBuffer(
     <InvoiceDocument
+      t={t}
       invoiceNumber={invoice.invoice_number}
       invoiceDate={invoice.invoice_date}
       serviceDate={invoice.service_date}
@@ -251,7 +259,7 @@ export async function generateSignedIntakePdf(repairId: string, businessId: stri
     .single();
   if (!repair) return null;
 
-  const [{ data: business }, { data: signature }] = await Promise.all([
+  const [{ data: business }, { data: signature }, t] = await Promise.all([
     supabase.from('businesses').select('*').eq('id', businessId).single(),
     supabase
       .from('intake_signatures')
@@ -260,6 +268,7 @@ export async function generateSignedIntakePdf(repairId: string, businessId: stri
       .order('created_at', { ascending: false })
       .limit(1)
       .maybeSingle(),
+    getPdfTranslator('pdfSignedIntake'),
   ]);
   if (!signature) return null;
 
@@ -273,6 +282,7 @@ export async function generateSignedIntakePdf(repairId: string, businessId: stri
 
   const buffer = await renderToBuffer(
     <SignedIntakeDocument
+      t={t}
       repairNumber={repair.repair_number}
       business={businessForPdf(business)}
       customer={{ name: `${customer.first_name} ${customer.last_name}`, phone: customer.phone }}
@@ -308,11 +318,12 @@ export async function generatePosReceiptPdf(saleId: string, businessId: string, 
     .single();
   if (!sale) return null;
 
-  const [{ data: business }, { data: items }, { data: payments }, template] = await Promise.all([
+  const [{ data: business }, { data: items }, { data: payments }, template, t] = await Promise.all([
     supabase.from('businesses').select('*').eq('id', businessId).single(),
     supabase.from('pos_sale_items').select('*').eq('pos_sale_id', sale.id),
     supabase.from('payments').select('*').eq('pos_sale_id', sale.id).order('paid_at', { ascending: false }),
     getTemplateContent(businessId, 'receipt'),
+    getPdfTranslator('pdfReceipt'),
   ]);
   const customer = sale.customer as any;
 
@@ -323,13 +334,14 @@ export async function generatePosReceiptPdf(saleId: string, businessId: string, 
 
   const buffer = await renderToBuffer(
     <ReceiptDocument
+      t={t}
       format={format}
       kind="completion"
       documentNumber={documentNumber}
       dateTime={sale.created_at}
       business={businessForPdf(business)}
       customer={{
-        name: customer ? `${customer.first_name} ${customer.last_name}` : 'Contant',
+        name: customer ? `${customer.first_name} ${customer.last_name}` : t('cashCustomer'),
         phone: customer?.phone,
         email: customer?.email,
       }}
@@ -353,19 +365,20 @@ export async function generatePosReceiptPdf(saleId: string, businessId: string, 
     filename: `${documentNumber}.pdf`,
     documentNumber,
     customerEmail: customer?.email ?? null,
-    customerName: customer ? `${customer.first_name} ${customer.last_name}` : 'Contant',
+    customerName: customer ? `${customer.first_name} ${customer.last_name}` : t('cashCustomer'),
   };
 }
 
 export async function generateReportPdf(businessId: string, from: string, to: string) {
   const supabase = createClient();
-  const [{ data: business }, data] = await Promise.all([
+  const [{ data: business }, data, t] = await Promise.all([
     supabase.from('businesses').select('*').eq('id', businessId).single(),
     getReportData(businessId, from, to),
+    getPdfTranslator('pdfReport'),
   ]);
 
   const buffer = await renderToBuffer(
-    <ReportDocument businessName={businessForPdf(business).name} data={data} />
+    <ReportDocument t={t} businessName={businessForPdf(business).name} data={data} />
   );
 
   return { buffer, filename: `rapportage-${from}-tot-${to}.pdf` };

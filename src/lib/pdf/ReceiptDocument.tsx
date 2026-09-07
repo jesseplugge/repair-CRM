@@ -2,6 +2,7 @@ import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/render
 import { pageSizeFor, isThermal, baseFontSize, type DocFormat } from './format';
 import { formatEuro } from '@/lib/utils/currency';
 import { formatDateTime } from '@/lib/utils/format';
+import type { PdfTranslator } from './i18n';
 
 export type ReceiptLine = {
   description: string;
@@ -12,6 +13,7 @@ export type ReceiptLine = {
 };
 
 export type ReceiptDocumentProps = {
+  t: PdfTranslator;
   format: DocFormat;
   kind: 'intake' | 'completion';
   documentNumber: string;
@@ -76,8 +78,9 @@ function styles(format: DocFormat) {
 }
 
 export function ReceiptDocument(props: ReceiptDocumentProps) {
+  const { t } = props;
   const s = styles(props.format);
-  const title = props.kind === 'intake' ? 'Innamebewijs / Reparatiebon' : 'Kassabon';
+  const title = props.kind === 'intake' ? t('titleIntake') : t('titleCompletion');
 
   return (
     <Document>
@@ -101,9 +104,9 @@ export function ReceiptDocument(props: ReceiptDocumentProps) {
         )}
         {(props.business.kvkNumber || props.business.vatNumber) && (
           <Text style={s.small}>
-            {props.business.kvkNumber ? `KVK ${props.business.kvkNumber}` : ''}
+            {props.business.kvkNumber ? t('kvk', { number: props.business.kvkNumber }) : ''}
             {props.business.kvkNumber && props.business.vatNumber ? ' · ' : ''}
-            {props.business.vatNumber ? `BTW ${props.business.vatNumber}` : ''}
+            {props.business.vatNumber ? t('vatNumber', { number: props.business.vatNumber }) : ''}
           </Text>
         )}
 
@@ -119,7 +122,7 @@ export function ReceiptDocument(props: ReceiptDocumentProps) {
         </View>
 
         <View style={s.section}>
-          <Text style={s.sectionTitle}>Klant</Text>
+          <Text style={s.sectionTitle}>{t('customer')}</Text>
           <Text>{props.customer.name}</Text>
           {props.customer.phone && <Text style={s.small}>{props.customer.phone}</Text>}
           {props.customer.email && <Text style={s.small}>{props.customer.email}</Text>}
@@ -127,28 +130,28 @@ export function ReceiptDocument(props: ReceiptDocumentProps) {
 
         {props.device && (
           <View style={s.section}>
-            <Text style={s.sectionTitle}>Apparaat</Text>
+            <Text style={s.sectionTitle}>{t('device')}</Text>
             <Text>
               {props.device.brand} {props.device.model}
             </Text>
             <Text style={s.small}>
               {props.device.color ? `${props.device.color} · ` : ''}
               {props.device.storage ? `${props.device.storage} · ` : ''}
-              {props.device.imei ? `IMEI ${props.device.imei}` : 'Geen IMEI geregistreerd'}
+              {props.device.imei ? `IMEI ${props.device.imei}` : t('noImei')}
             </Text>
-            {props.device.conditionNotes && <Text style={s.small}>Staat: {props.device.conditionNotes}</Text>}
+            {props.device.conditionNotes && <Text style={s.small}>{t('condition', { notes: props.device.conditionNotes })}</Text>}
           </View>
         )}
 
         {props.complaint && (
           <View style={s.section}>
-            <Text style={s.sectionTitle}>Klacht</Text>
+            <Text style={s.sectionTitle}>{t('complaint')}</Text>
             <Text>{props.complaint}</Text>
           </View>
         )}
 
         <View style={s.section}>
-          <Text style={s.sectionTitle}>{props.kind === 'intake' ? 'Geschatte werkzaamheden' : 'Specificatie'}</Text>
+          <Text style={s.sectionTitle}>{props.kind === 'intake' ? t('estimatedWork') : t('specification')}</Text>
           <View style={s.hr} />
           {props.lines.map((line, i) => (
             <View key={i} style={s.lineRow}>
@@ -161,20 +164,20 @@ export function ReceiptDocument(props: ReceiptDocumentProps) {
           ))}
           <View style={s.hr} />
           <View style={s.totalsRow}>
-            <Text style={s.small}>Subtotaal excl. BTW</Text>
+            <Text style={s.small}>{t('subtotalExclVat')}</Text>
             <Text style={s.small}>{formatEuro(props.subtotalExclVat)}</Text>
           </View>
           <View style={s.totalsRow}>
-            <Text style={s.small}>BTW</Text>
+            <Text style={s.small}>{t('vat')}</Text>
             <Text style={s.small}>{formatEuro(props.totalVat)}</Text>
           </View>
           <View style={s.totalsRow}>
-            <Text style={s.grandTotal}>Totaal</Text>
+            <Text style={s.grandTotal}>{t('total')}</Text>
             <Text style={s.grandTotal}>{formatEuro(props.totalInclVat)}</Text>
           </View>
           {props.paymentMethod && (
             <View style={s.totalsRow}>
-              <Text style={s.small}>Betaalmethode</Text>
+              <Text style={s.small}>{t('paymentMethod')}</Text>
               <Text style={s.small}>{props.paymentMethod}</Text>
             </View>
           )}
@@ -182,7 +185,7 @@ export function ReceiptDocument(props: ReceiptDocumentProps) {
 
         {props.warrantyMonths && props.kind === 'completion' && (
           <View style={s.section}>
-            <Text style={s.small}>Garantie: {props.warrantyMonths} maanden vanaf ophaaldatum.</Text>
+            <Text style={s.small}>{t('warranty', { months: props.warrantyMonths })}</Text>
           </View>
         )}
 
@@ -193,7 +196,7 @@ export function ReceiptDocument(props: ReceiptDocumentProps) {
         )}
 
         <Text style={s.footer}>
-          {props.footerNote?.trim() || `Bedankt voor uw vertrouwen in ${props.business.name}.`}
+          {props.footerNote?.trim() || t('defaultFooter', { businessName: props.business.name })}
         </Text>
       </Page>
     </Document>
