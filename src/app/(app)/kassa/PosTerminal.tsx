@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useTransition } from 'react';
+import { useTranslations } from 'next-intl';
 import { checkoutPosSale, type CartLine } from '@/lib/actions/pos';
 import { emailPosReceipt } from '@/lib/actions/email';
 import { EmailButton } from '@/components/EmailButton';
@@ -12,13 +13,14 @@ import { Search, Trash2, Banknote, CreditCard, Landmark, CheckCircle2, User } fr
 type Product = { id: string; name: string; sku: string | null; selling_price_excl_vat: number; vat_rate: number; stock_quantity: number };
 type CustomerLite = { id: string; first_name: string; last_name: string; phone: string | null; email?: string | null };
 
-const METHODS = [
-  { value: 'contant', label: 'CONTANT', icon: Banknote },
-  { value: 'pin', label: 'PIN', icon: CreditCard },
-  { value: 'bankoverschrijving', label: 'BANK', icon: Landmark },
-];
-
 export function PosTerminal() {
+  const t = useTranslations('pos');
+
+  const METHODS = [
+    { value: 'contant', label: t('methodCash'), icon: Banknote },
+    { value: 'pin', label: t('methodPin'), icon: CreditCard },
+    { value: 'bankoverschrijving', label: t('methodBank'), icon: Landmark },
+  ];
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<Product[]>([]);
   const [cart, setCart] = useState<(CartLine & { key: string })[]>([]);
@@ -111,13 +113,13 @@ export function PosTerminal() {
     return (
       <Card className="flex flex-col items-center gap-3 p-10 text-center">
         <CheckCircle2 size={32} className="text-green-600" />
-        <h2 className="font-display text-xl font-semibold text-ink-950">Betaling geslaagd</h2>
+        <h2 className="font-display text-xl font-semibold text-ink-950">{t('paymentSuccess')}</h2>
         <div className="flex w-full max-w-xs flex-col gap-2 pt-2">
-          <PrintControls baseUrl={`/api/pos-sales/${success}/pdf`} label="Bon printen" />
+          <PrintControls baseUrl={`/api/pos-sales/${success}/pdf`} label={t('printReceipt')} />
           <EmailButton id={success} action={emailPosReceipt} defaultEmail={successEmail} />
         </div>
         <button onClick={() => setSuccess(null)} className="mt-4 text-sm text-[var(--accent)] underline">
-          Nieuwe verkoop
+          {t('newSale')}
         </button>
       </Card>
     );
@@ -128,7 +130,7 @@ export function PosTerminal() {
       <div className="col-span-2 space-y-4">
         <div className="relative">
           <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-400" />
-          <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Zoek product op naam of SKU…" className="pl-9" autoFocus />
+          <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder={t('searchProductPlaceholder')} className="pl-9" autoFocus />
         </div>
         {results.length > 0 && (
           <Card className="divide-y divide-ink-100">
@@ -140,7 +142,7 @@ export function PosTerminal() {
               >
                 <div>
                   <div className="font-medium text-ink-900">{p.name}</div>
-                  <div className="text-xs text-ink-400">{p.sku ?? ''} &middot; Voorraad {p.stock_quantity}</div>
+                  <div className="text-xs text-ink-400">{p.sku ?? ''} &middot; {t('stock', { count: p.stock_quantity })}</div>
                 </div>
                 <div className="tabular-nums text-ink-900">{formatEuro(p.selling_price_excl_vat * (1 + p.vat_rate / 100))}</div>
               </button>
@@ -150,7 +152,7 @@ export function PosTerminal() {
 
         <Card className="p-4">
           <h3 className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-ink-400">
-            <User size={13} /> Klant (optioneel)
+            <User size={13} /> {t('customerOptional')}
           </h3>
           {customer ? (
             <div className="flex items-center justify-between rounded border border-[var(--accent-border-soft)] bg-[var(--accent-soft)] px-3 py-2">
@@ -158,12 +160,12 @@ export function PosTerminal() {
                 {customer.first_name} {customer.last_name}
               </span>
               <button onClick={() => setCustomer(null)} className="text-xs text-[var(--accent)] underline">
-                Wijzigen
+                {t('change')}
               </button>
             </div>
           ) : (
             <div>
-              <Input value={customerQuery} onChange={(e) => setCustomerQuery(e.target.value)} placeholder="Zoek klant…" />
+              <Input value={customerQuery} onChange={(e) => setCustomerQuery(e.target.value)} placeholder={t('searchCustomerPlaceholder')} />
               {customerResults.length > 0 && (
                 <div className="mt-1 divide-y divide-ink-100 rounded border border-ink-100">
                   {customerResults.map((c) => (
@@ -189,7 +191,7 @@ export function PosTerminal() {
       {/* Cart */}
       <div>
         <Card className="p-4">
-          <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink-400">Winkelmandje</h3>
+          <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink-400">{t('cart')}</h3>
           <div className="space-y-2">
             {cart.map((l) => (
               <div key={l.key} className="flex items-center justify-between text-sm">
@@ -211,11 +213,11 @@ export function PosTerminal() {
                 </button>
               </div>
             ))}
-            {cart.length === 0 && <p className="text-sm text-ink-400">Nog geen producten toegevoegd.</p>}
+            {cart.length === 0 && <p className="text-sm text-ink-400">{t('noItemsYet')}</p>}
           </div>
 
           <div className="mt-4 flex justify-between border-t border-ink-100 pt-3 font-display text-lg font-semibold text-ink-950">
-            <span>Totaal</span>
+            <span>{t('total')}</span>
             <span className="tabular-nums">{formatEuro(totalInclVat)}</span>
           </div>
 
@@ -243,7 +245,7 @@ export function PosTerminal() {
             disabled={cart.length === 0 || !method || pending}
             onClick={checkout}
           >
-            {pending ? 'Bezig…' : `Afrekenen ${formatEuro(totalInclVat)}`}
+            {pending ? t('busy') : t('checkout', { amount: formatEuro(totalInclVat) })}
           </Button>
         </Card>
       </div>

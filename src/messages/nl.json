@@ -403,5 +403,31 @@
   },
   "deviceErrors": {
     "brandModelRequired": "Merk en model zijn verplicht."
+  },
+  "posPage": {
+    "title": "Kassa",
+    "subtitle": "Losse verkoop van producten, zonder reparatie.",
+    "cashDrawer": "Kassalade"
+  },
+  "pos": {
+    "methodCash": "CONTANT",
+    "methodPin": "PIN",
+    "methodBank": "BANK",
+    "paymentSuccess": "Betaling geslaagd",
+    "printReceipt": "Bon printen",
+    "newSale": "Nieuwe verkoop",
+    "searchProductPlaceholder": "Zoek product op naam of SKU…",
+    "stock": "Voorraad {count}",
+    "customerOptional": "Klant (optioneel)",
+    "change": "Wijzigen",
+    "searchCustomerPlaceholder": "Zoek klant…",
+    "cart": "Winkelmandje",
+    "noItemsYet": "Nog geen producten toegevoegd.",
+    "total": "Totaal",
+    "busy": "Bezig…",
+    "checkout": "Afrekenen {amount}"
+  },
+  "posErrors": {
+    "cartEmpty": "Winkelmandje is leeg."
   }
 }

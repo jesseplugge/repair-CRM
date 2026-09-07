@@ -5,6 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { calculateFromExclVat } from '@/lib/utils/currency';
 import { insertPayment } from './payments';
+import { getTranslations } from 'next-intl/server';
 
 export type CartLine = {
   productId: string | null;
@@ -21,7 +22,10 @@ export async function checkoutPosSale(
 ): Promise<{ error?: string; saleId?: string }> {
   const user = await getCurrentUser();
   if (!user) redirect('/login');
-  if (lines.length === 0) return { error: 'Winkelmandje is leeg.' };
+  if (lines.length === 0) {
+    const t = await getTranslations('posErrors');
+    return { error: t('cartEmpty') };
+  }
   const supabase = createClient();
 
   const computed = lines.map((l) => {
