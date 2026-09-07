@@ -1,8 +1,9 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Inter, Space_Grotesk } from 'next/font/google';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages } from 'next-intl/server';
 import { ToastProvider } from '@/components/ui/toast';
+import { ServiceWorkerRegister } from '@/components/ServiceWorkerRegister';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
@@ -15,6 +16,22 @@ const spaceGrotesk = Space_Grotesk({
 export const metadata: Metadata = {
   title: 'Reparatie CRM',
   description: 'CRM, reparatiebeheer en kassa voor telefoonreparatie',
+  manifest: '/manifest.webmanifest',
+  icons: {
+    icon: [{ url: '/favicon.ico' }, { url: '/favicon.png', type: 'image/png' }],
+    apple: [{ url: '/apple-touch-icon.png' }],
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Reparatie CRM',
+  },
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  themeColor: '#0C7C82',
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
@@ -27,6 +44,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <NextIntlClientProvider locale={locale} messages={messages}>
           <ToastProvider>{children}</ToastProvider>
         </NextIntlClientProvider>
+        <ServiceWorkerRegister />
       </body>
     </html>
   );
