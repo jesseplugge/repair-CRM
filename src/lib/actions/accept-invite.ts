@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
+import { getTranslations } from 'next-intl/server';
 
 export type AcceptState = { error?: string; message?: string };
 
@@ -10,18 +11,16 @@ export async function signUpAndAccept(_prevState: AcceptState, formData: FormDat
   const email = formData.get('email') as string;
   const fullName = (formData.get('full_name') as string)?.trim();
   const password = formData.get('password') as string;
-  if (!fullName) return { error: 'Vul je naam in.' };
-  if (!password || password.length < 8) return { error: 'Kies een wachtwoord van minstens 8 tekens.' };
+  const t = await getTranslations('acceptInviteErrors');
+  if (!fullName) return { error: t('fillName') };
+  if (!password || password.length < 8) return { error: t('choosePassword') };
 
   const supabase = createClient();
   const { data, error } = await supabase.auth.signUp({ email, password });
   if (error) return { error: error.message };
 
   if (!data.session) {
-    return {
-      message:
-        'Controleer je e-mail om je account te bevestigen. Kom daarna terug naar deze link om je aan te sluiten bij het bedrijf.',
-    };
+    return { message: t('confirmEmail') };
   }
 
   const { error: acceptError } = await supabase.rpc('accept_invite', { p_token: token, p_full_name: fullName });
@@ -33,7 +32,8 @@ export async function signUpAndAccept(_prevState: AcceptState, formData: FormDat
 export async function acceptAsExistingSession(_prevState: AcceptState, formData: FormData): Promise<AcceptState> {
   const token = formData.get('token') as string;
   const fullName = (formData.get('full_name') as string)?.trim();
-  if (!fullName) return { error: 'Vul je naam in.' };
+  const t = await getTranslations('acceptInviteErrors');
+  if (!fullName) return { error: t('fillName') };
 
   const supabase = createClient();
   const { error } = await supabase.rpc('accept_invite', { p_token: token, p_full_name: fullName });

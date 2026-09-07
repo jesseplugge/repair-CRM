@@ -1,11 +1,13 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/primitives';
 
 export function LogoutButton() {
   const router = useRouter();
+  const t = useTranslations('acceptInvite');
 
   async function handleLogout() {
     const supabase = createClient();
@@ -15,7 +17,7 @@ export function LogoutButton() {
 
   return (
     <Button type="button" variant="ghost" onClick={handleLogout}>
-      Uitloggen en opnieuw proberen
+      {t('logout')}
     </Button>
   );
 }

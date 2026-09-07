@@ -791,5 +791,48 @@
     "notLoggedIn": "Niet ingelogd.",
     "onlyOwnersCanEdit": "Alleen eigenaren kunnen documentsjablonen aanpassen.",
     "invalidType": "Ongeldig documenttype."
+  },
+  "commandPalette": {
+    "typeCustomer": "Klant",
+    "typeDevice": "Apparaat",
+    "typeRepair": "Reparatie",
+    "typeInvoice": "Factuur",
+    "typeProduct": "Product",
+    "actionNewRepair": "Nieuwe reparatie",
+    "actionNewCustomer": "Nieuwe klant",
+    "actionStartSale": "Verkoop starten",
+    "actionCreateInvoice": "Factuur maken",
+    "actionRepairsKanban": "Reparaties (kanban)",
+    "searchPlaceholder": "Zoek klanten, reparaties, facturen…",
+    "quickStart": "Snel starten",
+    "searching": "Zoeken…",
+    "noResults": "Niets gevonden."
+  },
+  "paymentStatus": {
+    "open": "Openstaand",
+    "partial": "Gedeeltelijk betaald",
+    "paid": "Betaald"
+  },
+  "acceptInvite": {
+    "roleOwner": "Eigenaar",
+    "roleEmployee": "Medewerker",
+    "titleDefault": "Uitnodiging",
+    "titleFor": "Uitnodiging voor {businessName} ({role})",
+    "invalidInvite": "Deze uitnodiging is ongeldig, al gebruikt of verlopen. Vraag de eigenaar om een nieuwe uitnodiging te sturen.",
+    "wrongAccount": "Je bent ingelogd als <strong>{email}</strong>, maar deze uitnodiging is voor <strong>{inviteEmail}</strong>. Log uit en volg de link opnieuw met het juiste account.",
+    "alreadyLinked": "Dit account is al aan een bedrijf gekoppeld.",
+    "loggedInAs": "Ingelogd als <strong>{email}</strong>. Vul je naam in om je aan te sluiten.",
+    "emailLabel": "E-mailadres",
+    "nameLabel": "Je naam",
+    "passwordLabel": "Wachtwoord",
+    "busy": "Bezig…",
+    "join": "Aansluiten",
+    "joinCompany": "Aansluiten bij bedrijf",
+    "logout": "Uitloggen en opnieuw proberen"
+  },
+  "acceptInviteErrors": {
+    "fillName": "Vul je naam in.",
+    "choosePassword": "Kies een wachtwoord van minstens 8 tekens.",
+    "confirmEmail": "Controleer je e-mail om je account te bevestigen. Kom daarna terug naar deze link om je aan te sluiten bij het bedrijf."
   }
 }

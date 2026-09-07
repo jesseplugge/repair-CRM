@@ -1,8 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
+import { getTranslations } from 'next-intl/server';
 import { SignupAcceptForm, JoinExistingSessionForm } from './AcceptInviteForm';
 import { LogoutButton } from './LogoutButton';
-
-const ROLE_LABELS: Record<string, string> = { owner: 'Eigenaar', employee: 'Medewerker' };
 
 function Shell({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -20,17 +19,16 @@ function Shell({ title, children }: { title: string; children: React.ReactNode }
 
 export default async function AcceptInvitePage({ params }: { params: { token: string } }) {
   const supabase = createClient();
+  const t = await getTranslations('acceptInvite');
+  const ROLE_LABELS: Record<string, string> = { owner: t('roleOwner'), employee: t('roleEmployee') };
 
   const { data: infoRows } = await supabase.rpc('get_invite_info', { p_token: params.token });
   const info = infoRows?.[0];
 
   if (!info || !info.valid) {
     return (
-      <Shell title="Uitnodiging">
-        <p className="text-sm text-ink-700">
-          Deze uitnodiging is ongeldig, al gebruikt of verlopen. Vraag de eigenaar om een nieuwe uitnodiging te
-          sturen.
-        </p>
+      <Shell title={t('titleDefault')}>
+        <p className="text-sm text-ink-700">{t('invalidInvite')}</p>
       </Shell>
     );
   }
@@ -39,9 +37,11 @@ export default async function AcceptInvitePage({ params }: { params: { token: st
     data: { user: authUser },
   } = await supabase.auth.getUser();
 
+  const inviteTitle = t('titleFor', { businessName: info.business_name, role: ROLE_LABELS[info.role] ?? info.role });
+
   if (!authUser) {
     return (
-      <Shell title={`Uitnodiging voor ${info.business_name} (${ROLE_LABELS[info.role] ?? info.role})`}>
+      <Shell title={inviteTitle}>
         <SignupAcceptForm token={params.token} email={info.email} />
       </Shell>
     );
@@ -49,10 +49,13 @@ export default async function AcceptInvitePage({ params }: { params: { token: st
 
   if ((authUser.email ?? '').toLowerCase() !== info.email.toLowerCase()) {
     return (
-      <Shell title="Uitnodiging">
+      <Shell title={t('titleDefault')}>
         <p className="mb-4 text-sm text-ink-700">
-          Je bent ingelogd als <strong>{authUser.email}</strong>, maar deze uitnodiging is voor{' '}
-          <strong>{info.email}</strong>. Log uit en volg de link opnieuw met het juiste account.
+          {t.rich('wrongAccount', {
+            email: authUser.email ?? '',
+            inviteEmail: info.email,
+            strong: (chunks) => <strong>{chunks}</strong>,
+          })}
         </p>
         <LogoutButton />
       </Shell>
@@ -62,16 +65,16 @@ export default async function AcceptInvitePage({ params }: { params: { token: st
   const { data: existingProfile } = await supabase.from('users').select('id').eq('id', authUser.id).maybeSingle();
   if (existingProfile) {
     return (
-      <Shell title="Uitnodiging">
-        <p className="text-sm text-ink-700">Dit account is al aan een bedrijf gekoppeld.</p>
+      <Shell title={t('titleDefault')}>
+        <p className="text-sm text-ink-700">{t('alreadyLinked')}</p>
       </Shell>
     );
   }
 
   return (
-    <Shell title={`Uitnodiging voor ${info.business_name} (${ROLE_LABELS[info.role] ?? info.role})`}>
+    <Shell title={inviteTitle}>
       <p className="mb-4 text-sm text-ink-600">
-        Ingelogd als <strong>{authUser.email}</strong>. Vul je naam in om je aan te sluiten.
+        {t.rich('loggedInAs', { email: authUser.email ?? '', strong: (chunks) => <strong>{chunks}</strong> })}
       </p>
       <JoinExistingSessionForm token={params.token} />
     </Shell>

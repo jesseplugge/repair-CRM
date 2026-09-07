@@ -2,26 +2,28 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { globalSearch, type SearchResult } from '@/lib/actions/search';
 import { Search, PlusCircle, UserPlus, ShoppingCart, FileText, Wrench } from 'lucide-react';
 
-const TYPE_LABELS: Record<SearchResult['type'], string> = {
-  customer: 'Klant',
-  device: 'Apparaat',
-  repair: 'Reparatie',
-  invoice: 'Factuur',
-  product: 'Product',
-};
-
-const QUICK_ACTIONS = [
-  { href: '/reparaties/nieuw', label: 'Nieuwe reparatie', icon: PlusCircle },
-  { href: '/klanten/nieuw', label: 'Nieuwe klant', icon: UserPlus },
-  { href: '/kassa', label: 'Verkoop starten', icon: ShoppingCart },
-  { href: '/facturen/nieuw', label: 'Factuur maken', icon: FileText },
-  { href: '/reparaties?view=kanban', label: 'Reparaties (kanban)', icon: Wrench },
-];
-
 export function CommandPalette() {
+  const t = useTranslations('commandPalette');
+  const TYPE_LABELS: Record<SearchResult['type'], string> = {
+    customer: t('typeCustomer'),
+    device: t('typeDevice'),
+    repair: t('typeRepair'),
+    invoice: t('typeInvoice'),
+    product: t('typeProduct'),
+  };
+
+  const QUICK_ACTIONS = [
+    { href: '/reparaties/nieuw', label: t('actionNewRepair'), icon: PlusCircle },
+    { href: '/klanten/nieuw', label: t('actionNewCustomer'), icon: UserPlus },
+    { href: '/kassa', label: t('actionStartSale'), icon: ShoppingCart },
+    { href: '/facturen/nieuw', label: t('actionCreateInvoice'), icon: FileText },
+    { href: '/reparaties?view=kanban', label: t('actionRepairsKanban'), icon: Wrench },
+  ];
+
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchResult[]>([]);
@@ -88,7 +90,7 @@ export function CommandPalette() {
             ref={inputRef}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Zoek klanten, reparaties, facturen…"
+            placeholder={t('searchPlaceholder')}
             className="flex-1 text-sm outline-none placeholder:text-ink-400"
           />
           <kbd className="rounded border border-ink-200 px-1.5 py-0.5 text-[10px] text-ink-400">Esc</kbd>
@@ -97,7 +99,7 @@ export function CommandPalette() {
         <div className="max-h-80 overflow-y-auto p-2">
           {query.trim().length < 2 ? (
             <>
-              <div className="px-2 pb-1 pt-1 text-xs font-medium uppercase tracking-wide text-ink-400">Snel starten</div>
+              <div className="px-2 pb-1 pt-1 text-xs font-medium uppercase tracking-wide text-ink-400">{t('quickStart')}</div>
               {QUICK_ACTIONS.map((a) => (
                 <button
                   key={a.href}
@@ -110,9 +112,9 @@ export function CommandPalette() {
               ))}
             </>
           ) : loading ? (
-            <div className="px-2 py-4 text-sm text-ink-400">Zoeken…</div>
+            <div className="px-2 py-4 text-sm text-ink-400">{t('searching')}</div>
           ) : results.length === 0 ? (
-            <div className="px-2 py-4 text-sm text-ink-400">Niets gevonden.</div>
+            <div className="px-2 py-4 text-sm text-ink-400">{t('noResults')}</div>
           ) : (
             results.map((r) => (
               <button
