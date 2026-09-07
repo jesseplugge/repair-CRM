@@ -2,8 +2,8 @@ import Link from 'next/link';
 import { createClient, getCurrentUser } from '@/lib/supabase/server';
 import { Card } from '@/components/ui/primitives';
 import { formatEuro } from '@/lib/utils/currency';
-import { formatDate } from '@/lib/utils/format';
-import { PlusCircle, UserPlus, ShoppingCart, FileText, Search, AlertTriangle, Package, Euro, Clock } from 'lucide-react';
+import { getNotifications } from '@/lib/actions/notifications';
+import { PlusCircle, UserPlus, ShoppingCart, FileText, Search, AlertTriangle, Euro, Clock } from 'lucide-react';
 
 const QUICK_ACTIONS = [
   { href: '/reparaties/nieuw', label: 'Nieuwe reparatie', icon: PlusCircle },
@@ -24,15 +24,7 @@ export default async function DashboardPage() {
   const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
   const fiveDaysAgo = new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString();
 
-  const [
-    { data: statuses },
-    { data: repairs },
-    { data: posSalesToday },
-    { data: readyRepair },
-    { data: products },
-    { data: outstandingInvoices },
-    { data: openClaims },
-  ] = await Promise.all([
+  const [{ data: statuses }, { data: repairs }, { data: posSalesToday }, needsAttention] = await Promise.all([
     supabase.from('repair_statuses').select('*').eq('business_id', user!.business_id).order('sort_order'),
     supabase
       .from('repairs')
@@ -44,23 +36,7 @@ export default async function DashboardPage() {
       .eq('business_id', user!.business_id)
       .eq('status', 'paid')
       .gte('created_at', startOfToday.toISOString()),
-    supabase
-      .from('repairs')
-      .select('id, repair_number, date_completed, customer:customers(first_name, last_name), status:repair_statuses(name)')
-      .eq('business_id', user!.business_id)
-      .lt('date_completed', fiveDaysAgo)
-      .is('date_picked_up', null),
-    supabase.from('products').select('id, name, stock_quantity, minimum_stock').eq('business_id', user!.business_id).eq('active', true),
-    supabase
-      .from('invoices')
-      .select('id, invoice_number, invoice_date, payment_terms_days, total_incl_vat')
-      .eq('business_id', user!.business_id)
-      .in('status', ['sent', 'overdue']),
-    supabase
-      .from('warranty_claims')
-      .select('id, claim_number, repair:repairs(repair_number)')
-      .eq('business_id', user!.business_id)
-      .in('status', ['new', 'investigating', 'approved', 'repairing']),
+    getNotifications(),
   ]);
 
   const allRepairs = repairs ?? [];
@@ -85,14 +61,6 @@ export default async function DashboardPage() {
     ...status,
     count: allRepairs.filter((r) => r.status_id === status.id).length,
   }));
-
-  const todayStr = new Date().toISOString().slice(0, 10);
-  const overdueInvoices = (outstandingInvoices ?? []).filter((inv) => {
-    const due = new Date(new Date(inv.invoice_date).getTime() + (inv.payment_terms_days ?? 14) * 24 * 60 * 60 * 1000);
-    return due.toISOString().slice(0, 10) < todayStr;
-  });
-
-  const lowStock = (products ?? []).filter((p) => p.stock_quantity <= (p.minimum_stock ?? 0));
 
   // Insight: completed repairs this month vs last month
   const completedThisMonth = allRepairs.filter((r) => r.date_completed && new Date(r.date_completed) >= startOfMonth).length;
@@ -122,37 +90,6 @@ export default async function DashboardPage() {
   const topMarginType = [...marginByType.entries()]
     .filter(([, v]) => v.revenue > 0)
     .sort((a, b) => b[1].profit / b[1].revenue - a[1].profit / a[1].revenue)[0];
-
-  const needsAttention = [
-    ...(openClaims ?? []).map((c) => ({
-      key: `claim-${c.id}`,
-      icon: '🔴',
-      text: `Garantieclaim ${c.claim_number} (${(c.repair as any)?.repair_number ?? ''}) staat open`,
-      href: '/garantie',
-    })),
-    ...(readyRepair ?? []).map((r) => {
-      const customer = r.customer as any;
-      const days = Math.floor((Date.now() - new Date(r.date_completed!).getTime()) / (24 * 60 * 60 * 1000));
-      return {
-        key: `ready-${r.id}`,
-        icon: '🟠',
-        text: `${r.repair_number} (${customer?.first_name} ${customer?.last_name}) wacht al ${days} dagen op ophalen`,
-        href: `/reparaties/${r.id}`,
-      };
-    }),
-    ...lowStock.map((p) => ({
-      key: `stock-${p.id}`,
-      icon: '📦',
-      text: `${p.name} bijna op (${p.stock_quantity} over)`,
-      href: '/voorraad',
-    })),
-    ...overdueInvoices.map((inv) => ({
-      key: `inv-${inv.id}`,
-      icon: '💶',
-      text: `Factuur ${inv.invoice_number} is vervallen (${formatEuro(inv.total_incl_vat)})`,
-      href: `/facturen/${inv.id}`,
-    })),
-  ];
 
   return (
     <div className="space-y-8">

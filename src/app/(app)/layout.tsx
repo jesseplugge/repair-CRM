@@ -1,18 +1,20 @@
 import { redirect } from 'next/navigation';
 import { createClient, getCurrentUser } from '@/lib/supabase/server';
 import { Sidebar } from './Sidebar';
+import { TopBar } from './TopBar';
 import { buildAccentTokens } from '@/lib/utils/color';
+import { getNotifications } from '@/lib/actions/notifications';
+import { CommandPalette } from '@/components/CommandPalette';
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const user = await getCurrentUser();
   if (!user) redirect('/onboarding');
 
   const supabase = createClient();
-  const { data: business } = await supabase
-    .from('businesses')
-    .select('accent_color, logo_url, trading_name, legal_name')
-    .eq('id', user.business_id)
-    .single();
+  const [{ data: business }, notifications] = await Promise.all([
+    supabase.from('businesses').select('accent_color, logo_url, trading_name, legal_name').eq('id', user.business_id).single(),
+    getNotifications(),
+  ]);
 
   const accentStyle = buildAccentTokens(business?.accent_color || '#0C7C82');
 
@@ -23,7 +25,11 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         logoUrl={business?.logo_url ?? null}
         businessName={business?.trading_name || business?.legal_name || 'Reparatie CRM'}
       />
-      <main className="flex-1 bg-ink-50 p-6 lg:p-8">{children}</main>
+      <main className="flex-1 bg-ink-50 p-6 lg:p-8">
+        <TopBar notifications={notifications} />
+        {children}
+      </main>
+      <CommandPalette />
     </div>
   );
 }
