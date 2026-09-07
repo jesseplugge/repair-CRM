@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { SignatureCapture } from '@/components/SignatureCapture';
 import { Button } from '@/components/ui/primitives';
 import { PenLine, X } from 'lucide-react';
@@ -15,11 +16,12 @@ export function SignatureModalTrigger({
 }) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
+  const t = useTranslations('repairSub');
 
   if (!activeTerms) {
     return (
       <div className="rounded border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-700">
-        Geen actieve Algemene Voorwaarden — voeg er een toe in Instellingen om te kunnen ondertekenen.
+        {t('noActiveTerms')}
       </div>
     );
   }
@@ -27,7 +29,7 @@ export function SignatureModalTrigger({
   return (
     <>
       <Button type="button" variant="primary" className="w-full" onClick={() => setOpen(true)}>
-        <PenLine size={15} /> Klant laten ondertekenen
+        <PenLine size={15} /> {t('letCustomerSign')}
       </Button>
 
       {open && (
@@ -37,7 +39,7 @@ export function SignatureModalTrigger({
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-3 flex items-center justify-between">
-              <h2 className="font-display text-lg font-semibold text-ink-950">Ondertekenen</h2>
+              <h2 className="font-display text-lg font-semibold text-ink-950">{t('signTitle')}</h2>
               <button onClick={() => setOpen(false)} className="text-ink-400 hover:text-ink-700">
                 <X size={18} />
               </button>

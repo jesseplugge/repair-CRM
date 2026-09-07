@@ -5,6 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { calculateFromExclVat, calculateFromInclVat, formatPaymentDescription } from '@/lib/utils/currency';
 import { findOrCreateReceipt } from '@/lib/pdf/generate';
+import { getTranslations } from 'next-intl/server';
 import type { Database, Json } from '@/lib/types/database';
 
 export type RepairFormState = { error?: string };
@@ -41,13 +42,14 @@ export async function createRepair(_prevState: RepairFormState, formData: FormDa
   if (!user) redirect('/login');
   const supabase = createClient();
   const businessId = user.business_id;
+  const t = await getTranslations('repairErrors');
 
   // 1. Resolve customer
   let customerId = formData.get('customer_id') as string | null;
   if (!customerId) {
     const firstName = (formData.get('new_customer_first_name') as string)?.trim();
     const lastName = (formData.get('new_customer_last_name') as string)?.trim();
-    if (!firstName || !lastName) return { error: 'Selecteer een klant of vul voor- en achternaam in.' };
+    if (!firstName || !lastName) return { error: t('selectCustomerOrFillName') };
 
     const { data: customerNumber, error: numError } = await supabase.rpc('next_number', {
       p_business_id: businessId,
@@ -70,7 +72,7 @@ export async function createRepair(_prevState: RepairFormState, formData: FormDa
       })
       .select('id')
       .single();
-    if (custError || !newCustomer) return { error: custError?.message ?? 'Aanmaken klant mislukt.' };
+    if (custError || !newCustomer) return { error: custError?.message ?? t('createCustomerFailed') };
     customerId = newCustomer.id;
   }
 
@@ -79,7 +81,7 @@ export async function createRepair(_prevState: RepairFormState, formData: FormDa
   if (!deviceId) {
     const brand = (formData.get('new_device_brand') as string)?.trim();
     const model = (formData.get('new_device_model') as string)?.trim();
-    if (!brand || !model) return { error: 'Selecteer een apparaat of vul merk en model in.' };
+    if (!brand || !model) return { error: t('selectDeviceOrFillBrand') };
 
     const { data: newDevice, error: deviceError } = await supabase
       .from('devices')
@@ -95,7 +97,7 @@ export async function createRepair(_prevState: RepairFormState, formData: FormDa
       })
       .select('id')
       .single();
-    if (deviceError || !newDevice) return { error: deviceError?.message ?? 'Aanmaken apparaat mislukt.' };
+    if (deviceError || !newDevice) return { error: deviceError?.message ?? t('createDeviceFailed') };
     deviceId = newDevice.id;
   }
 
@@ -127,7 +129,7 @@ export async function createRepair(_prevState: RepairFormState, formData: FormDa
       .eq('id', catalogId)
       .eq('business_id', businessId)
       .single();
-    if (!catalogItem) return { error: 'Gekozen reparatietype niet gevonden.' };
+    if (!catalogItem) return { error: t('catalogItemNotFound') };
 
     const { exclVat, inclVat } = calculateFromExclVat(catalogItem.selling_price, catalogItem.vat_rate);
     repairTypeLabel = catalogItem.name;
@@ -148,7 +150,7 @@ export async function createRepair(_prevState: RepairFormState, formData: FormDa
     const priceRaw = parseFloat(formData.get('manual_price') as string);
     const vatRate = parseFloat((formData.get('manual_vat_rate') as string) ?? '21');
     const includesVat = formData.get('manual_price_includes_vat') === 'on';
-    if (!description || isNaN(priceRaw)) return { error: 'Vul een omschrijving en prijs in voor de reparatie.' };
+    if (!description || isNaN(priceRaw)) return { error: t('fillDescriptionAndPrice') };
 
     const calc = includesVat ? calculateFromInclVat(priceRaw, vatRate) : calculateFromExclVat(priceRaw, vatRate);
     repairTypeLabel = description;
@@ -172,7 +174,7 @@ export async function createRepair(_prevState: RepairFormState, formData: FormDa
     .eq('business_id', businessId)
     .eq('name', 'Nieuw')
     .single();
-  if (!newStatus) return { error: 'Standaardstatus "Nieuw" niet gevonden — controleer Instellingen.' };
+  if (!newStatus) return { error: t('defaultStatusNotFound') };
 
   // 5. Repair number
   const year = new Date().getFullYear();
@@ -219,7 +221,7 @@ export async function createRepair(_prevState: RepairFormState, formData: FormDa
     .select('id, repair_number')
     .single();
 
-  if (repairError || !repair) return { error: repairError?.message ?? 'Aanmaken reparatie mislukt.' };
+  if (repairError || !repair) return { error: repairError?.message ?? t('createRepairFailed') };
 
   // 7. Line item
   await supabase.from('repair_items').insert({ repair_id: repair.id, ...item, quantity: 1, discount: 0 });
@@ -242,14 +244,15 @@ export async function updateRepairStatus(repairId: string, newStatusId: string) 
   if (!user) redirect('/login');
   const supabase = createClient();
 
+  const t = await getTranslations('repairErrors');
   const { data: repair } = await supabase.from('repairs').select('id, business_id, customer_id, status_id').eq('id', repairId).single();
-  if (!repair) return { error: 'Reparatie niet gevonden.' };
+  if (!repair) return { error: t('repairNotFound') };
 
   const [{ data: oldStatus }, { data: newStatus }] = await Promise.all([
     supabase.from('repair_statuses').select('name').eq('id', repair.status_id).single(),
     supabase.from('repair_statuses').select('name, is_terminal').eq('id', newStatusId).single(),
   ]);
-  if (!newStatus) return { error: 'Status niet gevonden.' };
+  if (!newStatus) return { error: t('statusNotFound') };
   const oldName = oldStatus?.name ?? 'onbekend';
 
   const patch: Database['public']['Tables']['repairs']['Update'] = {
@@ -299,7 +302,10 @@ export async function addRepairItem(repairId: string, formData: FormData) {
   const priceRaw = parseFloat(formData.get('price') as string);
   const vatRate = parseFloat((formData.get('vat_rate') as string) || '21');
   const itemType = (formData.get('item_type') as string) || 'custom';
-  if (!description || isNaN(priceRaw)) return { error: 'Omschrijving en prijs zijn verplicht.' };
+  if (!description || isNaN(priceRaw)) {
+    const t = await getTranslations('repairErrors');
+    return { error: t('descriptionAndPriceRequired') };
+  }
 
   const { exclVat, inclVat } = calculateFromExclVat(priceRaw * quantity, vatRate);
 
@@ -351,7 +357,10 @@ export async function recordRepairPayment(repairId: string, amount: number, meth
     .select('business_id, customer_id')
     .eq('id', repairId)
     .single();
-  if (!repair) return { error: 'Reparatie niet gevonden.' };
+  if (!repair) {
+    const t = await getTranslations('repairErrors');
+    return { error: t('repairNotFound') };
+  }
 
   const { insertPayment } = await import('./payments');
   const result = await insertPayment(

@@ -2,17 +2,12 @@
 
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { recordRepairPayment, refundRepairPayment } from '@/lib/actions/repairs';
 import { Button, Input } from '@/components/ui/primitives';
 import { formatEuro } from '@/lib/utils/currency';
 import { formatDateTime } from '@/lib/utils/format';
 import { Banknote, CreditCard, Landmark, Undo2 } from 'lucide-react';
-
-const METHODS = [
-  { value: 'contant', label: 'Contant', icon: Banknote },
-  { value: 'pin', label: 'Pin', icon: CreditCard },
-  { value: 'bankoverschrijving', label: 'Bank', icon: Landmark },
-];
 
 type Payment = { id: string; amount: number; method: string; paid_at: string; notes: string | null };
 
@@ -34,6 +29,14 @@ export function PaymentPanel({
   const [method, setMethod] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
   const router = useRouter();
+  const t = useTranslations('repairSub');
+
+  const METHODS = [
+    { value: 'contant', label: t('methodCash'), icon: Banknote },
+    { value: 'pin', label: t('methodPin'), icon: CreditCard },
+    { value: 'bankoverschrijving', label: t('methodBank'), icon: Landmark },
+  ];
+  const methodLabel = (v: string) => METHODS.find((m) => m.value === v)?.label ?? v;
 
   function submit() {
     if (!method) return;
@@ -45,7 +48,7 @@ export function PaymentPanel({
   }
 
   function handleRefund(paymentId: string, maxAmount: number) {
-    const amountStr = window.prompt(`Terug te betalen bedrag (max ${formatEuro(maxAmount)})`, maxAmount.toFixed(2));
+    const amountStr = window.prompt(t('refundPrompt', { max: formatEuro(maxAmount) }), maxAmount.toFixed(2));
     if (!amountStr) return;
     const refundAmount = parseFloat(amountStr);
     if (isNaN(refundAmount) || refundAmount <= 0) return;
@@ -64,10 +67,10 @@ export function PaymentPanel({
               <div>
                 <div className="font-medium tabular-nums text-ink-900">{formatEuro(p.amount)}</div>
                 <div className="text-ink-400">
-                  {p.method} &middot; {formatDateTime(p.paid_at)}
+                  {methodLabel(p.method)} &middot; {formatDateTime(p.paid_at)}
                 </div>
               </div>
-              <button onClick={() => handleRefund(p.id, p.amount)} className="text-ink-300 hover:text-red-600" title="Terugbetalen">
+              <button onClick={() => handleRefund(p.id, p.amount)} className="text-ink-300 hover:text-red-600" title={t('refund')}>
                 <Undo2 size={14} />
               </button>
             </div>
@@ -76,12 +79,12 @@ export function PaymentPanel({
       )}
 
       {paymentStatus === 'paid' ? (
-        <div className="rounded bg-green-50 px-3 py-2 text-sm text-green-700">Volledig betaald</div>
+        <div className="rounded bg-green-50 px-3 py-2 text-sm text-green-700">{t('fullyPaid')}</div>
       ) : open ? (
         <div className="space-y-3">
           {paidSoFar > 0 && (
             <p className="text-xs text-amber-700">
-              Al betaald: {formatEuro(paidSoFar)} &middot; Nog te betalen: {formatEuro(remaining)}
+              {t('paidSoFarRemaining', { paid: formatEuro(paidSoFar), remaining: formatEuro(remaining) })}
             </p>
           )}
           <Input type="number" step="0.01" value={amount} onChange={(e) => setAmount(e.target.value)} />
@@ -102,16 +105,16 @@ export function PaymentPanel({
           </div>
           <div className="flex gap-2">
             <Button variant="primary" className="flex-1" disabled={!method || pending} onClick={submit}>
-              {pending ? 'Bezig…' : `Bevestig ${formatEuro(parseFloat(amount || '0'))}`}
+              {pending ? t('busy') : t('confirmAmount', { amount: formatEuro(parseFloat(amount || '0')) })}
             </Button>
             <Button variant="ghost" onClick={() => setOpen(false)}>
-              Annuleren
+              {t('cancel')}
             </Button>
           </div>
         </div>
       ) : (
         <Button variant="primary" className="w-full" onClick={() => setOpen(true)}>
-          {paymentStatus === 'partial' ? `Resterend ${formatEuro(remaining)} registreren` : 'Betaling registreren'}
+          {paymentStatus === 'partial' ? t('registerRemaining', { amount: formatEuro(remaining) }) : t('registerPayment')}
         </Button>
       )}
     </div>
