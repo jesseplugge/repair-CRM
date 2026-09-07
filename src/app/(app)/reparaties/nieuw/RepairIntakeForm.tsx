@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useFormState, useFormStatus } from 'react-dom';
+import { useTranslations } from 'next-intl';
 import { createRepair } from '@/lib/actions/repairs';
 import { Button, Card, Field, Input, Textarea, Label } from '@/components/ui/primitives';
 import { formatEuro } from '@/lib/utils/currency';
@@ -19,21 +20,12 @@ type CatalogLite = {
   warranty_months: number | null;
 };
 
-const CONDITION_FIELDS: { key: string; label: string }[] = [
-  { key: 'cond_screen', label: 'Schermschade' },
-  { key: 'cond_back', label: 'Achterglas beschadigd' },
-  { key: 'cond_frame', label: 'Frame beschadigd' },
-  { key: 'cond_camera', label: 'Camera beschadigd' },
-  { key: 'cond_buttons', label: 'Knoppen' },
-  { key: 'cond_port', label: 'Laadconnector' },
-  { key: 'cond_water', label: 'Waterschade' },
-];
-
 function SubmitButton() {
   const { pending } = useFormStatus();
+  const t = useTranslations('intake');
   return (
     <Button type="submit" variant="primary" size="lg" disabled={pending}>
-      {pending ? 'Bezig…' : 'Reparatie aanmaken'}
+      {pending ? t('busy') : t('createRepair')}
     </Button>
   );
 }
@@ -46,6 +38,17 @@ export function RepairIntakeForm({
   initialDevice: DeviceLite | null;
 }) {
   const [state, formAction] = useFormState(createRepair, { error: '' });
+  const t = useTranslations('intake');
+
+  const CONDITION_FIELDS: { key: string; label: string }[] = [
+    { key: 'cond_screen', label: t('condScreen') },
+    { key: 'cond_back', label: t('condBack') },
+    { key: 'cond_frame', label: t('condFrame') },
+    { key: 'cond_camera', label: t('condCamera') },
+    { key: 'cond_buttons', label: t('condButtons') },
+    { key: 'cond_port', label: t('condPort') },
+    { key: 'cond_water', label: t('condWater') },
+  ];
 
   // --- customer ---
   const [customer, setCustomer] = useState<CustomerLite | null>(initialCustomer);
@@ -58,11 +61,11 @@ export function RepairIntakeForm({
       setCustomerResults([]);
       return;
     }
-    const t = setTimeout(async () => {
+    const timer = setTimeout(async () => {
       const res = await fetch(`/api/customers/search?q=${encodeURIComponent(customerQuery)}`);
       setCustomerResults(res.ok ? await res.json() : []);
     }, 250);
-    return () => clearTimeout(t);
+    return () => clearTimeout(timer);
   }, [customerQuery, customer]);
 
   // --- device ---
@@ -95,11 +98,11 @@ export function RepairIntakeForm({
       setCatalogResults([]);
       return;
     }
-    const t = setTimeout(async () => {
+    const timer = setTimeout(async () => {
       const res = await fetch(`/api/catalog/search?q=${encodeURIComponent(catalogQuery)}`);
       setCatalogResults(res.ok ? await res.json() : []);
     }, 250);
-    return () => clearTimeout(t);
+    return () => clearTimeout(timer);
   }, [catalogQuery, catalogItem]);
 
   const estimatedTotal = catalogItem
@@ -110,7 +113,7 @@ export function RepairIntakeForm({
     <form action={formAction} className="space-y-6">
       {/* 1. Customer */}
       <Card className="p-5">
-        <SectionTitle icon={User} title="1. Klant" />
+        <SectionTitle icon={User} title={t('step1Customer')} />
         {customer ? (
           <SelectedRow
             title={`${customer.first_name} ${customer.last_name}`}
@@ -120,27 +123,28 @@ export function RepairIntakeForm({
               setDevice(null);
               setNewCustomer(false);
             }}
+            changeLabel={t('change')}
           />
         ) : newCustomer ? (
           <div className="space-y-3">
             <div className="grid grid-cols-2 gap-3">
-              <Field label="Voornaam">
+              <Field label={t('firstName')}>
                 <Input name="new_customer_first_name" required />
               </Field>
-              <Field label="Achternaam">
+              <Field label={t('lastName')}>
                 <Input name="new_customer_last_name" required />
               </Field>
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <Field label="Telefoonnummer">
+              <Field label={t('phone')}>
                 <Input name="new_customer_phone" placeholder="06 12345678" />
               </Field>
-              <Field label="E-mail">
+              <Field label={t('email')}>
                 <Input name="new_customer_email" type="email" />
               </Field>
             </div>
             <button type="button" onClick={() => setNewCustomer(false)} className="text-sm text-[var(--accent)] underline">
-              Toch bestaande klant zoeken
+              {t('searchExistingCustomerInstead')}
             </button>
           </div>
         ) : (
@@ -150,7 +154,7 @@ export function RepairIntakeForm({
               <Input
                 value={customerQuery}
                 onChange={(e) => setCustomerQuery(e.target.value)}
-                placeholder="Zoek op naam of telefoonnummer…"
+                placeholder={t('searchCustomerPlaceholder')}
                 className="pl-9"
                 autoFocus
               />
@@ -173,7 +177,7 @@ export function RepairIntakeForm({
               </div>
             )}
             <button type="button" onClick={() => setNewCustomer(true)} className="mt-2 text-sm text-[var(--accent)] underline">
-              + Nieuwe klant aanmaken
+              {t('newCustomer')}
             </button>
           </div>
         )}
@@ -182,12 +186,13 @@ export function RepairIntakeForm({
       {/* 2. Device */}
       {(customer || newCustomer) && (
         <Card className="p-5">
-          <SectionTitle icon={Smartphone} title="2. Apparaat" />
+          <SectionTitle icon={Smartphone} title={t('step2Device')} />
           {device ? (
             <SelectedRow
               title={`${device.brand} ${device.model}`}
-              subtitle={device.imei ? `IMEI ${device.imei}` : 'Geen IMEI'}
+              subtitle={device.imei ? `IMEI ${device.imei}` : t('noImei')}
               onChange={() => setDevice(null)}
+              changeLabel={t('change')}
             />
           ) : (
             <div className="space-y-3">
@@ -210,32 +215,32 @@ export function RepairIntakeForm({
               )}
               {!newDevice ? (
                 <button type="button" onClick={() => setNewDevice(true)} className="text-sm text-[var(--accent)] underline">
-                  + Nieuw apparaat toevoegen
+                  {t('newDevice')}
                 </button>
               ) : (
                 <div className="space-y-3">
                   <div className="grid grid-cols-2 gap-3">
-                    <Field label="Merk">
+                    <Field label={t('brand')}>
                       <Input name="new_device_brand" required placeholder="Apple" />
                     </Field>
-                    <Field label="Model">
+                    <Field label={t('model')}>
                       <Input name="new_device_model" required placeholder="iPhone 13" />
                     </Field>
                   </div>
                   <div className="grid grid-cols-3 gap-3">
-                    <Field label="Kleur">
+                    <Field label={t('color')}>
                       <Input name="new_device_color" />
                     </Field>
-                    <Field label="Opslag">
+                    <Field label={t('storage')}>
                       <Input name="new_device_storage" placeholder="128GB" />
                     </Field>
-                    <Field label="IMEI (optioneel)">
+                    <Field label={t('imeiOptional')}>
                       <Input name="new_device_imei" />
                     </Field>
                   </div>
                   {customerDevices.length > 0 && (
                     <button type="button" onClick={() => setNewDevice(false)} className="text-sm text-[var(--accent)] underline">
-                      Toch een bestaand apparaat kiezen
+                      {t('chooseExistingDeviceInstead')}
                     </button>
                   )}
                 </div>
@@ -248,20 +253,21 @@ export function RepairIntakeForm({
       {/* 3. Repair type */}
       {(customer || newCustomer) && (device || newDevice) && (
         <Card className="p-5">
-          <SectionTitle icon={Wrench} title="3. Reparatietype" />
+          <SectionTitle icon={Wrench} title={t('step3RepairType')} />
           {catalogItem ? (
             <SelectedRow
               title={catalogItem.name}
-              subtitle={`${formatEuro(catalogItem.selling_price * (1 + catalogItem.vat_rate / 100))} incl. BTW · Garantie ${catalogItem.warranty_months ?? '–'} mnd`}
+              subtitle={`${formatEuro(catalogItem.selling_price * (1 + catalogItem.vat_rate / 100))} ${t('inclVat')} · ${t('warrantyMonthsShort', { months: catalogItem.warranty_months ?? '–' })}`}
               onChange={() => setCatalogItem(null)}
+              changeLabel={t('change')}
             />
           ) : manualMode ? (
             <div className="space-y-3">
-              <Field label="Omschrijving">
-                <Input name="manual_description" required placeholder="Bijv. Batterij vervangen" />
+              <Field label={t('description')}>
+                <Input name="manual_description" required placeholder={t('descriptionPlaceholder')} />
               </Field>
               <div className="grid grid-cols-3 gap-3 items-end">
-                <Field label="Prijs">
+                <Field label={t('price')}>
                   <Input
                     name="manual_price"
                     type="number"
@@ -271,7 +277,7 @@ export function RepairIntakeForm({
                     onChange={(e) => setManualPrice(e.target.value)}
                   />
                 </Field>
-                <Field label="BTW-tarief">
+                <Field label={t('vatRate')}>
                   <select name="manual_vat_rate" defaultValue="21" className="w-full rounded border border-ink-200 bg-white px-3 py-2 text-sm">
                     <option value="21">21%</option>
                     <option value="9">9%</option>
@@ -280,11 +286,11 @@ export function RepairIntakeForm({
                 </Field>
                 <label className="flex items-center gap-2 pb-2 text-sm text-ink-600">
                   <input type="checkbox" name="manual_price_includes_vat" defaultChecked />
-                  Prijs is incl. BTW
+                  {t('priceIncludesVat')}
                 </label>
               </div>
               <button type="button" onClick={() => setManualMode(false)} className="text-sm text-[var(--accent)] underline">
-                Toch reparatietype uit catalogus kiezen
+                {t('chooseCatalogInstead')}
               </button>
             </div>
           ) : (
@@ -294,7 +300,7 @@ export function RepairIntakeForm({
                 <Input
                   value={catalogQuery}
                   onChange={(e) => setCatalogQuery(e.target.value)}
-                  placeholder="Bijv. iPhone 13 scherm…"
+                  placeholder={t('searchCatalogPlaceholder')}
                   className="pl-9"
                 />
               </div>
@@ -316,7 +322,7 @@ export function RepairIntakeForm({
                 </div>
               )}
               <button type="button" onClick={() => setManualMode(true)} className="mt-2 text-sm text-[var(--accent)] underline">
-                + Handmatige regel invoeren
+                {t('manualLine')}
               </button>
             </div>
           )}
@@ -326,10 +332,10 @@ export function RepairIntakeForm({
       {/* 4. Condition & notes */}
       {(catalogItem || manualMode) && (
         <Card className="p-5">
-          <SectionTitle icon={Smartphone} title="4. Staat van het apparaat & klacht" />
+          <SectionTitle icon={Smartphone} title={t('step4Condition')} />
           <div className="space-y-4">
             <div>
-              <Label>Zichtbare schade</Label>
+              <Label>{t('visibleDamage')}</Label>
               <div className="flex flex-wrap gap-4">
                 {CONDITION_FIELDS.map((f) => (
                   <label key={f.key} className="flex items-center gap-2 text-sm text-ink-700">
@@ -339,13 +345,13 @@ export function RepairIntakeForm({
                 ))}
               </div>
             </div>
-            <Field label="Overige schade / opmerkingen">
+            <Field label={t('otherDamage')}>
               <Textarea name="cond_other" rows={2} />
             </Field>
-            <Field label="Klacht van klant">
-              <Textarea name="customer_complaint" rows={2} placeholder="Wat meldt de klant?" />
+            <Field label={t('customerComplaint')}>
+              <Textarea name="customer_complaint" rows={2} placeholder={t('customerComplaintPlaceholder')} />
             </Field>
-            <Field label="Technische notities (intern)">
+            <Field label={t('technicianNotes')}>
               <Textarea name="technician_notes" rows={2} />
             </Field>
           </div>
@@ -356,7 +362,7 @@ export function RepairIntakeForm({
       {(catalogItem || manualMode) && (
         <Card className="flex items-center justify-between p-5">
           <div>
-            <div className="text-xs uppercase tracking-wide text-ink-400">Geschatte prijs</div>
+            <div className="text-xs uppercase tracking-wide text-ink-400">{t('estimatedPrice')}</div>
             <div className="font-display text-2xl font-semibold tabular-nums text-ink-950">
               {formatEuro(isNaN(estimatedTotal) ? 0 : estimatedTotal)}
             </div>
@@ -384,7 +390,7 @@ function SectionTitle({ icon: Icon, title }: { icon: typeof User; title: string 
   );
 }
 
-function SelectedRow({ title, subtitle, onChange }: { title: string; subtitle: string; onChange: () => void }) {
+function SelectedRow({ title, subtitle, onChange, changeLabel }: { title: string; subtitle: string; onChange: () => void; changeLabel: string }) {
   return (
     <div className="flex items-center justify-between rounded border border-[var(--accent-border-soft)] bg-[var(--accent-soft)] px-3 py-2.5">
       <div className="flex items-center gap-2">
@@ -395,7 +401,7 @@ function SelectedRow({ title, subtitle, onChange }: { title: string; subtitle: s
         </div>
       </div>
       <button type="button" onClick={onChange} className="text-xs font-medium text-[var(--accent)] underline">
-        Wijzigen
+        {changeLabel}
       </button>
     </div>
   );

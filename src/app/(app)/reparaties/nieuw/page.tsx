@@ -1,3 +1,4 @@
+import { getTranslations } from 'next-intl/server';
 import { createClient, getCurrentUser } from '@/lib/supabase/server';
 import { RepairIntakeForm } from './RepairIntakeForm';
 
@@ -26,11 +27,13 @@ export default async function NieuweReparatiePage({
     initialDevice = data;
   }
 
+  const t = await getTranslations('intake');
+
   return (
     <div className="mx-auto max-w-4xl space-y-6">
       <div>
-        <h1 className="font-display text-2xl font-semibold text-ink-950">Nieuwe reparatie</h1>
-        <p className="text-sm text-ink-600">Klant → apparaat → reparatietype → intake. Eén keer invullen.</p>
+        <h1 className="font-display text-2xl font-semibold text-ink-950">{t('pageTitle')}</h1>
+        <p className="text-sm text-ink-600">{t('pageSubtitle')}</p>
       </div>
       <RepairIntakeForm initialCustomer={initialCustomer} initialDevice={initialDevice} />
     </div>
