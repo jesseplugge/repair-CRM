@@ -33,8 +33,14 @@ export function SignatureCapture({
   }
 
   function pointerPos(e: React.PointerEvent<HTMLCanvasElement>) {
-    const rect = e.currentTarget.getBoundingClientRect();
-    return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+    const canvas = e.currentTarget;
+    const rect = canvas.getBoundingClientRect();
+    // The canvas's drawing buffer (width/height attrs) is a fixed 600x180, but it renders
+    // at whatever CSS width its container gives it — scale pointer coordinates into the
+    // buffer's coordinate space, or the line drawn won't track the cursor.
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    return { x: (e.clientX - rect.left) * scaleX, y: (e.clientY - rect.top) * scaleY };
   }
 
   function handlePointerDown(e: React.PointerEvent<HTMLCanvasElement>) {
@@ -54,7 +60,7 @@ export function SignatureCapture({
     const { x, y } = pointerPos(e);
     ctx.lineWidth = 2;
     ctx.lineCap = 'round';
-    ctx.strokeStyle = '#14171C';
+    ctx.strokeStyle = '#1C1917';
     ctx.lineTo(x, y);
     ctx.stroke();
     hasSignature.current = true;
