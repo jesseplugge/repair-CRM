@@ -14,6 +14,7 @@ import {
   BarChart3,
   Settings,
   LogOut,
+  ShieldCheck,
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
@@ -21,6 +22,7 @@ import { useRouter } from 'next/navigation';
 const NAV = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/reparaties', label: 'Reparaties', icon: Wrench },
+  { href: '/garantie', label: 'Garantie', icon: ShieldCheck },
   { href: '/kassa', label: 'Kassa', icon: ShoppingCart },
   { href: '/klanten', label: 'Klanten', icon: Users },
   { href: '/producten', label: 'Producten', icon: Package },

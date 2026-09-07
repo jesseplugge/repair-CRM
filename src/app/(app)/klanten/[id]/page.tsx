@@ -69,16 +69,18 @@ export default async function KlantProfielPage({ params }: { params: { id: strin
             </div>
             <div className="space-y-3">
               {(devices ?? []).map((d) => (
-                <Card key={d.id} className="px-4 py-3">
-                  <div className="font-medium text-ink-900">
-                    {d.brand} {d.model}
-                  </div>
-                  <div className="mt-0.5 text-xs text-ink-400">
-                    {d.color && <>{d.color} &middot; </>}
-                    {d.storage_capacity && <>{d.storage_capacity} &middot; </>}
-                    {d.imei ? `IMEI ${d.imei}` : 'Geen IMEI geregistreerd'}
-                  </div>
-                </Card>
+                <Link key={d.id} href={`/klanten/${customer.id}/apparaten/${d.id}`}>
+                  <Card className="px-4 py-3 transition-colors hover:border-[var(--accent-border-soft)]">
+                    <div className="font-medium text-ink-900">
+                      {d.brand} {d.model}
+                    </div>
+                    <div className="mt-0.5 text-xs text-ink-400">
+                      {d.color && <>{d.color} &middot; </>}
+                      {d.storage_capacity && <>{d.storage_capacity} &middot; </>}
+                      {d.imei ? `IMEI ${d.imei}` : 'Geen IMEI geregistreerd'}
+                    </div>
+                  </Card>
+                </Link>
               ))}
               {(devices ?? []).length === 0 && (
                 <p className="text-sm text-ink-400">Nog geen apparaten geregistreerd.</p>
