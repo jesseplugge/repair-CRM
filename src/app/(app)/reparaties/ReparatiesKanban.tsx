@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { updateRepairStatus } from '@/lib/actions/repairs';
 import { formatEuro } from '@/lib/utils/currency';
 
@@ -20,6 +21,7 @@ type Repair = {
 
 export function ReparatiesKanban({ statuses, repairs }: { statuses: Status[]; repairs: Repair[] }) {
   const router = useRouter();
+  const t = useTranslations('repairsList');
   const [pending, startTransition] = useTransition();
   const [dragging, setDragging] = useState<string | null>(null);
   const [overColumn, setOverColumn] = useState<string | null>(null);
@@ -82,7 +84,7 @@ export function ReparatiesKanban({ statuses, repairs }: { statuses: Status[]; re
                   </div>
                 </Link>
               ))}
-              {columnRepairs.length === 0 && <p className="px-2 py-4 text-center text-xs text-ink-300">Leeg</p>}
+              {columnRepairs.length === 0 && <p className="px-2 py-4 text-center text-xs text-ink-300">{t('kanbanEmpty')}</p>}
             </div>
           </div>
         );

@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import { getTranslations } from 'next-intl/server';
 import { createClient, getCurrentUser } from '@/lib/supabase/server';
 import { Card } from '@/components/ui/primitives';
 import { StatusBadge, PaymentStatusBadge } from '@/components/StatusBadge';
@@ -29,6 +30,7 @@ export default async function ReparatieDetailPage({ params }: { params: { id: st
     .eq('business_id', user!.business_id)
     .single();
   if (!repair) notFound();
+  const t = await getTranslations('repairDetail');
 
   const [
     { data: items },
@@ -97,7 +99,7 @@ export default async function ReparatieDetailPage({ params }: { params: { id: st
             <StatusBadge name={status.name} color={status.color} />
             <PaymentStatusBadge status={repair.payment_status} />
           </div>
-          <p className="text-sm text-ink-600">Ontvangen {formatDateTime(repair.date_received)}</p>
+          <p className="text-sm text-ink-600">{t('received', { date: formatDateTime(repair.date_received) })}</p>
         </div>
       </div>
 
@@ -105,7 +107,7 @@ export default async function ReparatieDetailPage({ params }: { params: { id: st
         {/* LEFT — customer + device */}
         <div className="col-span-3 space-y-4">
           <Card className="p-4">
-            <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink-400">Klant</h3>
+            <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink-400">{t('customer')}</h3>
             <Link href={`/klanten/${customer.id}`} className="font-medium text-ink-900 hover:text-[var(--accent)]">
               {customer.first_name} {customer.last_name}
             </Link>
@@ -124,7 +126,7 @@ export default async function ReparatieDetailPage({ params }: { params: { id: st
           </Card>
 
           <Card className="p-4">
-            <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink-400">Apparaat</h3>
+            <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink-400">{t('device')}</h3>
             <div className="flex items-center gap-1.5 font-medium text-ink-900">
               <Smartphone size={14} className="text-ink-400" />
               {device.brand} {device.model}
@@ -132,22 +134,22 @@ export default async function ReparatieDetailPage({ params }: { params: { id: st
             <div className="mt-1 text-xs text-ink-500">
               {device.color && <>{device.color} &middot; </>}
               {device.storage_capacity && <>{device.storage_capacity} &middot; </>}
-              {device.imei ? `IMEI ${device.imei}` : 'Geen IMEI'}
+              {device.imei ? `IMEI ${device.imei}` : t('noImei')}
             </div>
             {device.existing_damage && <p className="mt-2 text-sm text-ink-600">{device.existing_damage}</p>}
           </Card>
 
           <Card className="p-4">
-            <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink-400">Staat bij intake</h3>
+            <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink-400">{t('conditionAtIntake')}</h3>
             <ul className="space-y-1 text-sm text-ink-600">
               {Object.entries(condition)
                 .filter(([k, v]) => k !== 'other_notes' && v === true)
                 .map(([k]) => (
-                  <li key={k}>&bull; {CONDITION_LABELS[k] ?? k}</li>
+                  <li key={k}>&bull; {conditionLabels(t)[k] ?? k}</li>
                 ))}
               {Boolean(condition.other_notes) && <li className="italic text-ink-500">{String(condition.other_notes)}</li>}
               {Object.entries(condition).filter(([k, v]) => k !== 'other_notes' && v === true).length === 0 &&
-                !condition.other_notes && <li className="text-ink-400">Geen schade geregistreerd</li>}
+                !condition.other_notes && <li className="text-ink-400">{t('noDamageRecorded')}</li>}
             </ul>
           </Card>
         </div>
@@ -155,33 +157,33 @@ export default async function ReparatieDetailPage({ params }: { params: { id: st
         {/* MIDDLE — details + items + timeline */}
         <div className="col-span-6 space-y-4">
           <Card className="p-4">
-            <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink-400">Klacht &amp; notities</h3>
+            <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink-400">{t('complaintAndNotes')}</h3>
             {repair.customer_complaint && (
               <p className="mb-2 text-sm text-ink-700">
-                <span className="font-medium">Klacht: </span>
+                <span className="font-medium">{t('complaint')}</span>
                 {repair.customer_complaint}
               </p>
             )}
             {repair.technician_notes && (
               <p className="text-sm text-ink-700">
-                <span className="font-medium">Notities: </span>
+                <span className="font-medium">{t('technicianNotes')}</span>
                 {repair.technician_notes}
               </p>
             )}
             {!repair.customer_complaint && !repair.technician_notes && (
-              <p className="text-sm text-ink-400">Geen notities.</p>
+              <p className="text-sm text-ink-400">{t('noNotes')}</p>
             )}
           </Card>
 
           <Card className="p-4">
-            <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink-400">Onderdelen &amp; kosten</h3>
+            <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink-400">{t('partsAndCosts')}</h3>
             <div className="space-y-2">
               {(items ?? []).map((item) => (
                 <div key={item.id} className="flex items-center justify-between rounded border border-ink-100 px-3 py-2 text-sm">
                   <div>
                     <div className="font-medium text-ink-900">{item.description}</div>
                     <div className="text-xs text-ink-400">
-                      {item.quantity}x &middot; {formatEuro(item.selling_price_excl_vat)} excl. BTW &middot; BTW {item.vat_rate}%
+                      {item.quantity}x &middot; {formatEuro(item.selling_price_excl_vat)} {t('exclVat')} &middot; {t('vat')} {item.vat_rate}%
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
@@ -195,7 +197,7 @@ export default async function ReparatieDetailPage({ params }: { params: { id: st
           </Card>
 
           <Card className="p-4">
-            <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink-400">Tijdlijn</h3>
+            <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink-400">{t('timeline')}</h3>
             <div className="space-y-3">
               {(activity ?? []).map((a) => (
                 <div key={a.id} className="text-sm">
@@ -203,7 +205,7 @@ export default async function ReparatieDetailPage({ params }: { params: { id: st
                   <div className="text-ink-700">{a.description}</div>
                 </div>
               ))}
-              {(activity ?? []).length === 0 && <p className="text-sm text-ink-400">Nog geen gebeurtenissen.</p>}
+              {(activity ?? []).length === 0 && <p className="text-sm text-ink-400">{t('noEvents')}</p>}
             </div>
           </Card>
         </div>
@@ -211,39 +213,39 @@ export default async function ReparatieDetailPage({ params }: { params: { id: st
         {/* RIGHT — price + status + payment */}
         <div className="col-span-3 space-y-4">
           <Card className="p-4">
-            <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink-400">Prijs</h3>
+            <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink-400">{t('price')}</h3>
             <div className="space-y-1.5 text-sm">
               <div className="flex justify-between text-ink-600">
-                <span>Subtotaal excl. BTW</span>
+                <span>{t('subtotalExclVat')}</span>
                 <span className="tabular-nums">{formatEuro(subtotalExclVat)}</span>
               </div>
               <div className="flex justify-between text-ink-600">
-                <span>BTW</span>
+                <span>{t('vat')}</span>
                 <span className="tabular-nums">{formatEuro(totalVat)}</span>
               </div>
               <div className="mt-2 flex justify-between border-t border-ink-100 pt-2 font-display text-lg font-semibold text-ink-950">
-                <span>Totaal</span>
+                <span>{t('total')}</span>
                 <span className="tabular-nums">{formatEuro(totalInclVat)}</span>
               </div>
               <div className="mt-2 flex justify-between border-t border-ink-100 pt-2 text-xs text-ink-400">
-                <span>Winst (excl. BTW)</span>
+                <span>{t('profitExclVat')}</span>
                 <span className="tabular-nums">
                   {formatEuro(profit)} &middot; {margin.toFixed(0)}%
                 </span>
               </div>
             </div>
             {repair.warranty_months && (
-              <p className="mt-3 text-xs text-ink-400">Garantie: {repair.warranty_months} maanden na oplevering</p>
+              <p className="mt-3 text-xs text-ink-400">{t('warrantyMonths', { months: repair.warranty_months })}</p>
             )}
           </Card>
 
           <Card className="p-4">
-            <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink-400">Status</h3>
+            <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink-400">{t('status')}</h3>
             <StatusChanger repairId={repair.id} currentStatusId={status.id} statuses={statuses ?? []} />
           </Card>
 
           <Card className="p-4">
-            <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink-400">Betaling</h3>
+            <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink-400">{t('payment')}</h3>
             <PaymentPanel
               repairId={repair.id}
               paymentStatus={repair.payment_status}
@@ -253,32 +255,32 @@ export default async function ReparatieDetailPage({ params }: { params: { id: st
           </Card>
 
           <Card className="p-4">
-            <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink-400">Documenten</h3>
+            <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink-400">{t('documents')}</h3>
             <div className="space-y-4">
               <div>
-                <p className="mb-1.5 text-xs font-medium text-ink-600">Intakebon</p>
-                <PrintControls baseUrl={`/api/repairs/${repair.id}/intake-pdf`} label="Printen" />
+                <p className="mb-1.5 text-xs font-medium text-ink-600">{t('intakeBon')}</p>
+                <PrintControls baseUrl={`/api/repairs/${repair.id}/intake-pdf`} label={t('print')} />
                 <div className="mt-1.5">
-                  <EmailButton id={repair.id} action={emailIntakeDocument} defaultEmail={customer.email} label="Intakebon e-mailen" />
+                  <EmailButton id={repair.id} action={emailIntakeDocument} defaultEmail={customer.email} label={t('emailIntake')} />
                 </div>
               </div>
               <div>
-                <p className="mb-1.5 text-xs font-medium text-ink-600">Kassabon</p>
-                <PrintControls baseUrl={`/api/repairs/${repair.id}/receipt-pdf`} label="Printen" />
+                <p className="mb-1.5 text-xs font-medium text-ink-600">{t('kassabon')}</p>
+                <PrintControls baseUrl={`/api/repairs/${repair.id}/receipt-pdf`} label={t('print')} />
                 <div className="mt-1.5">
-                  <EmailButton id={repair.id} action={emailCompletionReceipt} defaultEmail={customer.email} label="Kassabon e-mailen" />
+                  <EmailButton id={repair.id} action={emailCompletionReceipt} defaultEmail={customer.email} label={t('emailReceipt')} />
                 </div>
               </div>
               <div className="space-y-2 border-t border-ink-100 pt-3">
                 {signature ? (
                   <div className="rounded bg-green-50 px-3 py-2 text-xs text-green-700">
-                    ✓ Ondertekend op {formatDateTime(signature.signed_at)}
+                    {t('signedOn', { date: formatDateTime(signature.signed_at) })}
                   </div>
                 ) : (
                   <SignatureModalTrigger repairId={repair.id} activeTerms={activeTerms ? { content: activeTerms.content, versionLabel: activeTerms.version_label } : null} />
                 )}
                 <Link href={`/facturen/nieuw?repair_id=${repair.id}`} className="block rounded border border-ink-200 px-3 py-2 text-center text-sm text-ink-700 hover:bg-ink-50">
-                  Factuur maken
+                  {t('makeInvoice')}
                 </Link>
               </div>
             </div>
@@ -297,19 +299,21 @@ export default async function ReparatieDetailPage({ params }: { params: { id: st
   );
 }
 
-const CONDITION_LABELS: Record<string, string> = {
-  cond_screen: 'Schermschade',
-  cond_back: 'Achterglas beschadigd',
-  cond_frame: 'Frame beschadigd',
-  cond_camera: 'Camera beschadigd',
-  cond_buttons: 'Knoppen',
-  cond_port: 'Laadconnector',
-  cond_water: 'Waterschade',
-  screen_damage: 'Schermschade',
-  back_glass_damage: 'Achterglas beschadigd',
-  frame_damage: 'Frame beschadigd',
-  camera_damage: 'Camera beschadigd',
-  buttons_damage: 'Knoppen',
-  charging_port_damage: 'Laadconnector',
-  water_damage: 'Waterschade',
-};
+function conditionLabels(t: Awaited<ReturnType<typeof getTranslations<'repairDetail'>>>): Record<string, string> {
+  return {
+    cond_screen: t('condScreen'),
+    cond_back: t('condBack'),
+    cond_frame: t('condFrame'),
+    cond_camera: t('condCamera'),
+    cond_buttons: t('condButtons'),
+    cond_port: t('condPort'),
+    cond_water: t('condWater'),
+    screen_damage: t('condScreen'),
+    back_glass_damage: t('condBack'),
+    frame_damage: t('condFrame'),
+    camera_damage: t('condCamera'),
+    buttons_damage: t('condButtons'),
+    charging_port_damage: t('condPort'),
+    water_damage: t('condWater'),
+  };
+}

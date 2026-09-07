@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { getTranslations } from 'next-intl/server';
 import { createClient, getCurrentUser } from '@/lib/supabase/server';
 import { Card, Button } from '@/components/ui/primitives';
 import { StatusBadge, PaymentStatusBadge } from '@/components/StatusBadge';
@@ -10,6 +11,7 @@ import { ReparatiesKanban } from './ReparatiesKanban';
 export default async function ReparatiesPage({ searchParams }: { searchParams: { status?: string; view?: string } }) {
   const user = await getCurrentUser();
   const supabase = createClient();
+  const t = await getTranslations('repairsList');
   const view = searchParams.view === 'kanban' ? 'kanban' : 'list';
 
   const { data: statuses } = await supabase
@@ -35,8 +37,8 @@ export default async function ReparatiesPage({ searchParams }: { searchParams: {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-display text-2xl font-semibold text-ink-950">Reparaties</h1>
-          <p className="text-sm text-ink-600">{repairs?.length ?? 0} reparaties</p>
+          <h1 className="font-display text-2xl font-semibold text-ink-950">{t('title')}</h1>
+          <p className="text-sm text-ink-600">{t('count', { count: repairs?.length ?? 0 })}</p>
         </div>
         <div className="flex items-center gap-2">
           <div className="flex rounded border border-ink-200 bg-white p-0.5">
@@ -44,18 +46,18 @@ export default async function ReparatiesPage({ searchParams }: { searchParams: {
               href={{ pathname: '/reparaties', query: { ...(searchParams.status ? { status: searchParams.status } : {}), view: 'list' } }}
               className={`flex items-center gap-1.5 rounded px-2.5 py-1.5 text-sm ${view === 'list' ? 'bg-ink-100 text-ink-900' : 'text-ink-500'}`}
             >
-              <List size={14} /> Lijst
+              <List size={14} /> {t('list')}
             </Link>
             <Link
               href={{ pathname: '/reparaties', query: { ...(searchParams.status ? { status: searchParams.status } : {}), view: 'kanban' } }}
               className={`flex items-center gap-1.5 rounded px-2.5 py-1.5 text-sm ${view === 'kanban' ? 'bg-ink-100 text-ink-900' : 'text-ink-500'}`}
             >
-              <Kanban size={14} /> Kanban
+              <Kanban size={14} /> {t('kanban')}
             </Link>
           </div>
           <Link href="/reparaties/nieuw">
             <Button variant="primary">
-              <Plus size={16} /> Nieuwe reparatie
+              <Plus size={16} /> {t('newRepair')}
             </Button>
           </Link>
         </div>
@@ -64,7 +66,7 @@ export default async function ReparatiesPage({ searchParams }: { searchParams: {
       {view === 'list' && (
         <div className="flex flex-wrap gap-2">
           <Link href="/reparaties">
-            <FilterChip active={!searchParams.status} label="Alle" />
+            <FilterChip active={!searchParams.status} label={t('all')} />
           </Link>
           {(statuses ?? []).map((s) => (
             <Link key={s.id} href={`/reparaties?status=${s.id}`}>
@@ -81,14 +83,14 @@ export default async function ReparatiesPage({ searchParams }: { searchParams: {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-ink-100 text-left text-xs uppercase tracking-wide text-ink-400">
-              <th className="px-4 py-3 font-medium">Nummer</th>
-              <th className="px-4 py-3 font-medium">Klant</th>
-              <th className="px-4 py-3 font-medium">Apparaat</th>
-              <th className="px-4 py-3 font-medium">Type</th>
-              <th className="px-4 py-3 font-medium">Ontvangen</th>
-              <th className="px-4 py-3 font-medium">Status</th>
-              <th className="px-4 py-3 font-medium">Betaling</th>
-              <th className="px-4 py-3 text-right font-medium">Bedrag</th>
+              <th className="px-4 py-3 font-medium">{t('colNumber')}</th>
+              <th className="px-4 py-3 font-medium">{t('colCustomer')}</th>
+              <th className="px-4 py-3 font-medium">{t('colDevice')}</th>
+              <th className="px-4 py-3 font-medium">{t('colType')}</th>
+              <th className="px-4 py-3 font-medium">{t('colReceived')}</th>
+              <th className="px-4 py-3 font-medium">{t('colStatus')}</th>
+              <th className="px-4 py-3 font-medium">{t('colPayment')}</th>
+              <th className="px-4 py-3 text-right font-medium">{t('colAmount')}</th>
             </tr>
           </thead>
           <tbody>
@@ -119,7 +121,7 @@ export default async function ReparatiesPage({ searchParams }: { searchParams: {
             {(repairs ?? []).length === 0 && (
               <tr>
                 <td colSpan={8} className="px-4 py-10 text-center text-ink-400">
-                  Geen reparaties gevonden.
+                  {t('empty')}
                 </td>
               </tr>
             )}
