@@ -5,6 +5,7 @@ import { sendEmail } from '@/lib/email';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { headers } from 'next/headers';
+import { getTranslations } from 'next-intl/server';
 
 type InviteState = { error?: string; inviteUrl?: string; emailSent?: boolean };
 
@@ -17,16 +18,17 @@ function baseUrl() {
 export async function createInvite(_prevState: InviteState, formData: FormData): Promise<InviteState> {
   const user = await getCurrentUser();
   if (!user) redirect('/login');
-  if (user.role !== 'owner') return { error: 'Alleen eigenaren kunnen teamleden uitnodigen.' };
+  const t = await getTranslations('inviteErrors');
+  if (user.role !== 'owner') return { error: t('onlyOwnersCanInvite') };
 
   const email = (formData.get('email') as string)?.trim().toLowerCase();
   const role = (formData.get('role') as string) === 'owner' ? 'owner' : 'employee';
-  if (!email) return { error: 'Vul een e-mailadres in.' };
+  if (!email) return { error: t('fillEmail') };
 
   const supabase = createClient();
 
   const { data: existingMember } = await supabase.from('users').select('id').eq('business_id', user.business_id).eq('email', email).maybeSingle();
-  if (existingMember) return { error: 'Dit e-mailadres is al gekoppeld aan een teamlid.' };
+  if (existingMember) return { error: t('emailAlreadyLinked') };
 
   const { data: invite, error } = await supabase
     .from('invites')
@@ -38,12 +40,12 @@ export async function createInvite(_prevState: InviteState, formData: FormData):
   const inviteUrl = `${baseUrl()}/uitnodiging/${invite.token}`;
 
   const { data: business } = await supabase.from('businesses').select('trading_name, legal_name').eq('id', user.business_id).single();
-  const businessName = business?.trading_name || business?.legal_name || 'het bedrijf';
+  const businessName = business?.trading_name || business?.legal_name || t('defaultBusinessName');
 
   const emailResult = await sendEmail({
     to: email,
-    subject: `Uitnodiging voor ${businessName}`,
-    html: `<p>Beste,</p><p>Je bent uitgenodigd om je aan te sluiten bij <strong>${businessName}</strong> op Reparatie CRM.</p><p><a href="${inviteUrl}">Klik hier om de uitnodiging te accepteren</a></p><p>Deze link is 7 dagen geldig.</p>`,
+    subject: t('emailSubject', { businessName }),
+    html: `<p>${t('emailGreeting')}</p><p>${t('emailBody', { businessName })}</p><p><a href="${inviteUrl}">${t('emailLink')}</a></p><p>${t('emailExpiry')}</p>`,
   });
 
   revalidatePath('/instellingen');
@@ -53,7 +55,8 @@ export async function createInvite(_prevState: InviteState, formData: FormData):
 export async function revokeInvite(inviteId: string) {
   const user = await getCurrentUser();
   if (!user) redirect('/login');
-  if (user.role !== 'owner') return { error: 'Alleen eigenaren kunnen uitnodigingen intrekken.' };
+  const t = await getTranslations('inviteErrors');
+  if (user.role !== 'owner') return { error: t('onlyOwnersCanRevoke') };
 
   const supabase = createClient();
   await supabase.from('invites').delete().eq('id', inviteId).eq('business_id', user.business_id);
