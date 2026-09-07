@@ -50,5 +50,34 @@
     "readyWaiting": "{repairNumber} ({customerName}) wacht al {days} dagen op ophalen",
     "lowStock": "{productName} bijna op ({quantity} over)",
     "invoiceOverdue": "Factuur {invoiceNumber} is vervallen"
+  },
+  "auth": {
+    "appName": "Reparatie CRM",
+    "tagline": "Beheer, kassa en administratie voor je reparatiezaak",
+    "signIn": "Inloggen",
+    "signUp": "Account aanmaken",
+    "email": "E-mailadres",
+    "password": "Wachtwoord",
+    "busy": "Bezig…",
+    "fillEmailPassword": "Vul een e-mailadres en wachtwoord in.",
+    "invalidCredentials": "E-mailadres of wachtwoord onjuist.",
+    "checkEmailToConfirm": "Controleer je e-mail om je account te bevestigen. Log daarna hieronder in."
+  },
+  "onboarding": {
+    "title": "Welkom — stel je bedrijf in",
+    "subtitle": "Deze gegevens verschijnen op je bonnen en facturen. Je kunt ze later aanpassen in Instellingen.",
+    "createAndStart": "Bedrijf aanmaken en starten",
+    "legalName": "Bedrijfsnaam (statutair)",
+    "tradingName": "Handelsnaam (optioneel)",
+    "yourName": "Jouw naam",
+    "address": "Adres",
+    "postcode": "Postcode",
+    "city": "Plaats",
+    "phone": "Telefoonnummer",
+    "emailForDocuments": "E-mail (voor bonnen/facturen)",
+    "kvkNumber": "KVK-nummer",
+    "vatNumber": "BTW-nummer",
+    "iban": "IBAN",
+    "legalNameRequired": "Bedrijfsnaam en jouw naam zijn verplicht."
   }
 }

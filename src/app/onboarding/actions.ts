@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
+import { getTranslations } from 'next-intl/server';
 
 export async function createBusiness(_prevState: { error?: string }, formData: FormData) {
   const supabase = createClient();
@@ -12,7 +13,10 @@ export async function createBusiness(_prevState: { error?: string }, formData: F
 
   const legalName = (formData.get('legal_name') as string)?.trim();
   const fullName = (formData.get('full_name') as string)?.trim();
-  if (!legalName || !fullName) return { error: 'Bedrijfsnaam en jouw naam zijn verplicht.' };
+  if (!legalName || !fullName) {
+    const t = await getTranslations('onboarding');
+    return { error: t('legalNameRequired') };
+  }
 
   const { error } = await supabase.rpc('create_business_and_owner', {
     p_legal_name: legalName,

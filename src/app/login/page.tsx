@@ -2,14 +2,16 @@
 
 import { useState } from 'react';
 import { useFormState, useFormStatus } from 'react-dom';
+import { useTranslations } from 'next-intl';
 import { authenticate } from './actions';
 import { Button, Field, Input } from '@/components/ui/primitives';
 
 function SubmitButton({ label }: { label: string }) {
   const { pending } = useFormStatus();
+  const t = useTranslations('auth');
   return (
     <Button type="submit" variant="primary" size="lg" className="w-full" disabled={pending}>
-      {pending ? 'Bezig…' : label}
+      {pending ? t('busy') : label}
     </Button>
   );
 }
@@ -17,13 +19,14 @@ function SubmitButton({ label }: { label: string }) {
 export default function LoginPage() {
   const [mode, setMode] = useState<'signin' | 'signup'>('signin');
   const [state, formAction] = useFormState(authenticate, { error: '' });
+  const t = useTranslations('auth');
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-ink-950 px-4">
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
-          <div className="mb-2 font-display text-2xl font-semibold text-white">Reparatie CRM</div>
-          <p className="text-sm text-ink-400">Beheer, kassa en administratie voor je reparatiezaak</p>
+          <div className="mb-2 font-display text-2xl font-semibold text-white">{t('appName')}</div>
+          <p className="text-sm text-ink-400">{t('tagline')}</p>
         </div>
 
         <div className="rounded-lg border border-ink-800 bg-white p-6 shadow-card">
@@ -33,23 +36,23 @@ export default function LoginPage() {
               onClick={() => setMode('signin')}
               className={`flex-1 rounded py-1.5 transition-colors ${mode === 'signin' ? 'bg-white text-ink-900 shadow-card' : 'text-ink-600'}`}
             >
-              Inloggen
+              {t('signIn')}
             </button>
             <button
               type="button"
               onClick={() => setMode('signup')}
               className={`flex-1 rounded py-1.5 transition-colors ${mode === 'signup' ? 'bg-white text-ink-900 shadow-card' : 'text-ink-600'}`}
             >
-              Account aanmaken
+              {t('signUp')}
             </button>
           </div>
 
           <form action={formAction} className="space-y-4">
             <input type="hidden" name="mode" value={mode === 'signin' ? 'signin' : 'signup'} />
-            <Field label="E-mailadres">
+            <Field label={t('email')}>
               <Input type="email" name="email" required autoComplete="email" placeholder="naam@bedrijf.nl" />
             </Field>
-            <Field label="Wachtwoord">
+            <Field label={t('password')}>
               <Input
                 type="password"
                 name="password"
@@ -66,7 +69,7 @@ export default function LoginPage() {
               <p className="rounded bg-[var(--accent-soft)] px-3 py-2 text-sm text-[var(--accent)]">{state.message}</p>
             )}
 
-            <SubmitButton label={mode === 'signin' ? 'Inloggen' : 'Account aanmaken'} />
+            <SubmitButton label={mode === 'signin' ? t('signIn') : t('signUp')} />
           </form>
         </div>
       </div>
