@@ -32,6 +32,10 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   themeColor: '#0C7C82',
+  // Lets the page reach the physical screen edges in standalone/native contexts so the
+  // env(safe-area-inset-*) values used by MobileNav/AppShell actually resolve to real
+  // insets instead of always computing to 0. No visible effect in an ordinary browser tab.
+  viewportFit: 'cover',
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {

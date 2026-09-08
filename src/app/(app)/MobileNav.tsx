@@ -14,13 +14,22 @@ const ITEMS = [
   { href: '/instellingen', key: 'settings', icon: Settings },
 ] as const;
 
-/** Bottom tab bar for small viewports — the sidebar (Sidebar.tsx) is desktop-only (lg:flex). */
-export function MobileNav() {
+/**
+ * Bottom tab bar for small viewports — the sidebar (Sidebar.tsx) is desktop-only (lg:flex).
+ * `forceVisible` is set only inside the native app shell (AppShell.tsx), where the bottom tabs
+ * are the permanent app navigation regardless of screen width — never set from the web layout.
+ */
+export function MobileNav({ forceVisible = false }: { forceVisible?: boolean }) {
   const pathname = usePathname();
   const t = useTranslations('nav');
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-30 flex border-t border-ink-100 bg-white/95 backdrop-blur lg:hidden">
+    <nav
+      className={clsx(
+        'fixed inset-x-0 bottom-0 z-30 flex border-t border-ink-100 bg-white/95 backdrop-blur',
+        !forceVisible && 'lg:hidden'
+      )}
+    >
       {ITEMS.map(({ href, key, icon: Icon }) => {
         const active = pathname === href || pathname.startsWith(href + '/');
         return (

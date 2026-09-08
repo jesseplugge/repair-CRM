@@ -19,6 +19,14 @@
     background-attachment: fixed;
   }
 
+  /* Native app shell only (set by AppShell.tsx once Capacitor is detected client-side) — kills
+     the browser-y rubber-band overscroll bounce so the app doesn't feel like a webpage in a
+     wrapper. Never applies to the web app, including mobile browsers. */
+  html[data-shell='native'],
+  html[data-shell='native'] body {
+    overscroll-behavior: none;
+  }
+
   h1, h2, h3 {
     letter-spacing: -0.01em;
   }

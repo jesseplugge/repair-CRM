@@ -1,11 +1,9 @@
 import { redirect } from 'next/navigation';
 import { createClient, getCurrentUser } from '@/lib/supabase/server';
-import { Sidebar } from './Sidebar';
-import { MobileNav } from './MobileNav';
+import { AppShell } from './AppShell';
 import { TopBar } from './TopBar';
 import { buildAccentTokens } from '@/lib/utils/color';
 import { getNotifications } from '@/lib/actions/notifications';
-import { CommandPalette } from '@/components/CommandPalette';
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const user = await getCurrentUser();
@@ -20,18 +18,16 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const accentStyle = buildAccentTokens(business?.accent_color || '#0C7C82');
 
   return (
-    <div className="flex min-h-screen" style={accentStyle as React.CSSProperties}>
-      <Sidebar
-        userName={user.full_name}
-        logoUrl={business?.logo_url ?? null}
-        businessName={business?.trading_name || business?.legal_name || 'Reparatie CRM'}
-      />
-      <main className="flex-1 bg-ink-50 p-4 pb-24 sm:p-6 lg:p-8 lg:pb-8">
-        <TopBar notifications={notifications} />
-        {children}
-      </main>
-      <MobileNav />
-      <CommandPalette />
-    </div>
+    <AppShell
+      style={accentStyle as React.CSSProperties}
+      sidebarProps={{
+        userName: user.full_name,
+        logoUrl: business?.logo_url ?? null,
+        businessName: business?.trading_name || business?.legal_name || 'Reparatie CRM',
+      }}
+    >
+      <TopBar notifications={notifications} />
+      {children}
+    </AppShell>
   );
 }
