@@ -1,12 +1,30 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import type { ReactNode } from 'react';
 import { getTranslations } from 'next-intl/server';
 import { createClient, getCurrentUser } from '@/lib/supabase/server';
 import { Card } from '@/components/ui/primitives';
 import { StatusBadge, PaymentStatusBadge } from '@/components/StatusBadge';
-import { formatDate, formatDateTime } from '@/lib/utils/format';
+import { formatDateTime } from '@/lib/utils/format';
 import { formatEuro } from '@/lib/utils/currency';
-import { ArrowLeft, Phone, Mail, Smartphone } from 'lucide-react';
+import {
+  ArrowLeft,
+  Phone,
+  Mail,
+  Smartphone,
+  Hash,
+  Fingerprint,
+  Calendar,
+  AlertTriangle,
+  FileText,
+  ShieldCheck,
+  User,
+  MapPin,
+  StickyNote,
+  ExternalLink,
+  CircleDot,
+  type LucideIcon,
+} from 'lucide-react';
 import { StatusChanger } from './StatusChanger';
 import { AddItemForm } from './AddItemForm';
 import { PaymentPanel } from './PaymentPanel';
@@ -114,106 +132,174 @@ export default async function ReparatieDetailPage({ params }: { params: { id: st
         <Link href="/reparaties" className="focus-ring inline-flex items-center gap-1.5 text-sm text-ink-500 hover:text-ink-800">
           <ArrowLeft size={14} /> {tNav('repairs')}
         </Link>
-        <div className="flex items-center gap-1">
-          <EditRepairModal
-            repairId={repair.id}
-            dateReceived={repair.date_received}
-            dateCompleted={repair.date_completed}
-            datePickedUp={repair.date_picked_up}
-            customerComplaint={repair.customer_complaint}
-            technicianNotes={repair.technician_notes}
-            warrantyMonths={repair.warranty_months}
-          />
-          <DeleteRepairButton repairId={repair.id} />
-        </div>
+        <DeleteRepairButton repairId={repair.id} />
       </div>
 
       <div className="flex items-center gap-3">
         <h1 className="font-display text-2xl font-semibold text-ink-950">{repair.repair_number}</h1>
         <StatusBadge name={status.name} color={status.color} />
         <PaymentStatusBadge status={repair.payment_status} />
-        <span className="text-sm text-ink-400">{t('received', { date: formatDateTime(repair.date_received) })}</span>
       </div>
 
       <div className="grid grid-cols-12 gap-6">
         {/* MAIN WORKSPACE */}
         <div className="col-span-12 space-y-5 lg:col-span-8">
-          {/* Hero — device, complaint, customer. No card border: this is the dominant information (doc §14). */}
-          <div>
-            <div className="flex items-center gap-2 text-lg font-semibold text-ink-950">
-              <Smartphone size={18} className="text-ink-400" />
-              {device.brand} {device.model}
-            </div>
-            <div className="mt-0.5 text-xs text-ink-500">
-              {device.color && <>{device.color} &middot; </>}
-              {device.storage_capacity && <>{device.storage_capacity} &middot; </>}
-              {device.imei ? `IMEI ${device.imei}` : t('noImei')}
-            </div>
+          {/* Repair Card + Customer Information — at-a-glance identity for the repair (doc §14). */}
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <Card className="p-4">
+              <div className="mb-3 flex items-center justify-between">
+                <h3 className="font-display text-base font-semibold text-ink-950">{t('repairCard')}</h3>
+                <EditRepairModal
+                  repairId={repair.id}
+                  dateReceived={repair.date_received}
+                  dateCompleted={repair.date_completed}
+                  datePickedUp={repair.date_picked_up}
+                  customerComplaint={repair.customer_complaint}
+                  technicianNotes={repair.technician_notes}
+                  warrantyMonths={repair.warranty_months}
+                />
+              </div>
 
-            <div className="mt-3 space-y-1 text-sm">
-              {repair.customer_complaint && (
-                <p className="text-ink-700">
-                  <span className="font-medium text-ink-900">{t('complaint')}</span>
-                  {repair.customer_complaint}
-                </p>
-              )}
-              {repair.technician_notes && (
-                <p className="text-ink-700">
-                  <span className="font-medium text-ink-900">{t('technicianNotes')}</span>
-                  {repair.technician_notes}
-                </p>
-              )}
-              {!repair.customer_complaint && !repair.technician_notes && <p className="text-ink-400">{t('noNotes')}</p>}
-            </div>
+              <div className="mb-4 rounded-lg bg-[var(--accent)] px-4 py-3 text-white">
+                <div className="flex items-center gap-1.5 text-xs font-medium text-white/80">
+                  <Hash size={12} /> {t('repairNumberLabel')}
+                </div>
+                <div className="mt-0.5 font-display text-lg font-semibold">{repair.repair_number}</div>
+              </div>
 
-            <div className="mt-3 flex items-center gap-4 text-sm">
-              <Link href={`/klanten/${customer.id}`} className="font-medium text-ink-900 hover:text-[var(--accent)]">
-                {customer.first_name} {customer.last_name}
-              </Link>
-              {customer.phone && (
-                <span className="flex items-center gap-1.5 text-ink-500">
-                  <Phone size={13} className="text-ink-400" /> {customer.phone}
-                </span>
-              )}
-              {customer.email && (
-                <span className="flex items-center gap-1.5 text-ink-500">
-                  <Mail size={13} className="text-ink-400" /> {customer.email}
-                </span>
-              )}
-            </div>
+              <div className="space-y-3">
+                <div className="flex items-start gap-3">
+                  <div
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
+                    style={{ backgroundColor: `${status.color ?? '#495164'}1a` }}
+                  >
+                    <CircleDot size={16} style={{ color: status.color ?? '#495164' }} />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-xs text-ink-400">{t('status')}</div>
+                    <div className="text-sm font-medium" style={{ color: status.color ?? undefined }}>
+                      {status.name}
+                    </div>
+                  </div>
+                </div>
 
-            {(conditionFlags.length > 0 || Boolean(condition.other_notes)) && (
-              <div className="mt-3 flex flex-wrap gap-1.5">
-                {conditionFlags.map(([k]) => (
-                  <span key={k} className="rounded-full bg-warning-50 px-2.5 py-1 text-xs font-medium text-warning-700">
-                    {conditionLabels(t)[k] ?? k}
-                  </span>
-                ))}
-                {Boolean(condition.other_notes) && (
-                  <span className="rounded-full bg-ink-100 px-2.5 py-1 text-xs italic text-ink-600">{String(condition.other_notes)}</span>
+                <InfoRow icon={Smartphone} tone="teal" label={t('deviceName')}>
+                  {device.brand} {device.model}
+                  {device.color && <> &middot; {device.color}</>}
+                  {device.storage_capacity && <> &middot; {device.storage_capacity}</>}
+                </InfoRow>
+                <InfoRow icon={Fingerprint} tone="amber" label={t('imeiSerial')}>
+                  {device.imei || t('noImei')}
+                </InfoRow>
+                <InfoRow icon={Calendar} tone="green" label={t('dateReceived')}>
+                  {formatDateTime(repair.date_received)}
+                </InfoRow>
+                {repair.warranty_months && (
+                  <InfoRow icon={ShieldCheck} tone="teal" label={t('warrantyLabel')}>
+                    {t('warrantyMonths', { months: repair.warranty_months })}
+                  </InfoRow>
+                )}
+                {repair.customer_complaint && (
+                  <InfoRow icon={AlertTriangle} tone="danger" label={t('complaintLabel')}>
+                    {repair.customer_complaint}
+                  </InfoRow>
+                )}
+                {repair.technician_notes && (
+                  <InfoRow icon={FileText} tone="ink" label={t('technicianNotesLabel')}>
+                    {repair.technician_notes}
+                  </InfoRow>
                 )}
               </div>
-            )}
+
+              {(conditionFlags.length > 0 || Boolean(condition.other_notes)) && (
+                <div className="mt-4 flex flex-wrap gap-1.5 border-t border-ink-100 pt-3">
+                  {conditionFlags.map(([k]) => (
+                    <span key={k} className="rounded-full bg-warning-50 px-2.5 py-1 text-xs font-medium text-warning-700">
+                      {conditionLabels(t)[k] ?? k}
+                    </span>
+                  ))}
+                  {Boolean(condition.other_notes) && (
+                    <span className="rounded-full bg-ink-100 px-2.5 py-1 text-xs italic text-ink-600">{String(condition.other_notes)}</span>
+                  )}
+                </div>
+              )}
+            </Card>
+
+            <Card className="p-4">
+              <div className="mb-3 flex items-center justify-between">
+                <h3 className="font-display text-base font-semibold text-ink-950">{t('customerInfoCard')}</h3>
+                <Link
+                  href={`/klanten/${customer.id}`}
+                  className="focus-ring flex items-center gap-1.5 rounded px-2 py-1.5 text-sm font-medium text-ink-500 hover:bg-ink-100 hover:text-ink-800"
+                >
+                  <ExternalLink size={14} /> {t('viewCustomer')}
+                </Link>
+              </div>
+
+              <div className="space-y-3">
+                <InfoRow icon={User} tone="teal" label={t('fullName')}>
+                  <Link href={`/klanten/${customer.id}`} className="hover:text-[var(--accent)]">
+                    {customer.first_name} {customer.last_name}
+                  </Link>
+                </InfoRow>
+                {customer.phone && (
+                  <InfoRow icon={Phone} tone="green" label={t('phoneNumber')}>
+                    {customer.phone}
+                  </InfoRow>
+                )}
+                {customer.email && (
+                  <InfoRow icon={Mail} tone="amber" label={t('emailAddress')}>
+                    {customer.email}
+                  </InfoRow>
+                )}
+                {(customer.address || customer.city) && (
+                  <InfoRow icon={MapPin} tone="ink" label={t('addressLabel')}>
+                    {[customer.address, customer.postcode, customer.city].filter(Boolean).join(', ')}
+                  </InfoRow>
+                )}
+                {customer.notes && (
+                  <InfoRow icon={StickyNote} tone="ink" label={t('customerNotesLabel')}>
+                    {customer.notes}
+                  </InfoRow>
+                )}
+              </div>
+            </Card>
           </div>
 
           <Card className="p-4">
             <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink-400">{t('partsAndCosts')}</h3>
-            <div className="space-y-2">
-              {(items ?? []).map((item) => (
-                <div key={item.id} className="flex items-center justify-between rounded border border-ink-100 px-3 py-2 text-sm">
-                  <div>
-                    <div className="font-medium text-ink-900">{item.description}</div>
-                    <div className="text-xs text-ink-400">
-                      {item.quantity}x &middot; {formatEuro(item.selling_price_excl_vat)} {t('exclVat')} &middot; {t('vat')} {item.vat_rate}%
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="tabular-nums font-medium text-ink-900">{formatEuro(item.total_incl_vat)}</div>
-                    <RemoveItemButton repairId={repair.id} itemId={item.id} />
-                  </div>
-                </div>
-              ))}
-            </div>
+            {(items ?? []).length > 0 ? (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-ink-100 text-left text-xs font-semibold uppercase tracking-wide text-ink-400">
+                      <th className="pb-2 pr-2 font-semibold">{t('colDescription')}</th>
+                      <th className="pb-2 pr-2 text-right font-semibold">{t('colQuantity')}</th>
+                      <th className="pb-2 pr-2 text-right font-semibold">{t('colPrice')}</th>
+                      <th className="pb-2 pr-2 text-right font-semibold">{t('vat')}</th>
+                      <th className="pb-2 pr-2 text-right font-semibold">{t('total')}</th>
+                      <th className="pb-2" />
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {(items ?? []).map((item) => (
+                      <tr key={item.id} className="border-b border-ink-50 last:border-0">
+                        <td className="py-2 pr-2 font-medium text-ink-900">{item.description}</td>
+                        <td className="py-2 pr-2 text-right tabular-nums text-ink-600">{item.quantity}x</td>
+                        <td className="py-2 pr-2 text-right tabular-nums text-ink-600">{formatEuro(item.selling_price_excl_vat)}</td>
+                        <td className="py-2 pr-2 text-right tabular-nums text-ink-600">{item.vat_rate}%</td>
+                        <td className="py-2 pr-2 text-right tabular-nums font-medium text-ink-900">{formatEuro(item.total_incl_vat)}</td>
+                        <td className="py-2 text-right">
+                          <RemoveItemButton repairId={repair.id} itemId={item.id} />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <p className="text-sm text-ink-400">{t('noPartsYet')}</p>
+            )}
             <AddItemForm repairId={repair.id} />
           </Card>
 
@@ -301,6 +387,38 @@ export default async function ReparatieDetailPage({ params }: { params: { id: st
             </div>
           </Card>
         </div>
+      </div>
+    </div>
+  );
+}
+
+const INFO_ROW_TONES = {
+  teal: 'bg-teal-50 text-teal-600',
+  amber: 'bg-amber-50 text-amber-600',
+  green: 'bg-green-50 text-green-600',
+  danger: 'bg-danger-50 text-danger-600',
+  ink: 'bg-ink-100 text-ink-600',
+} as const;
+
+function InfoRow({
+  icon: Icon,
+  tone,
+  label,
+  children,
+}: {
+  icon: LucideIcon;
+  tone: keyof typeof INFO_ROW_TONES;
+  label: string;
+  children: ReactNode;
+}) {
+  return (
+    <div className="flex items-start gap-3">
+      <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${INFO_ROW_TONES[tone]}`}>
+        <Icon size={16} />
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="text-xs text-ink-400">{label}</div>
+        <div className="text-sm font-medium text-ink-900">{children}</div>
       </div>
     </div>
   );
