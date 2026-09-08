@@ -176,7 +176,7 @@
     "typeCustom": "Overig",
     "addLine": "Regel toevoegen",
     "description": "Omschrijving",
-    "price": "Prijs excl.",
+    "price": "Prijs",
     "busy": "Bezig…",
     "add": "Toevoegen",
     "cancel": "Annuleren",
@@ -203,7 +203,8 @@
     "confirmStatusChange": "Status wijzigen naar {status}?",
     "refundTitle": "Betaling terugbetalen",
     "refundAmountLabel": "Terug te betalen bedrag",
-    "refundMax": "Maximaal {max}"
+    "refundMax": "Maximaal {max}",
+    "priceIncludesVat": "Prijs is incl. BTW"
   },
   "repairErrors": {
     "selectCustomerOrFillName": "Selecteer een klant of vul voor- en achternaam in.",

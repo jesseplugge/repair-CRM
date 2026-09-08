@@ -176,7 +176,7 @@
     "typeCustom": "Sonstiges",
     "addLine": "Position hinzufügen",
     "description": "Beschreibung",
-    "price": "Preis exkl.",
+    "price": "Preis",
     "busy": "Wird bearbeitet…",
     "add": "Hinzufügen",
     "cancel": "Abbrechen",
@@ -203,7 +203,8 @@
     "confirmStatusChange": "Status auf {status} ändern?",
     "refundTitle": "Zahlung erstatten",
     "refundAmountLabel": "Zu erstattender Betrag",
-    "refundMax": "Maximal {max}"
+    "refundMax": "Maximal {max}",
+    "priceIncludesVat": "Preis inkl. MwSt."
   },
   "repairErrors": {
     "selectCustomerOrFillName": "Wähle einen Kunden oder gib Vor- und Nachname ein.",

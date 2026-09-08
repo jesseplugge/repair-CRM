@@ -381,12 +381,17 @@ export async function addRepairItem(repairId: string, formData: FormData) {
   const priceRaw = parseFloat(formData.get('price') as string);
   const vatRate = parseFloat((formData.get('vat_rate') as string) || '21');
   const itemType = (formData.get('item_type') as string) || 'custom';
+  const priceIncludesVat = formData.get('price_includes_vat') === 'on';
   if (!description || isNaN(priceRaw)) {
     const t = await getTranslations('repairErrors');
     return { error: t('descriptionAndPriceRequired') };
   }
 
-  const { exclVat, inclVat } = calculateFromExclVat(priceRaw * quantity, vatRate);
+  // priceRaw is a per-unit price; back it out to a per-unit excl.-VAT price
+  // first so the stored unit price and the quantity-scaled totals agree,
+  // regardless of which way the tech entered it.
+  const unitExclVat = priceIncludesVat ? calculateFromInclVat(priceRaw, vatRate).exclVat : priceRaw;
+  const { exclVat, inclVat } = calculateFromExclVat(unitExclVat * quantity, vatRate);
 
   const { error } = await supabase.from('repair_items').insert({
     repair_id: repairId,
@@ -394,7 +399,7 @@ export async function addRepairItem(repairId: string, formData: FormData) {
     description,
     quantity,
     cost_price_excl_vat: 0,
-    selling_price_excl_vat: priceRaw,
+    selling_price_excl_vat: unitExclVat,
     vat_rate: vatRate,
     discount: 0,
     total_excl_vat: exclVat,

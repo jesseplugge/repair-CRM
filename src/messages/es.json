@@ -176,7 +176,7 @@
     "typeCustom": "Otro",
     "addLine": "Añadir línea",
     "description": "Descripción",
-    "price": "Precio sin IVA",
+    "price": "Precio",
     "busy": "Procesando…",
     "add": "Añadir",
     "cancel": "Cancelar",
@@ -203,7 +203,8 @@
     "confirmStatusChange": "¿Cambiar el estado a {status}?",
     "refundTitle": "Reembolsar pago",
     "refundAmountLabel": "Importe a reembolsar",
-    "refundMax": "Máximo {max}"
+    "refundMax": "Máximo {max}",
+    "priceIncludesVat": "El precio incluye IVA"
   },
   "repairErrors": {
     "selectCustomerOrFillName": "Selecciona un cliente o introduce nombre y apellidos.",

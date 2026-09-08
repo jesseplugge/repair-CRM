@@ -63,14 +63,20 @@ export function AddItemForm({ repairId }: { repairId: string }) {
             </option>
           ))}
         </select>
-        <Input name="description" placeholder={t('description')} required className="col-span-5" />
-        <Input name="quantity" type="number" step="1" defaultValue="1" className="col-span-1" />
-        <Input name="price" type="number" step="0.01" placeholder={t('price')} required className="col-span-2" />
-        <select name="vat_rate" defaultValue="21" className="col-span-1 rounded border border-ink-200 bg-white px-1 py-1.5 text-xs">
+        <Input name="description" placeholder={t('description')} required className="col-span-9" />
+      </div>
+      <div className="grid grid-cols-12 items-center gap-2">
+        <Input name="quantity" type="number" step="1" defaultValue="1" className="col-span-2" />
+        <Input name="price" type="number" step="0.01" placeholder={t('price')} required className="col-span-3" />
+        <select name="vat_rate" defaultValue="21" className="col-span-2 rounded border border-ink-200 bg-white px-1 py-1.5 text-xs">
           <option value="21">21%</option>
           <option value="9">9%</option>
           <option value="0">0%</option>
         </select>
+        <label className="col-span-5 flex items-center gap-1.5 text-xs text-ink-600">
+          <input type="checkbox" name="price_includes_vat" />
+          {t('priceIncludesVat')}
+        </label>
       </div>
       {error && <p className="text-xs text-red-700">{error}</p>}
       <div className="flex gap-2">

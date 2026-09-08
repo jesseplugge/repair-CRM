@@ -176,7 +176,7 @@
     "typeCustom": "Diğer",
     "addLine": "Satır ekle",
     "description": "Açıklama",
-    "price": "Fiyat (KDV hariç)",
+    "price": "Fiyat",
     "busy": "İşleniyor…",
     "add": "Ekle",
     "cancel": "İptal",
@@ -203,7 +203,8 @@
     "confirmStatusChange": "Durum {status} olarak değiştirilsin mi?",
     "refundTitle": "Ödemeyi iade et",
     "refundAmountLabel": "İade edilecek tutar",
-    "refundMax": "En fazla {max}"
+    "refundMax": "En fazla {max}",
+    "priceIncludesVat": "Fiyata KDV dahildir"
   },
   "repairErrors": {
     "selectCustomerOrFillName": "Bir müşteri seçin veya ad ve soyad girin.",

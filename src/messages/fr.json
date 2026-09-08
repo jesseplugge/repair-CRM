@@ -176,7 +176,7 @@
     "typeCustom": "Autre",
     "addLine": "Ajouter une ligne",
     "description": "Description",
-    "price": "Prix HT",
+    "price": "Prix",
     "busy": "Chargement…",
     "add": "Ajouter",
     "cancel": "Annuler",
@@ -203,7 +203,8 @@
     "confirmStatusChange": "Changer le statut en {status} ?",
     "refundTitle": "Rembourser le paiement",
     "refundAmountLabel": "Montant à rembourser",
-    "refundMax": "Maximum {max}"
+    "refundMax": "Maximum {max}",
+    "priceIncludesVat": "Le prix inclut la TVA"
   },
   "repairErrors": {
     "selectCustomerOrFillName": "Sélectionnez un client ou saisissez un prénom et un nom.",

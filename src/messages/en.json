@@ -176,7 +176,7 @@
     "typeCustom": "Other",
     "addLine": "Add line",
     "description": "Description",
-    "price": "Price excl.",
+    "price": "Price",
     "busy": "Working…",
     "add": "Add",
     "cancel": "Cancel",
@@ -203,7 +203,8 @@
     "confirmStatusChange": "Change status to {status}?",
     "refundTitle": "Refund payment",
     "refundAmountLabel": "Amount to refund",
-    "refundMax": "Maximum {max}"
+    "refundMax": "Maximum {max}",
+    "priceIncludesVat": "Price includes VAT"
   },
   "repairErrors": {
     "selectCustomerOrFillName": "Select a customer or enter a first and last name.",
