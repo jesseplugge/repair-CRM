@@ -4,7 +4,7 @@ import { createClient, getCurrentUser } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { calculateFromExclVat, calculateFromInclVat } from '@/lib/utils/currency';
-import { insertPayment } from './payments';
+import { insertPayment, updatePaymentTime } from './payments';
 import { getTranslations } from 'next-intl/server';
 
 export type InvoiceLineInput = { description: string; quantity: number; unitPriceExclVat: number; vatRate: number };
@@ -183,6 +183,21 @@ export async function recordInvoicePayment(invoiceId: string, amount: number, me
   const paidTotal = (payments ?? []).reduce((s, p) => s + p.amount, 0);
   const newStatus = paidTotal <= 0.005 ? invoice.status : paidTotal < invoice.total_incl_vat - 0.005 ? 'partially_paid' : 'paid';
   await supabase.from('invoices').update({ status: newStatus }).eq('id', invoiceId);
+
+  revalidatePath(`/facturen/${invoiceId}`);
+  return { error: undefined };
+}
+
+export async function updateInvoicePaymentTime(invoiceId: string, paymentId: string, paidAt: string) {
+  const user = await getCurrentUser();
+  if (!user) redirect('/login');
+  const t = await getTranslations('invoiceErrors');
+
+  const date = new Date(paidAt);
+  if (isNaN(date.getTime())) return { error: t('invalidDate') };
+
+  const result = await updatePaymentTime(paymentId, date.toISOString());
+  if (result.error) return { error: result.error };
 
   revalidatePath(`/facturen/${invoiceId}`);
   return { error: undefined };

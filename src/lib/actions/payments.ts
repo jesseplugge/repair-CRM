@@ -44,6 +44,20 @@ export async function insertPayment(
   return { payment };
 }
 
+/** Corrects the recorded date/time of an existing payment (e.g. it was entered late or backdated). */
+export async function updatePaymentTime(paymentId: string, paidAt: string): Promise<{ error?: string }> {
+  const user = await getCurrentUser();
+  if (!user) return { error: 'Niet ingelogd.' };
+  const supabase = createClient();
+
+  const { data: payment } = await supabase.from('payments').select('id, business_id').eq('id', paymentId).single();
+  if (!payment || payment.business_id !== user.business_id) return { error: 'Betaling niet gevonden.' };
+
+  const { error } = await supabase.from('payments').update({ paid_at: paidAt }).eq('id', paymentId);
+  if (error) return { error: error.message };
+  return {};
+}
+
 export async function refundPayment(
   paymentId: string,
   amount: number,

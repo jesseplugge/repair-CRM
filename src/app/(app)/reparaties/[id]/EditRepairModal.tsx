@@ -7,14 +7,8 @@ import { updateRepairDetails } from '@/lib/actions/repairs';
 import { Button, Field, Input, Textarea } from '@/components/ui/primitives';
 import { Modal } from '@/components/ui/modal';
 import { useToast } from '@/components/ui/toast';
+import { toDateTimeLocalValue } from '@/lib/utils/format';
 import { Pencil } from 'lucide-react';
-
-function toLocalInputValue(iso: string | null): string {
-  if (!iso) return '';
-  const d = new Date(iso);
-  const pad = (n: number) => String(n).padStart(2, '0');
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-}
 
 export function EditRepairModal({
   repairId,
@@ -91,13 +85,13 @@ export function EditRepairModal({
         <form ref={formRef} id="edit-repair-form" onSubmit={handleSubmit} className="space-y-3">
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
             <Field label={t('dateReceived')}>
-              <Input type="datetime-local" name="date_received" defaultValue={toLocalInputValue(dateReceived)} required />
+              <Input type="datetime-local" name="date_received" defaultValue={toDateTimeLocalValue(dateReceived)} required />
             </Field>
             <Field label={t('dateCompleted')}>
-              <Input type="datetime-local" name="date_completed" defaultValue={toLocalInputValue(dateCompleted)} />
+              <Input type="datetime-local" name="date_completed" defaultValue={toDateTimeLocalValue(dateCompleted)} />
             </Field>
             <Field label={t('datePickedUp')}>
-              <Input type="datetime-local" name="date_picked_up" defaultValue={toLocalInputValue(datePickedUp)} />
+              <Input type="datetime-local" name="date_picked_up" defaultValue={toDateTimeLocalValue(datePickedUp)} />
             </Field>
           </div>
           <Field label={t('complaintLabel')}>

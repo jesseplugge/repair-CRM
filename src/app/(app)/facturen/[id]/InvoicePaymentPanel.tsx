@@ -3,10 +3,11 @@
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { recordInvoicePayment } from '@/lib/actions/invoices';
+import { recordInvoicePayment, updateInvoicePaymentTime } from '@/lib/actions/invoices';
 import { Button, Input } from '@/components/ui/primitives';
 import { formatEuro } from '@/lib/utils/currency';
-import { formatDateTime } from '@/lib/utils/format';
+import { formatDateTime, toDateTimeLocalValue } from '@/lib/utils/format';
+import { Pencil } from 'lucide-react';
 
 const METHODS = ['contant', 'pin', 'bankoverschrijving', 'tikkie'];
 const METHOD_KEYS: Record<string, string> = {
@@ -35,9 +36,12 @@ export function InvoicePaymentPanel({
   const [amount, setAmount] = useState(remaining.toFixed(2));
   const [method, setMethod] = useState('contant');
   const [transactionId, setTransactionId] = useState('');
+  const [editingTimeId, setEditingTimeId] = useState<string | null>(null);
+  const [editPaidAt, setEditPaidAt] = useState('');
   const [pending, startTransition] = useTransition();
   const router = useRouter();
   const t = useTranslations('invoiceDetail');
+  const tCommon = useTranslations('common');
 
   function submit() {
     startTransition(async () => {
@@ -48,16 +52,47 @@ export function InvoicePaymentPanel({
     });
   }
 
+  function startEditTime(payment: Payment) {
+    setEditingTimeId(payment.id);
+    setEditPaidAt(toDateTimeLocalValue(payment.paid_at));
+  }
+
+  function saveEditTime() {
+    if (!editingTimeId || !editPaidAt) return;
+    startTransition(async () => {
+      const result = await updateInvoicePaymentTime(invoiceId, editingTimeId, editPaidAt);
+      if (!result?.error) {
+        setEditingTimeId(null);
+        router.refresh();
+      }
+    });
+  }
+
   return (
     <div className="space-y-2">
-      {payments.map((p) => (
-        <div key={p.id} className="flex justify-between text-xs text-ink-500">
-          <span>
-            {METHOD_KEYS[p.method] ? t(METHOD_KEYS[p.method] as any) : p.method} &middot; {formatDateTime(p.paid_at)}
-          </span>
-          <span className="tabular-nums">{formatEuro(p.amount)}</span>
-        </div>
-      ))}
+      {payments.map((p) =>
+        editingTimeId === p.id ? (
+          <div key={p.id} className="flex items-center gap-1.5 text-xs">
+            <Input type="datetime-local" value={editPaidAt} onChange={(e) => setEditPaidAt(e.target.value)} className="!py-1 text-xs" autoFocus />
+            <button onClick={saveEditTime} disabled={pending} className="focus-ring shrink-0 font-medium text-[var(--accent)] hover:underline">
+              {tCommon('save')}
+            </button>
+            <button onClick={() => setEditingTimeId(null)} className="focus-ring shrink-0 text-ink-400 hover:text-ink-700">
+              {t('cancel')}
+            </button>
+          </div>
+        ) : (
+          <div key={p.id} className="flex items-center justify-between text-xs text-ink-500">
+            <span className="flex items-center gap-1">
+              {METHOD_KEYS[p.method] ? t(METHOD_KEYS[p.method] as any) : p.method} &middot; {formatDateTime(p.paid_at)}
+              <button onClick={() => startEditTime(p)} className="focus-ring text-ink-300 hover:text-ink-700">
+                <Pencil size={11} />
+              </button>
+            </span>
+            <span className="tabular-nums">{formatEuro(p.amount)}</span>
+          </div>
+        )
+      )}
 
       {status === 'paid' ? (
         <div className="rounded bg-green-50 px-3 py-2 text-sm text-green-700">{t('fullyPaid')}</div>

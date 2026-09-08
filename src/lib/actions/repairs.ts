@@ -476,6 +476,28 @@ export async function getRepairPayments(repairId: string) {
   return data ?? [];
 }
 
+export async function updateRepairPaymentTime(repairId: string, paymentId: string, paidAt: string) {
+  const user = await getCurrentUser();
+  if (!user) redirect('/login');
+  const supabase = createClient();
+  const t = await getTranslations('repairErrors');
+
+  const date = new Date(paidAt);
+  if (isNaN(date.getTime())) return { error: t('invalidDate') };
+
+  const { updatePaymentTime } = await import('./payments');
+  const result = await updatePaymentTime(paymentId, date.toISOString());
+  if (result.error) return { error: result.error };
+
+  const { data: repair } = await supabase.from('repairs').select('business_id').eq('id', repairId).single();
+  if (repair) {
+    await logActivity(supabase, repair.business_id, repairId, 'payment_time_updated', 'Betaaltijd aangepast', user.id);
+  }
+
+  revalidatePath(`/reparaties/${repairId}`);
+  return { error: undefined };
+}
+
 async function recalculateRepairPaymentStatus(repairId: string) {
   const supabase = createClient();
   const [{ data: items }, { data: payments }] = await Promise.all([

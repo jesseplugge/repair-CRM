@@ -208,7 +208,9 @@
     "methodTikkie": "Tikkie",
     "transactionIdOptional": "Transaction ID (optional)",
     "tipOptional": "Tip (optional)",
-    "tipInline": "tip"
+    "tipInline": "tip",
+    "paymentTimeUpdated": "Payment time updated",
+    "editPaymentTime": "Edit payment time"
   },
   "repairErrors": {
     "selectCustomerOrFillName": "Select a customer or enter a first and last name.",
@@ -650,7 +652,8 @@
     "selectCustomer": "Select a customer.",
     "addAtLeastOneLine": "Add at least one line.",
     "invoiceNotFound": "Invoice not found.",
-    "invalidAmount": "Enter a valid amount."
+    "invalidAmount": "Enter a valid amount.",
+    "invalidDate": "Invalid date."
   },
   "receiptsPage": {
     "title": "Receipts",

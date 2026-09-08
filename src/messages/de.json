@@ -208,7 +208,9 @@
     "methodTikkie": "Tikkie",
     "transactionIdOptional": "Transaktions-ID (optional)",
     "tipOptional": "Trinkgeld (optional)",
-    "tipInline": "Trinkgeld"
+    "tipInline": "Trinkgeld",
+    "paymentTimeUpdated": "Zahlungszeit aktualisiert",
+    "editPaymentTime": "Zahlungszeit bearbeiten"
   },
   "repairErrors": {
     "selectCustomerOrFillName": "Wähle einen Kunden oder gib Vor- und Nachname ein.",
@@ -650,7 +652,8 @@
     "selectCustomer": "Wähle einen Kunden.",
     "addAtLeastOneLine": "Füge mindestens eine Position hinzu.",
     "invoiceNotFound": "Rechnung nicht gefunden.",
-    "invalidAmount": "Gib einen gültigen Betrag ein."
+    "invalidAmount": "Gib einen gültigen Betrag ein.",
+    "invalidDate": "Ungültiges Datum."
   },
   "receiptsPage": {
     "title": "Belege",

@@ -208,7 +208,9 @@
     "methodTikkie": "Tikkie",
     "transactionIdOptional": "ID de transacción (opcional)",
     "tipOptional": "Propina (opcional)",
-    "tipInline": "propina"
+    "tipInline": "propina",
+    "paymentTimeUpdated": "Hora de pago actualizada",
+    "editPaymentTime": "Editar hora de pago"
   },
   "repairErrors": {
     "selectCustomerOrFillName": "Selecciona un cliente o introduce nombre y apellidos.",
@@ -650,7 +652,8 @@
     "selectCustomer": "Selecciona un cliente.",
     "addAtLeastOneLine": "Añade al menos una línea.",
     "invoiceNotFound": "Factura no encontrada.",
-    "invalidAmount": "Introduce un importe válido."
+    "invalidAmount": "Introduce un importe válido.",
+    "invalidDate": "Fecha inválida."
   },
   "receiptsPage": {
     "title": "Recibos",

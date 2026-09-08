@@ -208,7 +208,9 @@
     "methodTikkie": "Tikkie",
     "transactionIdOptional": "İşlem kimliği (opsiyonel)",
     "tipOptional": "Bahşiş (opsiyonel)",
-    "tipInline": "bahşiş"
+    "tipInline": "bahşiş",
+    "paymentTimeUpdated": "Ödeme zamanı güncellendi",
+    "editPaymentTime": "Ödeme zamanını düzenle"
   },
   "repairErrors": {
     "selectCustomerOrFillName": "Bir müşteri seçin veya ad ve soyad girin.",
@@ -650,7 +652,8 @@
     "selectCustomer": "Bir müşteri seçin.",
     "addAtLeastOneLine": "En az bir satır ekleyin.",
     "invoiceNotFound": "Fatura bulunamadı.",
-    "invalidAmount": "Geçerli bir tutar girin."
+    "invalidAmount": "Geçerli bir tutar girin.",
+    "invalidDate": "Geçersiz tarih."
   },
   "receiptsPage": {
     "title": "Fişler",

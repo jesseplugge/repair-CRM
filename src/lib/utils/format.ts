@@ -19,3 +19,11 @@ export function formatRelative(value: string | Date | null | undefined): string 
 export function initials(firstName: string, lastName: string): string {
   return `${firstName[0] ?? ''}${lastName[0] ?? ''}`.toUpperCase();
 }
+
+/** Formats a timestamp for an <input type="datetime-local"> value, in local time (not UTC). */
+export function toDateTimeLocalValue(value: string | Date | null | undefined): string {
+  if (!value) return '';
+  const d = new Date(value);
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}

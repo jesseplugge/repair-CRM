@@ -208,7 +208,9 @@
     "methodTikkie": "Tikkie",
     "transactionIdOptional": "ID de transaction (facultatif)",
     "tipOptional": "Pourboire (facultatif)",
-    "tipInline": "pourboire"
+    "tipInline": "pourboire",
+    "paymentTimeUpdated": "Heure de paiement mise à jour",
+    "editPaymentTime": "Modifier l'heure de paiement"
   },
   "repairErrors": {
     "selectCustomerOrFillName": "Sélectionnez un client ou saisissez un prénom et un nom.",
@@ -650,7 +652,8 @@
     "selectCustomer": "Sélectionnez un client.",
     "addAtLeastOneLine": "Ajoutez au moins une ligne.",
     "invoiceNotFound": "Facture introuvable.",
-    "invalidAmount": "Saisissez un montant valide."
+    "invalidAmount": "Saisissez un montant valide.",
+    "invalidDate": "Date invalide."
   },
   "receiptsPage": {
     "title": "Reçus",

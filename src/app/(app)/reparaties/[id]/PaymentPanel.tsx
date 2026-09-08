@@ -3,13 +3,13 @@
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { recordRepairPayment, refundRepairPayment } from '@/lib/actions/repairs';
+import { recordRepairPayment, refundRepairPayment, updateRepairPaymentTime } from '@/lib/actions/repairs';
 import { Button, Input, Label } from '@/components/ui/primitives';
 import { Modal } from '@/components/ui/modal';
 import { useToast } from '@/components/ui/toast';
 import { formatEuro } from '@/lib/utils/currency';
-import { formatDateTime } from '@/lib/utils/format';
-import { Banknote, CreditCard, Landmark, Link2, Undo2 } from 'lucide-react';
+import { formatDateTime, toDateTimeLocalValue } from '@/lib/utils/format';
+import { Banknote, CreditCard, Landmark, Link2, Pencil, Undo2 } from 'lucide-react';
 
 type Payment = {
   id: string;
@@ -41,6 +41,8 @@ export function PaymentPanel({
   const [tipAmount, setTipAmount] = useState('');
   const [refundTarget, setRefundTarget] = useState<Payment | null>(null);
   const [refundAmount, setRefundAmount] = useState('');
+  const [editingTimeId, setEditingTimeId] = useState<string | null>(null);
+  const [editPaidAt, setEditPaidAt] = useState('');
   const [pending, startTransition] = useTransition();
   const router = useRouter();
   const t = useTranslations('repairSub');
@@ -71,6 +73,23 @@ export function PaymentPanel({
     });
   }
 
+  function startEditTime(payment: Payment) {
+    setEditingTimeId(payment.id);
+    setEditPaidAt(toDateTimeLocalValue(payment.paid_at));
+  }
+
+  function saveEditTime() {
+    if (!editingTimeId || !editPaidAt) return;
+    startTransition(async () => {
+      const result = await updateRepairPaymentTime(repairId, editingTimeId, editPaidAt);
+      if (!result?.error) {
+        setEditingTimeId(null);
+        toast({ variant: 'success', title: t('paymentTimeUpdated') });
+        router.refresh();
+      }
+    });
+  }
+
   function openRefund(payment: Payment) {
     setRefundTarget(payment);
     setRefundAmount(payment.amount.toFixed(2));
@@ -92,23 +111,48 @@ export function PaymentPanel({
     <div className="space-y-3">
       {payments.length > 0 && (
         <div className="space-y-1.5">
-          {payments.map((p) => (
-            <div key={p.id} className="flex items-center justify-between rounded border border-ink-100 px-2.5 py-1.5 text-xs">
-              <div>
-                <div className="font-medium tabular-nums text-ink-900">
-                  {formatEuro(p.amount)}
-                  {p.tip_amount > 0 && <span className="text-ink-400"> + {formatEuro(p.tip_amount)} {t('tipInline')}</span>}
-                </div>
-                <div className="text-ink-400">
-                  {methodLabel(p.method)} &middot; {formatDateTime(p.paid_at)}
-                  {p.transaction_id && <> &middot; {p.transaction_id}</>}
-                </div>
+          {payments.map((p) =>
+            editingTimeId === p.id ? (
+              <div key={p.id} className="flex items-center gap-1.5 rounded border border-ink-100 px-2.5 py-1.5 text-xs">
+                <Input
+                  type="datetime-local"
+                  value={editPaidAt}
+                  onChange={(e) => setEditPaidAt(e.target.value)}
+                  className="!py-1 text-xs"
+                  autoFocus
+                />
+                <button
+                  onClick={saveEditTime}
+                  disabled={pending}
+                  className="focus-ring shrink-0 font-medium text-[var(--accent)] hover:underline"
+                >
+                  {tCommon('save')}
+                </button>
+                <button onClick={() => setEditingTimeId(null)} className="focus-ring shrink-0 text-ink-400 hover:text-ink-700">
+                  {t('cancel')}
+                </button>
               </div>
-              <button onClick={() => openRefund(p)} className="focus-ring text-ink-300 hover:text-danger-600" title={t('refund')}>
-                <Undo2 size={14} />
-              </button>
-            </div>
-          ))}
+            ) : (
+              <div key={p.id} className="flex items-center justify-between rounded border border-ink-100 px-2.5 py-1.5 text-xs">
+                <div>
+                  <div className="font-medium tabular-nums text-ink-900">
+                    {formatEuro(p.amount)}
+                    {p.tip_amount > 0 && <span className="text-ink-400"> + {formatEuro(p.tip_amount)} {t('tipInline')}</span>}
+                  </div>
+                  <div className="flex items-center gap-1 text-ink-400">
+                    {methodLabel(p.method)} &middot; {formatDateTime(p.paid_at)}
+                    {p.transaction_id && <> &middot; {p.transaction_id}</>}
+                    <button onClick={() => startEditTime(p)} className="focus-ring text-ink-300 hover:text-ink-700" title={t('editPaymentTime')}>
+                      <Pencil size={11} />
+                    </button>
+                  </div>
+                </div>
+                <button onClick={() => openRefund(p)} className="focus-ring text-ink-300 hover:text-danger-600" title={t('refund')}>
+                  <Undo2 size={14} />
+                </button>
+              </div>
+            )
+          )}
         </div>
       )}
 

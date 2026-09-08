@@ -208,7 +208,9 @@
     "methodTikkie": "Tikkie",
     "transactionIdOptional": "Transactie-ID (optioneel)",
     "tipOptional": "Fooi (optioneel)",
-    "tipInline": "fooi"
+    "tipInline": "fooi",
+    "paymentTimeUpdated": "Betaaltijd bijgewerkt",
+    "editPaymentTime": "Betaaltijd wijzigen"
   },
   "repairErrors": {
     "selectCustomerOrFillName": "Selecteer een klant of vul voor- en achternaam in.",
@@ -650,7 +652,8 @@
     "selectCustomer": "Selecteer een klant.",
     "addAtLeastOneLine": "Voeg minimaal één regel toe.",
     "invoiceNotFound": "Factuur niet gevonden.",
-    "invalidAmount": "Vul een geldig bedrag in."
+    "invalidAmount": "Vul een geldig bedrag in.",
+    "invalidDate": "Ongeldige datum."
   },
   "receiptsPage": {
     "title": "Bonnen",
