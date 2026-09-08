@@ -292,6 +292,85 @@ export async function updateRepairStatus(repairId: string, newStatusId: string) 
   return { error: undefined };
 }
 
+export async function updateRepairDetails(repairId: string, formData: FormData) {
+  const user = await getCurrentUser();
+  if (!user) redirect('/login');
+  const supabase = createClient();
+  const t = await getTranslations('repairErrors');
+
+  const { data: repair } = await supabase
+    .from('repairs')
+    .select('id, business_id')
+    .eq('id', repairId)
+    .eq('business_id', user.business_id)
+    .single();
+  if (!repair) return { error: t('repairNotFound') };
+
+  const dateReceivedRaw = formData.get('date_received') as string;
+  if (!dateReceivedRaw) return { error: t('dateReceivedRequired') };
+  const dateReceived = new Date(dateReceivedRaw);
+  if (isNaN(dateReceived.getTime())) return { error: t('invalidDate') };
+
+  const dateCompletedRaw = (formData.get('date_completed') as string) || '';
+  const dateCompleted = dateCompletedRaw ? new Date(dateCompletedRaw) : null;
+  if (dateCompletedRaw && isNaN(dateCompleted!.getTime())) return { error: t('invalidDate') };
+
+  const datePickedUpRaw = (formData.get('date_picked_up') as string) || '';
+  const datePickedUp = datePickedUpRaw ? new Date(datePickedUpRaw) : null;
+  if (datePickedUpRaw && isNaN(datePickedUp!.getTime())) return { error: t('invalidDate') };
+
+  const warrantyMonthsRaw = (formData.get('warranty_months') as string) || '';
+  const warrantyMonths = warrantyMonthsRaw ? parseInt(warrantyMonthsRaw, 10) : null;
+  if (warrantyMonthsRaw && isNaN(warrantyMonths as number)) return { error: t('invalidWarrantyMonths') };
+
+  const patch: Database['public']['Tables']['repairs']['Update'] = {
+    date_received: dateReceived.toISOString(),
+    date_completed: dateCompleted ? dateCompleted.toISOString() : null,
+    date_picked_up: datePickedUp ? datePickedUp.toISOString() : null,
+    customer_complaint: (formData.get('customer_complaint') as string)?.trim() || null,
+    technician_notes: (formData.get('technician_notes') as string)?.trim() || null,
+    warranty_months: warrantyMonths,
+    updated_at: new Date().toISOString(),
+  };
+
+  const { error } = await supabase.from('repairs').update(patch).eq('id', repairId);
+  if (error) return { error: error.message };
+
+  await logActivity(supabase, repair.business_id, repairId, 'details_updated', 'Reparatiegegevens bijgewerkt', user.id);
+
+  revalidatePath(`/reparaties/${repairId}`);
+  revalidatePath('/reparaties');
+  return { error: undefined };
+}
+
+/**
+ * Un-signs a repair intake. Used to correct a signature captured by mistake
+ * (wrong customer, wrong device) — the customer can then sign again from the
+ * repair page.
+ */
+export async function removeIntakeSignature(repairId: string) {
+  const user = await getCurrentUser();
+  if (!user) redirect('/login');
+  const supabase = createClient();
+  const t = await getTranslations('repairErrors');
+
+  const { data: repair } = await supabase
+    .from('repairs')
+    .select('id, business_id')
+    .eq('id', repairId)
+    .eq('business_id', user.business_id)
+    .single();
+  if (!repair) return { error: t('repairNotFound') };
+
+  const { error } = await supabase.from('intake_signatures').delete().eq('repair_id', repairId);
+  if (error) return { error: error.message };
+
+  await logActivity(supabase, repair.business_id, repairId, 'signature_removed', 'Handtekening verwijderd', user.id);
+
+  revalidatePath(`/reparaties/${repairId}`);
+  return { error: undefined };
+}
+
 export async function addRepairItem(repairId: string, formData: FormData) {
   const user = await getCurrentUser();
   if (!user) redirect('/login');

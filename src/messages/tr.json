@@ -7,7 +7,8 @@
     "errorDetails": "Ayrıntılar",
     "cancel": "İptal",
     "delete": "Sil",
-    "busy": "İşleniyor…"
+    "busy": "İşleniyor…",
+    "save": "Kaydet"
   },
   "nav": {
     "dashboard": "Kontrol paneli",
@@ -153,7 +154,19 @@
     "deleteRepair": "Onarımı sil",
     "deleteConfirmTitle": "Bu onarım silinsin mi?",
     "deleteConfirmBody": "Bu işlem onarımı; kalemleri, fotoğrafları, tanı bilgilerini, ödemelerini, imzasını ve garanti taleplerini kalıcı olarak siler. Bağlı bir fatura korunur ancak bağlantısı kaldırılır. Geri alınamaz.",
-    "repairDeleted": "Onarım silindi"
+    "repairDeleted": "Onarım silindi",
+    "editRepair": "Düzenle",
+    "repairUpdated": "Onarım güncellendi",
+    "dateReceived": "Alınma tarihi",
+    "dateCompleted": "Tamamlanma tarihi",
+    "datePickedUp": "Teslim alınma tarihi",
+    "warrantyMonthsField": "Garanti (ay)",
+    "complaintLabel": "Şikayet",
+    "technicianNotesLabel": "Notlar",
+    "removeSignature": "İmzayı kaldır",
+    "removeSignatureConfirmTitle": "İmza kaldırılsın mı?",
+    "removeSignatureConfirmBody": "İmzalı bir teslim alma belgesi tekrar oluşturulmadan önce müşterinin yeniden imzalaması gerekir. Bu işlem geri alınamaz.",
+    "signatureRemoved": "İmza kaldırıldı"
   },
   "repairSub": {
     "typePart": "Parça",
@@ -203,7 +216,10 @@
     "createRepairFailed": "Onarım oluşturulamadı.",
     "repairNotFound": "Onarım bulunamadı.",
     "statusNotFound": "Durum bulunamadı.",
-    "descriptionAndPriceRequired": "Açıklama ve fiyat zorunludur."
+    "descriptionAndPriceRequired": "Açıklama ve fiyat zorunludur.",
+    "dateReceivedRequired": "Alınma tarihi zorunludur.",
+    "invalidDate": "Geçersiz tarih.",
+    "invalidWarrantyMonths": "Geçersiz garanti ay sayısı."
   },
   "repairTabs": {
     "diagnostics": "Diagnostik",

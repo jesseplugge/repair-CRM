@@ -7,7 +7,8 @@
     "errorDetails": "Details",
     "cancel": "Annuleren",
     "delete": "Verwijderen",
-    "busy": "Bezig…"
+    "busy": "Bezig…",
+    "save": "Opslaan"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -153,7 +154,19 @@
     "deleteRepair": "Reparatie verwijderen",
     "deleteConfirmTitle": "Deze reparatie verwijderen?",
     "deleteConfirmBody": "Dit verwijdert de reparatie inclusief de regels, foto's, diagnostiek, betalingen, handtekening en garantieclaims. Een gekoppelde factuur blijft bestaan maar wordt losgekoppeld. Dit kan niet ongedaan worden gemaakt.",
-    "repairDeleted": "Reparatie verwijderd"
+    "repairDeleted": "Reparatie verwijderd",
+    "editRepair": "Bewerken",
+    "repairUpdated": "Reparatie bijgewerkt",
+    "dateReceived": "Datum ontvangen",
+    "dateCompleted": "Datum gereed",
+    "datePickedUp": "Datum opgehaald",
+    "warrantyMonthsField": "Garantie (maanden)",
+    "complaintLabel": "Klacht",
+    "technicianNotesLabel": "Notities",
+    "removeSignature": "Handtekening verwijderen",
+    "removeSignatureConfirmTitle": "Handtekening verwijderen?",
+    "removeSignatureConfirmBody": "De klant moet opnieuw ondertekenen voordat er weer een intakebon met handtekening beschikbaar is. Dit kan niet ongedaan worden gemaakt.",
+    "signatureRemoved": "Handtekening verwijderd"
   },
   "repairSub": {
     "typePart": "Onderdeel",
@@ -203,7 +216,10 @@
     "createRepairFailed": "Aanmaken reparatie mislukt.",
     "repairNotFound": "Reparatie niet gevonden.",
     "statusNotFound": "Status niet gevonden.",
-    "descriptionAndPriceRequired": "Omschrijving en prijs zijn verplicht."
+    "descriptionAndPriceRequired": "Omschrijving en prijs zijn verplicht.",
+    "dateReceivedRequired": "Datum ontvangen is verplicht.",
+    "invalidDate": "Ongeldige datum.",
+    "invalidWarrantyMonths": "Ongeldig aantal maanden garantie."
   },
   "repairTabs": {
     "diagnostics": "Diagnose",

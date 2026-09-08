@@ -7,7 +7,8 @@
     "errorDetails": "Detalles",
     "cancel": "Cancelar",
     "delete": "Eliminar",
-    "busy": "Procesando…"
+    "busy": "Procesando…",
+    "save": "Guardar"
   },
   "nav": {
     "dashboard": "Panel",
@@ -153,7 +154,19 @@
     "deleteRepair": "Eliminar reparación",
     "deleteConfirmTitle": "¿Eliminar esta reparación?",
     "deleteConfirmBody": "Esto elimina la reparación junto con sus líneas, fotos, diagnósticos, pagos, firma y reclamaciones de garantía. Una factura vinculada se conserva pero se desvincula. Esta acción no se puede deshacer.",
-    "repairDeleted": "Reparación eliminada"
+    "repairDeleted": "Reparación eliminada",
+    "editRepair": "Editar",
+    "repairUpdated": "Reparación actualizada",
+    "dateReceived": "Fecha de recepción",
+    "dateCompleted": "Fecha de finalización",
+    "datePickedUp": "Fecha de recogida",
+    "warrantyMonthsField": "Garantía (meses)",
+    "complaintLabel": "Queja",
+    "technicianNotesLabel": "Notas",
+    "removeSignature": "Eliminar firma",
+    "removeSignatureConfirmTitle": "¿Eliminar la firma?",
+    "removeSignatureConfirmBody": "El cliente deberá firmar de nuevo antes de que haya un recibo de entrada firmado disponible. Esta acción no se puede deshacer.",
+    "signatureRemoved": "Firma eliminada"
   },
   "repairSub": {
     "typePart": "Pieza",
@@ -203,7 +216,10 @@
     "createRepairFailed": "No se pudo crear la reparación.",
     "repairNotFound": "Reparación no encontrada.",
     "statusNotFound": "Estado no encontrado.",
-    "descriptionAndPriceRequired": "La descripción y el precio son obligatorios."
+    "descriptionAndPriceRequired": "La descripción y el precio son obligatorios.",
+    "dateReceivedRequired": "La fecha de recepción es obligatoria.",
+    "invalidDate": "Fecha inválida.",
+    "invalidWarrantyMonths": "Número de meses de garantía inválido."
   },
   "repairTabs": {
     "diagnostics": "Diagnóstico",

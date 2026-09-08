@@ -7,7 +7,8 @@
     "errorDetails": "Details",
     "cancel": "Abbrechen",
     "delete": "Löschen",
-    "busy": "Wird bearbeitet…"
+    "busy": "Wird bearbeitet…",
+    "save": "Speichern"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -153,7 +154,19 @@
     "deleteRepair": "Reparatur löschen",
     "deleteConfirmTitle": "Diese Reparatur löschen?",
     "deleteConfirmBody": "Dies entfernt die Reparatur samt Positionen, Fotos, Diagnosen, Zahlungen, Unterschrift und Garantiefällen dauerhaft. Eine verknüpfte Rechnung bleibt erhalten, wird aber entkoppelt. Kann nicht rückgängig gemacht werden.",
-    "repairDeleted": "Reparatur gelöscht"
+    "repairDeleted": "Reparatur gelöscht",
+    "editRepair": "Bearbeiten",
+    "repairUpdated": "Reparatur aktualisiert",
+    "dateReceived": "Datum Eingang",
+    "dateCompleted": "Datum fertig",
+    "datePickedUp": "Datum abgeholt",
+    "warrantyMonthsField": "Garantie (Monate)",
+    "complaintLabel": "Beanstandung",
+    "technicianNotesLabel": "Notizen",
+    "removeSignature": "Unterschrift entfernen",
+    "removeSignatureConfirmTitle": "Unterschrift entfernen?",
+    "removeSignatureConfirmBody": "Der Kunde muss erneut unterschreiben, bevor wieder ein unterschriebener Anfangsbeleg verfügbar ist. Dies kann nicht rückgängig gemacht werden.",
+    "signatureRemoved": "Unterschrift entfernt"
   },
   "repairSub": {
     "typePart": "Teil",
@@ -203,7 +216,10 @@
     "createRepairFailed": "Reparatur konnte nicht angelegt werden.",
     "repairNotFound": "Reparatur nicht gefunden.",
     "statusNotFound": "Status nicht gefunden.",
-    "descriptionAndPriceRequired": "Beschreibung und Preis sind Pflichtfelder."
+    "descriptionAndPriceRequired": "Beschreibung und Preis sind Pflichtfelder.",
+    "dateReceivedRequired": "Eingangsdatum ist erforderlich.",
+    "invalidDate": "Ungültiges Datum.",
+    "invalidWarrantyMonths": "Ungültige Anzahl Garantiemonate."
   },
   "repairTabs": {
     "diagnostics": "Diagnose",

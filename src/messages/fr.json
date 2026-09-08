@@ -7,7 +7,8 @@
     "errorDetails": "Détails",
     "cancel": "Annuler",
     "delete": "Supprimer",
-    "busy": "Chargement…"
+    "busy": "Chargement…",
+    "save": "Enregistrer"
   },
   "nav": {
     "dashboard": "Tableau de bord",
@@ -153,7 +154,19 @@
     "deleteRepair": "Supprimer la réparation",
     "deleteConfirmTitle": "Supprimer cette réparation ?",
     "deleteConfirmBody": "Cela supprime définitivement la réparation ainsi que ses lignes, photos, diagnostics, paiements, signature et réclamations de garantie. Une facture liée est conservée mais dissociée. Action irréversible.",
-    "repairDeleted": "Réparation supprimée"
+    "repairDeleted": "Réparation supprimée",
+    "editRepair": "Modifier",
+    "repairUpdated": "Réparation mise à jour",
+    "dateReceived": "Date de réception",
+    "dateCompleted": "Date de fin",
+    "datePickedUp": "Date de retrait",
+    "warrantyMonthsField": "Garantie (mois)",
+    "complaintLabel": "Plainte",
+    "technicianNotesLabel": "Notes",
+    "removeSignature": "Supprimer la signature",
+    "removeSignatureConfirmTitle": "Supprimer la signature ?",
+    "removeSignatureConfirmBody": "Le client devra signer à nouveau avant qu'un reçu de prise en charge signé soit disponible. Cette action est irréversible.",
+    "signatureRemoved": "Signature supprimée"
   },
   "repairSub": {
     "typePart": "Pièce",
@@ -203,7 +216,10 @@
     "createRepairFailed": "Échec de la création de la réparation.",
     "repairNotFound": "Réparation introuvable.",
     "statusNotFound": "Statut introuvable.",
-    "descriptionAndPriceRequired": "La description et le prix sont obligatoires."
+    "descriptionAndPriceRequired": "La description et le prix sont obligatoires.",
+    "dateReceivedRequired": "La date de réception est obligatoire.",
+    "invalidDate": "Date invalide.",
+    "invalidWarrantyMonths": "Nombre de mois de garantie invalide."
   },
   "repairTabs": {
     "diagnostics": "Diagnostic",

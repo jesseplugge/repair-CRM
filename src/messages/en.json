@@ -7,7 +7,8 @@
     "errorDetails": "Details",
     "cancel": "Cancel",
     "delete": "Delete",
-    "busy": "Working…"
+    "busy": "Working…",
+    "save": "Save"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -153,7 +154,19 @@
     "deleteRepair": "Delete repair",
     "deleteConfirmTitle": "Delete this repair?",
     "deleteConfirmBody": "This removes the repair along with its line items, photos, diagnostics, payments, signature, and warranty claims. A linked invoice is kept but unlinked. This can't be undone.",
-    "repairDeleted": "Repair deleted"
+    "repairDeleted": "Repair deleted",
+    "editRepair": "Edit",
+    "repairUpdated": "Repair updated",
+    "dateReceived": "Date received",
+    "dateCompleted": "Date completed",
+    "datePickedUp": "Date picked up",
+    "warrantyMonthsField": "Warranty (months)",
+    "complaintLabel": "Complaint",
+    "technicianNotesLabel": "Notes",
+    "removeSignature": "Remove signature",
+    "removeSignatureConfirmTitle": "Remove signature?",
+    "removeSignatureConfirmBody": "The customer will need to sign again before a signed intake receipt is available. This cannot be undone.",
+    "signatureRemoved": "Signature removed"
   },
   "repairSub": {
     "typePart": "Part",
@@ -203,7 +216,10 @@
     "createRepairFailed": "Failed to create repair.",
     "repairNotFound": "Repair not found.",
     "statusNotFound": "Status not found.",
-    "descriptionAndPriceRequired": "Description and price are required."
+    "descriptionAndPriceRequired": "Description and price are required.",
+    "dateReceivedRequired": "Date received is required.",
+    "invalidDate": "Invalid date.",
+    "invalidWarrantyMonths": "Invalid warranty months."
   },
   "repairTabs": {
     "diagnostics": "Diagnostics",

@@ -17,6 +17,8 @@ import { PrintControls } from '@/components/PrintControls';
 import { SignatureModalTrigger } from './SignatureModalTrigger';
 import { RepairExtraTabs } from './RepairExtraTabs';
 import { DeleteRepairButton } from './DeleteRepairButton';
+import { EditRepairModal } from './EditRepairModal';
+import { RemoveSignatureButton } from './RemoveSignatureButton';
 
 export default async function ReparatieDetailPage({ params }: { params: { id: string } }) {
   const user = await getCurrentUser();
@@ -112,7 +114,18 @@ export default async function ReparatieDetailPage({ params }: { params: { id: st
         <Link href="/reparaties" className="focus-ring inline-flex items-center gap-1.5 text-sm text-ink-500 hover:text-ink-800">
           <ArrowLeft size={14} /> {tNav('repairs')}
         </Link>
-        <DeleteRepairButton repairId={repair.id} />
+        <div className="flex items-center gap-1">
+          <EditRepairModal
+            repairId={repair.id}
+            dateReceived={repair.date_received}
+            dateCompleted={repair.date_completed}
+            datePickedUp={repair.date_picked_up}
+            customerComplaint={repair.customer_complaint}
+            technicianNotes={repair.technician_notes}
+            warrantyMonths={repair.warranty_months}
+          />
+          <DeleteRepairButton repairId={repair.id} />
+        </div>
       </div>
 
       <div className="flex items-center gap-3">
@@ -274,8 +287,9 @@ export default async function ReparatieDetailPage({ params }: { params: { id: st
               </div>
               <div className="space-y-2 border-t border-ink-100 pt-3">
                 {signature ? (
-                  <div className="rounded bg-success-50 px-3 py-2 text-xs text-success-700">
-                    {t('signedOn', { date: formatDateTime(signature.signed_at) })}
+                  <div className="flex items-center justify-between gap-2 rounded bg-success-50 px-3 py-2 text-xs text-success-700">
+                    <span>{t('signedOn', { date: formatDateTime(signature.signed_at) })}</span>
+                    <RemoveSignatureButton repairId={repair.id} />
                   </div>
                 ) : (
                   <SignatureModalTrigger repairId={repair.id} activeTerms={activeTerms ? { content: activeTerms.content, versionLabel: activeTerms.version_label } : null} />
