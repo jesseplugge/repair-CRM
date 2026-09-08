@@ -204,7 +204,11 @@
     "refundTitle": "Rembourser le paiement",
     "refundAmountLabel": "Montant à rembourser",
     "refundMax": "Maximum {max}",
-    "priceIncludesVat": "Le prix inclut la TVA"
+    "priceIncludesVat": "Le prix inclut la TVA",
+    "methodTikkie": "Tikkie",
+    "transactionIdOptional": "ID de transaction (facultatif)",
+    "tipOptional": "Pourboire (facultatif)",
+    "tipInline": "pourboire"
   },
   "repairErrors": {
     "selectCustomerOrFillName": "Sélectionnez un client ou saisissez un prénom et un nom.",
@@ -475,7 +479,10 @@
     "noItemsYet": "Aucun produit ajouté pour le moment.",
     "total": "Total",
     "busy": "Chargement…",
-    "checkout": "Encaisser {amount}"
+    "checkout": "Encaisser {amount}",
+    "methodTikkie": "TIKKIE",
+    "transactionIdOptional": "ID de transaction (facultatif)",
+    "tipOptional": "Pourboire (facultatif)"
   },
   "posErrors": {
     "cartEmpty": "Le panier est vide."
@@ -604,7 +611,9 @@
     "registerPayment": "Enregistrer un paiement",
     "methodCash": "Espèces",
     "methodPin": "Carte",
-    "methodBank": "Virement"
+    "methodBank": "Virement",
+    "methodTikkie": "Tikkie",
+    "transactionIdOptional": "ID de transaction (facultatif)"
   },
   "creditNotes": {
     "title": "Avoirs",

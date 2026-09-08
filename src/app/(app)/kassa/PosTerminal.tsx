@@ -8,7 +8,7 @@ import { EmailButton } from '@/components/EmailButton';
 import { PrintControls } from '@/components/PrintControls';
 import { Button, Card, Input } from '@/components/ui/primitives';
 import { formatEuro } from '@/lib/utils/currency';
-import { Search, Trash2, Banknote, CreditCard, Landmark, CheckCircle2, User } from 'lucide-react';
+import { Search, Trash2, Banknote, CreditCard, Landmark, Link2, CheckCircle2, User } from 'lucide-react';
 
 type Product = { id: string; name: string; sku: string | null; selling_price_excl_vat: number; vat_rate: number; stock_quantity: number };
 type CustomerLite = { id: string; first_name: string; last_name: string; phone: string | null; email?: string | null };
@@ -20,6 +20,7 @@ export function PosTerminal() {
     { value: 'contant', label: t('methodCash'), icon: Banknote },
     { value: 'pin', label: t('methodPin'), icon: CreditCard },
     { value: 'bankoverschrijving', label: t('methodBank'), icon: Landmark },
+    { value: 'tikkie', label: t('methodTikkie'), icon: Link2 },
   ];
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<Product[]>([]);
@@ -28,6 +29,8 @@ export function PosTerminal() {
   const [customerQuery, setCustomerQuery] = useState('');
   const [customerResults, setCustomerResults] = useState<CustomerLite[]>([]);
   const [method, setMethod] = useState<string | null>(null);
+  const [transactionId, setTransactionId] = useState('');
+  const [tipAmount, setTipAmount] = useState('');
   const [pending, startTransition] = useTransition();
   const [success, setSuccess] = useState<string | null>(null);
   const [successEmail, setSuccessEmail] = useState<string | null>(null);
@@ -95,7 +98,8 @@ export function PosTerminal() {
       const result = await checkoutPosSale(
         cart.map(({ key, ...l }) => l),
         customer?.id ?? null,
-        method
+        method,
+        { transactionId: transactionId.trim() || null, tipAmount: parseFloat(tipAmount || '0') || 0 }
       );
       if (result.error) {
         setError(result.error);
@@ -105,6 +109,8 @@ export function PosTerminal() {
         setCart([]);
         setCustomer(null);
         setMethod(null);
+        setTransactionId('');
+        setTipAmount('');
       }
     });
   }
@@ -221,7 +227,7 @@ export function PosTerminal() {
             <span className="tabular-nums">{formatEuro(totalInclVat)}</span>
           </div>
 
-          <div className="mt-4 grid grid-cols-3 gap-2">
+          <div className="mt-4 grid grid-cols-2 gap-2">
             {METHODS.map((m) => (
               <button
                 key={m.value}
@@ -236,6 +242,22 @@ export function PosTerminal() {
             ))}
           </div>
 
+          <div className="mt-3 space-y-2">
+            <Input
+              type="text"
+              placeholder={t('transactionIdOptional')}
+              value={transactionId}
+              onChange={(e) => setTransactionId(e.target.value)}
+            />
+            <Input
+              type="number"
+              step="0.01"
+              placeholder={t('tipOptional')}
+              value={tipAmount}
+              onChange={(e) => setTipAmount(e.target.value)}
+            />
+          </div>
+
           {error && <p className="mt-2 text-sm text-red-700">{error}</p>}
 
           <Button
@@ -245,7 +267,9 @@ export function PosTerminal() {
             disabled={cart.length === 0 || !method || pending}
             onClick={checkout}
           >
-            {pending ? t('busy') : t('checkout', { amount: formatEuro(totalInclVat) })}
+            {pending
+              ? t('busy')
+              : t('checkout', { amount: formatEuro(totalInclVat + (parseFloat(tipAmount || '0') || 0)) })}
           </Button>
         </Card>
       </div>

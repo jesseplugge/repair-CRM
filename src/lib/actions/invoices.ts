@@ -159,7 +159,7 @@ export async function updateInvoiceStatus(invoiceId: string, status: string) {
   revalidatePath('/facturen');
 }
 
-export async function recordInvoicePayment(invoiceId: string, amount: number, method: string) {
+export async function recordInvoicePayment(invoiceId: string, amount: number, method: string, transactionId?: string | null) {
   const user = await getCurrentUser();
   if (!user) redirect('/login');
   const supabase = createClient();
@@ -173,7 +173,9 @@ export async function recordInvoicePayment(invoiceId: string, amount: number, me
   const result = await insertPayment(
     { businessId: invoice.business_id, customerId: invoice.customer_id, invoiceId },
     amount,
-    method
+    method,
+    undefined,
+    { transactionId }
   );
   if (result.error) return { error: result.error };
 

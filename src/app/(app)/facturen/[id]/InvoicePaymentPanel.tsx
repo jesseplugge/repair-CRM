@@ -8,11 +8,12 @@ import { Button, Input } from '@/components/ui/primitives';
 import { formatEuro } from '@/lib/utils/currency';
 import { formatDateTime } from '@/lib/utils/format';
 
-const METHODS = ['contant', 'pin', 'bankoverschrijving'];
+const METHODS = ['contant', 'pin', 'bankoverschrijving', 'tikkie'];
 const METHOD_KEYS: Record<string, string> = {
   contant: 'methodCash',
   pin: 'methodPin',
   bankoverschrijving: 'methodBank',
+  tikkie: 'methodTikkie',
 };
 
 type Payment = { id: string; amount: number; method: string; paid_at: string };
@@ -33,14 +34,16 @@ export function InvoicePaymentPanel({
   const [open, setOpen] = useState(false);
   const [amount, setAmount] = useState(remaining.toFixed(2));
   const [method, setMethod] = useState('contant');
+  const [transactionId, setTransactionId] = useState('');
   const [pending, startTransition] = useTransition();
   const router = useRouter();
   const t = useTranslations('invoiceDetail');
 
   function submit() {
     startTransition(async () => {
-      await recordInvoicePayment(invoiceId, parseFloat(amount), method);
+      await recordInvoicePayment(invoiceId, parseFloat(amount), method, transactionId.trim() || null);
       setOpen(false);
+      setTransactionId('');
       router.refresh();
     });
   }
@@ -68,6 +71,12 @@ export function InvoicePaymentPanel({
               </option>
             ))}
           </select>
+          <Input
+            type="text"
+            placeholder={t('transactionIdOptional')}
+            value={transactionId}
+            onChange={(e) => setTransactionId(e.target.value)}
+          />
           <div className="flex gap-2">
             <Button variant="primary" className="flex-1" disabled={pending} onClick={submit}>
               {pending ? t('busy') : t('confirm')}

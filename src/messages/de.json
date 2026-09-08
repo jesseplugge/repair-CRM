@@ -204,7 +204,11 @@
     "refundTitle": "Zahlung erstatten",
     "refundAmountLabel": "Zu erstattender Betrag",
     "refundMax": "Maximal {max}",
-    "priceIncludesVat": "Preis inkl. MwSt."
+    "priceIncludesVat": "Preis inkl. MwSt.",
+    "methodTikkie": "Tikkie",
+    "transactionIdOptional": "Transaktions-ID (optional)",
+    "tipOptional": "Trinkgeld (optional)",
+    "tipInline": "Trinkgeld"
   },
   "repairErrors": {
     "selectCustomerOrFillName": "Wähle einen Kunden oder gib Vor- und Nachname ein.",
@@ -475,7 +479,10 @@
     "noItemsYet": "Noch keine Produkte hinzugefügt.",
     "total": "Gesamt",
     "busy": "Wird bearbeitet…",
-    "checkout": "Abrechnen {amount}"
+    "checkout": "Abrechnen {amount}",
+    "methodTikkie": "TIKKIE",
+    "transactionIdOptional": "Transaktions-ID (optional)",
+    "tipOptional": "Trinkgeld (optional)"
   },
   "posErrors": {
     "cartEmpty": "Warenkorb ist leer."
@@ -604,7 +611,9 @@
     "registerPayment": "Zahlung erfassen",
     "methodCash": "Bar",
     "methodPin": "Karte",
-    "methodBank": "Überweisung"
+    "methodBank": "Überweisung",
+    "methodTikkie": "Tikkie",
+    "transactionIdOptional": "Transaktions-ID (optional)"
   },
   "creditNotes": {
     "title": "Gutschriften",

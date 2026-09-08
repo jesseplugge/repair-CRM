@@ -18,7 +18,8 @@ export type CartLine = {
 export async function checkoutPosSale(
   lines: CartLine[],
   customerId: string | null,
-  method: string | null
+  method: string | null,
+  extras?: { transactionId?: string | null; tipAmount?: number }
 ): Promise<{ error?: string; saleId?: string }> {
   const user = await getCurrentUser();
   if (!user) redirect('/login');
@@ -101,7 +102,9 @@ export async function checkoutPosSale(
     const result = await insertPayment(
       { businessId: user.business_id, customerId, posSaleId: sale.id },
       totalInclVat,
-      method
+      method,
+      undefined,
+      extras
     );
     if (result.error) return { error: result.error };
   }

@@ -431,7 +431,13 @@ async function recalculateRepairTotal(repairId: string) {
  * partial/split payments, per §11/§13) and recomputes payment_status from
  * the actual sum of payments minus refunds — never stored as a flag alone.
  */
-export async function recordRepairPayment(repairId: string, amount: number, method: string, notes?: string) {
+export async function recordRepairPayment(
+  repairId: string,
+  amount: number,
+  method: string,
+  notes?: string,
+  extras?: { transactionId?: string | null; tipAmount?: number }
+) {
   const user = await getCurrentUser();
   if (!user) redirect('/login');
   const supabase = createClient();
@@ -451,7 +457,8 @@ export async function recordRepairPayment(repairId: string, amount: number, meth
     { businessId: repair.business_id, customerId: repair.customer_id, repairId },
     amount,
     method,
-    notes
+    notes,
+    extras
   );
   if (result.error) return { error: result.error };
 

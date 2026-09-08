@@ -204,7 +204,11 @@
     "refundTitle": "Betaling terugbetalen",
     "refundAmountLabel": "Terug te betalen bedrag",
     "refundMax": "Maximaal {max}",
-    "priceIncludesVat": "Prijs is incl. BTW"
+    "priceIncludesVat": "Prijs is incl. BTW",
+    "methodTikkie": "Tikkie",
+    "transactionIdOptional": "Transactie-ID (optioneel)",
+    "tipOptional": "Fooi (optioneel)",
+    "tipInline": "fooi"
   },
   "repairErrors": {
     "selectCustomerOrFillName": "Selecteer een klant of vul voor- en achternaam in.",
@@ -475,7 +479,10 @@
     "noItemsYet": "Nog geen producten toegevoegd.",
     "total": "Totaal",
     "busy": "Bezig…",
-    "checkout": "Afrekenen {amount}"
+    "checkout": "Afrekenen {amount}",
+    "methodTikkie": "TIKKIE",
+    "transactionIdOptional": "Transactie-ID (optioneel)",
+    "tipOptional": "Fooi (optioneel)"
   },
   "posErrors": {
     "cartEmpty": "Winkelmandje is leeg."
@@ -604,7 +611,9 @@
     "registerPayment": "Betaling registreren",
     "methodCash": "Contant",
     "methodPin": "Pin",
-    "methodBank": "Bankoverschrijving"
+    "methodBank": "Bankoverschrijving",
+    "methodTikkie": "Tikkie",
+    "transactionIdOptional": "Transactie-ID (optioneel)"
   },
   "creditNotes": {
     "title": "Creditfacturen",

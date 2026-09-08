@@ -204,6 +204,8 @@ export interface Database {
         pos_sale_id: string | null;
         amount: number;
         method: string;
+        transaction_id: string | null;
+        tip_amount: number;
         paid_at: string;
         notes: string | null;
         created_by: string | null;

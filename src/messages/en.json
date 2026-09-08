@@ -204,7 +204,11 @@
     "refundTitle": "Refund payment",
     "refundAmountLabel": "Amount to refund",
     "refundMax": "Maximum {max}",
-    "priceIncludesVat": "Price includes VAT"
+    "priceIncludesVat": "Price includes VAT",
+    "methodTikkie": "Tikkie",
+    "transactionIdOptional": "Transaction ID (optional)",
+    "tipOptional": "Tip (optional)",
+    "tipInline": "tip"
   },
   "repairErrors": {
     "selectCustomerOrFillName": "Select a customer or enter a first and last name.",
@@ -475,7 +479,10 @@
     "noItemsYet": "No products added yet.",
     "total": "Total",
     "busy": "Working…",
-    "checkout": "Check out {amount}"
+    "checkout": "Check out {amount}",
+    "methodTikkie": "TIKKIE",
+    "transactionIdOptional": "Transaction ID (optional)",
+    "tipOptional": "Tip (optional)"
   },
   "posErrors": {
     "cartEmpty": "Cart is empty."
@@ -604,7 +611,9 @@
     "registerPayment": "Register payment",
     "methodCash": "Cash",
     "methodPin": "Card",
-    "methodBank": "Bank transfer"
+    "methodBank": "Bank transfer",
+    "methodTikkie": "Tikkie",
+    "transactionIdOptional": "Transaction ID (optional)"
   },
   "creditNotes": {
     "title": "Credit notes",

@@ -9,9 +9,17 @@ import { Modal } from '@/components/ui/modal';
 import { useToast } from '@/components/ui/toast';
 import { formatEuro } from '@/lib/utils/currency';
 import { formatDateTime } from '@/lib/utils/format';
-import { Banknote, CreditCard, Landmark, Undo2 } from 'lucide-react';
+import { Banknote, CreditCard, Landmark, Link2, Undo2 } from 'lucide-react';
 
-type Payment = { id: string; amount: number; method: string; paid_at: string; notes: string | null };
+type Payment = {
+  id: string;
+  amount: number;
+  method: string;
+  paid_at: string;
+  notes: string | null;
+  transaction_id: string | null;
+  tip_amount: number;
+};
 
 export function PaymentPanel({
   repairId,
@@ -29,6 +37,8 @@ export function PaymentPanel({
   const remaining = Math.max(0, Math.round((totalInclVat - paidSoFar) * 100) / 100);
   const [amount, setAmount] = useState(remaining.toFixed(2));
   const [method, setMethod] = useState<string | null>(null);
+  const [transactionId, setTransactionId] = useState('');
+  const [tipAmount, setTipAmount] = useState('');
   const [refundTarget, setRefundTarget] = useState<Payment | null>(null);
   const [refundAmount, setRefundAmount] = useState('');
   const [pending, startTransition] = useTransition();
@@ -41,14 +51,21 @@ export function PaymentPanel({
     { value: 'contant', label: t('methodCash'), icon: Banknote },
     { value: 'pin', label: t('methodPin'), icon: CreditCard },
     { value: 'bankoverschrijving', label: t('methodBank'), icon: Landmark },
+    { value: 'tikkie', label: t('methodTikkie'), icon: Link2 },
   ];
   const methodLabel = (v: string) => METHODS.find((m) => m.value === v)?.label ?? v;
 
   function submit() {
     if (!method) return;
+    const tip = parseFloat(tipAmount || '0') || 0;
     startTransition(async () => {
-      await recordRepairPayment(repairId, parseFloat(amount), method);
+      await recordRepairPayment(repairId, parseFloat(amount), method, undefined, {
+        transactionId: transactionId.trim() || null,
+        tipAmount: tip,
+      });
       setOpen(false);
+      setTransactionId('');
+      setTipAmount('');
       toast({ variant: 'success', title: t('paymentRecorded') });
       router.refresh();
     });
@@ -78,9 +95,13 @@ export function PaymentPanel({
           {payments.map((p) => (
             <div key={p.id} className="flex items-center justify-between rounded border border-ink-100 px-2.5 py-1.5 text-xs">
               <div>
-                <div className="font-medium tabular-nums text-ink-900">{formatEuro(p.amount)}</div>
+                <div className="font-medium tabular-nums text-ink-900">
+                  {formatEuro(p.amount)}
+                  {p.tip_amount > 0 && <span className="text-ink-400"> + {formatEuro(p.tip_amount)} {t('tipInline')}</span>}
+                </div>
                 <div className="text-ink-400">
                   {methodLabel(p.method)} &middot; {formatDateTime(p.paid_at)}
+                  {p.transaction_id && <> &middot; {p.transaction_id}</>}
                 </div>
               </div>
               <button onClick={() => openRefund(p)} className="focus-ring text-ink-300 hover:text-danger-600" title={t('refund')}>
@@ -101,7 +122,7 @@ export function PaymentPanel({
             </p>
           )}
           <Input type="number" step="0.01" value={amount} onChange={(e) => setAmount(e.target.value)} />
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-2 gap-2">
             {METHODS.map((m) => (
               <button
                 key={m.value}
@@ -116,9 +137,26 @@ export function PaymentPanel({
               </button>
             ))}
           </div>
+          <Input
+            type="text"
+            placeholder={t('transactionIdOptional')}
+            value={transactionId}
+            onChange={(e) => setTransactionId(e.target.value)}
+          />
+          <Input
+            type="number"
+            step="0.01"
+            placeholder={t('tipOptional')}
+            value={tipAmount}
+            onChange={(e) => setTipAmount(e.target.value)}
+          />
           <div className="flex gap-2">
             <Button variant="primary" className="flex-1" disabled={!method || pending} onClick={submit}>
-              {pending ? t('busy') : t('confirmAmount', { amount: formatEuro(parseFloat(amount || '0')) })}
+              {pending
+                ? t('busy')
+                : t('confirmAmount', {
+                    amount: formatEuro((parseFloat(amount || '0') || 0) + (parseFloat(tipAmount || '0') || 0)),
+                  })}
             </Button>
             <Button variant="ghost" onClick={() => setOpen(false)}>
               {t('cancel')}

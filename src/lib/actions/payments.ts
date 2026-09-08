@@ -10,12 +10,13 @@ export type PaymentTarget = {
   posSaleId?: string | null;
 };
 
-/** Inserts a payment row. Never stores card numbers or auth tokens — amount/method/notes only. */
+/** Inserts a payment row. Never stores card numbers or auth tokens — amount/method/notes (plus an optional free-text transaction reference and tip) only. */
 export async function insertPayment(
   target: PaymentTarget,
   amount: number,
   method: string,
-  notes?: string
+  notes?: string,
+  extras?: { transactionId?: string | null; tipAmount?: number }
 ): Promise<{ error?: string; payment?: { id: string } }> {
   const user = await getCurrentUser();
   if (!user) return { error: 'Niet ingelogd.' };
@@ -31,6 +32,8 @@ export async function insertPayment(
       pos_sale_id: target.posSaleId ?? null,
       amount,
       method,
+      transaction_id: extras?.transactionId || null,
+      tip_amount: extras?.tipAmount ?? 0,
       notes: notes || null,
       created_by: user.id,
     })

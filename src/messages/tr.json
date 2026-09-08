@@ -204,7 +204,11 @@
     "refundTitle": "Ödemeyi iade et",
     "refundAmountLabel": "İade edilecek tutar",
     "refundMax": "En fazla {max}",
-    "priceIncludesVat": "Fiyata KDV dahildir"
+    "priceIncludesVat": "Fiyata KDV dahildir",
+    "methodTikkie": "Tikkie",
+    "transactionIdOptional": "İşlem kimliği (opsiyonel)",
+    "tipOptional": "Bahşiş (opsiyonel)",
+    "tipInline": "bahşiş"
   },
   "repairErrors": {
     "selectCustomerOrFillName": "Bir müşteri seçin veya ad ve soyad girin.",
@@ -475,7 +479,10 @@
     "noItemsYet": "Henüz ürün eklenmedi.",
     "total": "Toplam",
     "busy": "İşleniyor…",
-    "checkout": "{amount} tahsil et"
+    "checkout": "{amount} tahsil et",
+    "methodTikkie": "TIKKIE",
+    "transactionIdOptional": "İşlem kimliği (opsiyonel)",
+    "tipOptional": "Bahşiş (opsiyonel)"
   },
   "posErrors": {
     "cartEmpty": "Sepet boş."
@@ -604,7 +611,9 @@
     "registerPayment": "Ödeme kaydet",
     "methodCash": "Nakit",
     "methodPin": "Kart",
-    "methodBank": "Banka havalesi"
+    "methodBank": "Banka havalesi",
+    "methodTikkie": "Tikkie",
+    "transactionIdOptional": "İşlem kimliği (opsiyonel)"
   },
   "creditNotes": {
     "title": "Alacak dekontları",
