@@ -286,7 +286,8 @@
     "claimCreated": "Garantieclaim aangemaakt",
     "photoUploaded": "Foto geüpload",
     "photoDeleted": "Foto verwijderd",
-    "activity": "Activiteit"
+    "activity": "Activiteit",
+    "testedCount": "{tested} van {total} getest"
   },
   "warrantyPage": {
     "title": "Garantie",

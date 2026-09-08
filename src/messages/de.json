@@ -286,7 +286,8 @@
     "claimCreated": "Garantiefall erstellt",
     "photoUploaded": "Foto hochgeladen",
     "photoDeleted": "Foto gelöscht",
-    "activity": "Aktivität"
+    "activity": "Aktivität",
+    "testedCount": "{tested} von {total} getestet"
   },
   "warrantyPage": {
     "title": "Garantie",

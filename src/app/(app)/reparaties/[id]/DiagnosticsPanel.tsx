@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react';
 import { useTranslations } from 'next-intl';
 import { setDiagnosticResult } from '@/lib/actions/diagnostics';
+import { ChevronDown, ChevronRight } from 'lucide-react';
 
 type Result = 'pass' | 'fail' | 'not_tested' | 'na';
 
@@ -57,6 +58,7 @@ export function DiagnosticsPanel({
   initial: Record<string, { pre: Result; post: Result }>;
 }) {
   const [values, setValues] = useState(initial);
+  const [open, setOpen] = useState(false);
   const [pending, startTransition] = useTransition();
   const t = useTranslations('repairTabs');
 
@@ -71,23 +73,40 @@ export function DiagnosticsPanel({
     return <p className="text-sm text-ink-400">{t('noDiagnosticProfile')}</p>;
   }
 
+  const testedCount = items.filter((item) => (values[item] ?? { pre: 'not_tested' }).pre !== 'not_tested').length;
+
   return (
-    <div className="space-y-1">
-      <div className="grid grid-cols-[1fr_120px_120px] gap-2 px-1 pb-1 text-xs font-medium uppercase tracking-wide text-ink-400">
-        <span>{t('component')}</span>
-        <span>{t('beforeRepair')}</span>
-        <span>{t('afterRepair')}</span>
-      </div>
-      {items.map((item) => {
-        const v = values[item] ?? { pre: 'not_tested', post: 'not_tested' };
-        return (
-          <div key={item} className="grid grid-cols-[1fr_120px_120px] items-center gap-2 rounded px-1 py-1 text-sm hover:bg-ink-50">
-            <span className="text-ink-700">{item}</span>
-            <ResultSelect value={v.pre} disabled={pending} onChange={(r) => update(item, 'pre', r)} t={t} />
-            <ResultSelect value={v.post} disabled={pending} onChange={(r) => update(item, 'post', r)} t={t} />
+    <div>
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="focus-ring flex w-full items-center gap-2 rounded px-1 py-1.5 text-left text-sm font-medium text-ink-900 hover:bg-ink-50"
+        aria-expanded={open}
+      >
+        {open ? <ChevronDown size={15} className="text-ink-400" /> : <ChevronRight size={15} className="text-ink-400" />}
+        {t('diagnostics')}
+        <span className="text-xs font-normal text-ink-400">{t('testedCount', { tested: testedCount, total: items.length })}</span>
+      </button>
+
+      {open && (
+        <div className="mt-2 space-y-1">
+          <div className="grid grid-cols-[1fr_120px_120px] gap-2 px-1 pb-1 text-xs font-medium uppercase tracking-wide text-ink-400">
+            <span>{t('component')}</span>
+            <span>{t('beforeRepair')}</span>
+            <span>{t('afterRepair')}</span>
           </div>
-        );
-      })}
+          {items.map((item) => {
+            const v = values[item] ?? { pre: 'not_tested', post: 'not_tested' };
+            return (
+              <div key={item} className="grid grid-cols-[1fr_120px_120px] items-center gap-2 rounded px-1 py-1 text-sm hover:bg-ink-50">
+                <span className="text-ink-700">{item}</span>
+                <ResultSelect value={v.pre} disabled={pending} onChange={(r) => update(item, 'pre', r)} t={t} />
+                <ResultSelect value={v.post} disabled={pending} onChange={(r) => update(item, 'post', r)} t={t} />
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

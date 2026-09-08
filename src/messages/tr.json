@@ -286,7 +286,8 @@
     "claimCreated": "Garanti talebi oluşturuldu",
     "photoUploaded": "Fotoğraf yüklendi",
     "photoDeleted": "Fotoğraf silindi",
-    "activity": "Etkinlik"
+    "activity": "Etkinlik",
+    "testedCount": "{total} üründen {tested} test edildi"
   },
   "warrantyPage": {
     "title": "Garanti",

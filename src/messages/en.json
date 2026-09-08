@@ -286,7 +286,8 @@
     "claimCreated": "Warranty claim created",
     "photoUploaded": "Photo uploaded",
     "photoDeleted": "Photo deleted",
-    "activity": "Activity"
+    "activity": "Activity",
+    "testedCount": "{tested} of {total} tested"
   },
   "warrantyPage": {
     "title": "Warranty",

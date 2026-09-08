@@ -4,8 +4,6 @@ import { createClient, getCurrentUser } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { getTranslations } from 'next-intl/server';
 
-const LABELS = ['front', 'back', 'left', 'right', 'top', 'bottom', 'damage'] as const;
-
 export async function uploadRepairPhoto(_prevState: { error?: string }, formData: FormData): Promise<{ error?: string }> {
   const user = await getCurrentUser();
   const t = await getTranslations('photoErrors');
@@ -53,5 +51,3 @@ export async function deleteRepairPhoto(photoId: string, repairId: string) {
 
   revalidatePath(`/reparaties/${repairId}`);
 }
-
-export { LABELS as PHOTO_LABELS };

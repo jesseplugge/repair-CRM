@@ -286,7 +286,8 @@
     "claimCreated": "Réclamation de garantie créée",
     "photoUploaded": "Photo ajoutée",
     "photoDeleted": "Photo supprimée",
-    "activity": "Activité"
+    "activity": "Activité",
+    "testedCount": "{tested} sur {total} testés"
   },
   "warrantyPage": {
     "title": "Garantie",
