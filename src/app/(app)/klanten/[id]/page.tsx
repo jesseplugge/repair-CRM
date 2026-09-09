@@ -67,20 +67,24 @@ export default async function KlantProfielPage({ params }: { params: { id: strin
         <div className="space-y-2 text-sm">
           {customer.phone && (
             <div className="flex items-center gap-2 text-ink-700">
-              <Phone size={14} className="text-ink-400" /> {customer.phone}
+              <Phone size={14} className="shrink-0 text-ink-400" />
+              <span className="min-w-0 break-words">{customer.phone}</span>
             </div>
           )}
           {customer.email && (
             <div className="flex items-center gap-2 text-ink-700">
-              <Mail size={14} className="text-ink-400" /> {customer.email}
+              <Mail size={14} className="shrink-0 text-ink-400" />
+              <span className="min-w-0 break-words">{customer.email}</span>
             </div>
           )}
           {(customer.address || customer.city) && (
             <div className="flex items-center gap-2 text-ink-700">
-              <MapPin size={14} className="text-ink-400" />
-              {customer.address}
-              {customer.address && customer.city && ', '}
-              {customer.postcode} {customer.city}
+              <MapPin size={14} className="shrink-0 text-ink-400" />
+              <span className="min-w-0 break-words">
+                {customer.address}
+                {customer.address && customer.city && ', '}
+                {customer.postcode} {customer.city}
+              </span>
             </div>
           )}
           {!customer.phone && !customer.email && !customer.address && <p className="text-ink-400">{t('noContactInfo')}</p>}

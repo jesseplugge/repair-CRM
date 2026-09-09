@@ -34,7 +34,12 @@ export function TabList({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div ref={listRef} role="tablist" onKeyDown={handleKeyDown} className="mb-4 flex gap-1 border-b border-ink-100">
+    <div
+      ref={listRef}
+      role="tablist"
+      onKeyDown={handleKeyDown}
+      className="mb-4 flex gap-1 overflow-x-auto border-b border-ink-100"
+    >
       {children}
     </div>
   );
@@ -50,7 +55,7 @@ export function Tab({ value, children, badge }: { value: string; children: React
       tabIndex={selected ? 0 : -1}
       onClick={() => setValue(value)}
       className={clsx(
-        'focus-ring px-3 py-2 text-sm font-medium transition-colors',
+        'focus-ring shrink-0 whitespace-nowrap px-3 py-2 text-sm font-medium transition-colors',
         selected ? 'border-b-2 border-[var(--accent)] text-[var(--accent)]' : 'text-ink-500 hover:text-ink-800'
       )}
     >
