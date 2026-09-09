@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Printer, Download } from 'lucide-react';
 
@@ -14,7 +14,6 @@ export function PrintControls({
   showFormatPicker?: boolean;
 }) {
   const [format, setFormat] = useState('a4');
-  const iframeRef = useRef<HTMLIFrameElement>(null);
   const [printing, setPrinting] = useState(false);
   const t = useTranslations('printControls');
 
@@ -27,15 +26,31 @@ export function PrintControls({
 
   const url = showFormatPicker ? `${baseUrl}${baseUrl.includes('?') ? '&' : '?'}format=${format}` : baseUrl;
 
+  // The hidden/off-screen-iframe auto-print trick turned out to be
+  // unreliable across browsers — the PDF itself was always fine (the
+  // download link below never had a problem), so instead of fighting the
+  // embedded PDF viewer inside an iframe, open it in a real tab (same as
+  // the download link) and print from there, where it's confirmed to
+  // actually render.
   function handlePrint() {
     setPrinting(true);
-    if (iframeRef.current) {
-      // Re-assigning the same src won't re-fire onLoad in some browsers, so clear first.
-      iframeRef.current.src = 'about:blank';
-      requestAnimationFrame(() => {
-        if (iframeRef.current) iframeRef.current.src = url;
-      });
+    const win = window.open(url, '_blank');
+    if (!win) {
+      setPrinting(false);
+      return;
     }
+    win.addEventListener('load', () => {
+      setTimeout(() => {
+        try {
+          win.focus();
+          win.print();
+        } catch {
+          // If the browser blocks this, the tab is still open with the PDF
+          // visible, so the user can print it manually from there.
+        }
+        setPrinting(false);
+      }, 300);
+    });
   }
 
   return (
@@ -72,34 +87,6 @@ export function PrintControls({
           <Download size={15} />
         </a>
       </div>
-      {/*
-        Kept off-screen rather than display:none — a zero-size hidden iframe
-        doesn't reliably get its embedded PDF viewer painted by the browser
-        before print() fires (this used to work but browsers have gotten
-        stricter about rendering truly-hidden content), which produced blank
-        pages. A real, positioned-off-screen iframe still gets painted.
-      */}
-      <iframe
-        ref={iframeRef}
-        title="print-frame"
-        style={{ position: 'fixed', top: 0, left: '-10000px', width: '800px', height: '1000px', border: 'none' }}
-        onLoad={() => {
-          const src = iframeRef.current?.getAttribute('src');
-          if (!src || src === 'about:blank') return;
-          // Give the browser's PDF viewer a beat to actually paint the
-          // document after the load event fires, before invoking print().
-          setTimeout(() => {
-            try {
-              iframeRef.current?.contentWindow?.focus();
-              iframeRef.current?.contentWindow?.print();
-            } catch {
-              // Some browsers block cross-origin frame printing — the download
-              // link above is the fallback in that case.
-            }
-            setPrinting(false);
-          }, 300);
-        }}
-      />
     </div>
   );
 }
