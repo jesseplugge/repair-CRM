@@ -87,7 +87,7 @@ export function CatalogManager({ items }: { items: CatalogItem[] }) {
             {items.map((item) => (
               <div key={item.id} className="rounded-lg border border-ink-100 bg-white p-3 shadow-card">
                 <div className="flex items-center justify-between gap-2">
-                  <span className="font-medium text-ink-900">{item.name}</span>
+                  <span className="min-w-0 truncate font-medium text-ink-900">{item.name}</span>
                   <button
                     onClick={() => toggleCatalogItem(item.id, !item.active)}
                     className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${
@@ -97,14 +97,14 @@ export function CatalogManager({ items }: { items: CatalogItem[] }) {
                     {item.active ? t('active') : t('inactive')}
                   </button>
                 </div>
-                <div className="text-xs text-ink-400">
+                <div className="break-words text-xs text-ink-400">
                   {item.brand} {item.model}
                 </div>
-                <div className="mt-1.5 flex items-center justify-between text-sm">
-                  <span className="text-ink-600">
+                <div className="mt-1.5 flex items-center justify-between gap-2 text-sm">
+                  <span className="min-w-0 truncate text-ink-600">
                     {t('colVat')} {item.vat_rate}% · {item.warranty_months ?? '–'} {t('months')}
                   </span>
-                  <span className="font-medium text-ink-900">{formatEuro(item.selling_price)}</span>
+                  <span className="shrink-0 font-medium text-ink-900">{formatEuro(item.selling_price)}</span>
                 </div>
               </div>
             ))}

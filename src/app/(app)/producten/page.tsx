@@ -68,22 +68,22 @@ export default async function ProductenPage() {
             {(products ?? []).map((p: any) => (
               <div key={p.id} className="rounded-lg border border-ink-100 bg-white p-3 shadow-card">
                 <div className="flex items-center justify-between gap-2">
-                  <span className="font-medium text-ink-900">{p.name}</span>
+                  <span className="min-w-0 truncate font-medium text-ink-900">{p.name}</span>
                   <span
                     className={`shrink-0 tabular-nums text-sm ${p.stock_quantity <= (p.minimum_stock ?? 0) ? 'font-semibold text-red-600' : 'text-ink-900'}`}
                   >
                     {t('colStock')}: {p.stock_quantity}
                   </span>
                 </div>
-                <div className="text-xs text-ink-400">
+                <div className="break-words text-xs text-ink-400">
                   {p.sku ?? '—'}
                   {p.category?.name ? ` · ${p.category.name}` : ''}
                 </div>
-                <div className="mt-1.5 flex items-center justify-between text-sm">
-                  <span className="text-ink-600">
+                <div className="mt-1.5 flex items-center justify-between gap-2 text-sm">
+                  <span className="min-w-0 truncate text-ink-600">
                     {t('colPurchaseExcl')}: {formatEuro(p.purchase_price_excl_vat)}
                   </span>
-                  <span className="font-medium text-ink-900">{formatEuro(p.selling_price_excl_vat)}</span>
+                  <span className="shrink-0 font-medium text-ink-900">{formatEuro(p.selling_price_excl_vat)}</span>
                 </div>
               </div>
             ))}

@@ -135,7 +135,7 @@ export default async function ReparatieDetailPage({ params }: { params: { id: st
         <DeleteRepairButton repairId={repair.id} />
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center gap-3">
         <h1 className="font-display text-2xl font-semibold text-ink-950">{repair.repair_number}</h1>
         <StatusBadge name={status.name} color={status.color} />
         <PaymentStatusBadge status={repair.payment_status} />

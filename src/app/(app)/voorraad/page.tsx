@@ -22,12 +22,12 @@ export default async function VoorraadPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="font-display text-2xl font-semibold text-ink-950">{t('title')}</h1>
           <p className="text-sm text-ink-600">{t('lowStockCount', { count: lowStock.length })}</p>
         </div>
-        <Link href="/voorraad/bewegingen" className="flex items-center gap-1.5 text-sm font-medium text-[var(--accent)] hover:underline">
+        <Link href="/voorraad/bewegingen" className="flex items-center gap-1.5 self-start text-sm font-medium text-[var(--accent)] hover:underline">
           <History size={15} /> {t('movements')}
         </Link>
       </div>

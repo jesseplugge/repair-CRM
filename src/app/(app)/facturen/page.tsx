@@ -30,12 +30,12 @@ export default async function FacturenPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="font-display text-2xl font-semibold text-ink-950">{t('title')}</h1>
           <p className="text-sm text-ink-600">{t('count', { count: invoices?.length ?? 0 })}</p>
         </div>
-        <Link href="/facturen/nieuw">
+        <Link href="/facturen/nieuw" className="self-start">
           <Button variant="primary">
             <Plus size={16} /> {t('newInvoice')}
           </Button>
@@ -98,10 +98,10 @@ export default async function FacturenPage() {
                   className="block rounded-lg border border-ink-100 bg-white p-3 shadow-card"
                 >
                   <div className="flex items-center justify-between gap-2">
-                    <span className="font-medium text-[var(--accent)]">{inv.invoice_number}</span>
+                    <span className="min-w-0 truncate font-medium text-[var(--accent)]">{inv.invoice_number}</span>
                     <span className="shrink-0 tabular-nums font-medium text-ink-900">{formatEuro(inv.total_incl_vat)}</span>
                   </div>
-                  <div className="mt-0.5 text-sm text-ink-700">
+                  <div className="mt-0.5 break-words text-sm text-ink-700">
                     {inv.customer?.first_name} {inv.customer?.last_name}
                   </div>
                   <div className="mt-2 flex items-center justify-between gap-2">

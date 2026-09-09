@@ -38,12 +38,12 @@ export default async function ReparatiesPage({ searchParams }: { searchParams: {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="font-display text-2xl font-semibold text-ink-950">{t('title')}</h1>
           <p className="text-sm text-ink-600">{t('count', { count: repairs?.length ?? 0 })}</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <div className="flex rounded border border-ink-200 bg-white p-0.5">
             <Link
               href={{ pathname: '/reparaties', query: { ...(searchParams.status ? { status: searchParams.status } : {}), view: 'list' } }}
@@ -134,15 +134,15 @@ export default async function ReparatiesPage({ searchParams }: { searchParams: {
             {(repairs ?? []).map((r: any) => (
               <Link key={r.id} href={`/reparaties/${r.id}`} className="block rounded-lg border border-ink-100 bg-white p-3 shadow-card">
                 <div className="flex items-center justify-between gap-2">
-                  <span className="font-medium text-[var(--accent)]">{r.repair_number}</span>
+                  <span className="min-w-0 truncate font-medium text-[var(--accent)]">{r.repair_number}</span>
                   <span className="shrink-0 tabular-nums font-medium text-ink-900">
                     {formatEuro(r.final_price ?? r.estimated_price)}
                   </span>
                 </div>
-                <div className="mt-0.5 text-sm text-ink-700">
+                <div className="mt-0.5 break-words text-sm text-ink-700">
                   {r.customer?.first_name} {r.customer?.last_name}
                 </div>
-                <div className="text-xs text-ink-400">
+                <div className="break-words text-xs text-ink-400">
                   {r.device?.brand} {r.device?.model}
                   {r.repair_type_label ? ` · ${r.repair_type_label}` : ''} · {formatDate(r.date_received)}
                 </div>

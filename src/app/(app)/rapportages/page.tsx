@@ -37,12 +37,12 @@ export default async function RapportagesPage({ searchParams }: { searchParams: 
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="font-display text-2xl font-semibold text-ink-950">{t('title')}</h1>
           <p className="text-sm text-ink-600">{t('subtitle')}</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <a
             href={`/api/reports/csv?from=${from}&to=${to}`}
             className="flex items-center gap-1.5 rounded border border-ink-200 px-3 py-2 text-sm font-medium text-ink-700 hover:bg-ink-50"
@@ -176,10 +176,10 @@ export default async function RapportagesPage({ searchParams }: { searchParams: 
                     className="block rounded-lg border border-ink-100 bg-white p-3 shadow-card"
                   >
                     <div className="flex items-center justify-between gap-2">
-                      <span className="font-medium text-[var(--accent)]">{inv.invoiceNumber}</span>
+                      <span className="min-w-0 truncate font-medium text-[var(--accent)]">{inv.invoiceNumber}</span>
                       <span className="shrink-0 tabular-nums font-medium text-ink-900">{formatEuro(inv.outstanding)}</span>
                     </div>
-                    <div className="text-sm text-ink-700">{inv.customerName}</div>
+                    <div className="break-words text-sm text-ink-700">{inv.customerName}</div>
                     <div className={`text-xs ${inv.overdue ? 'font-medium text-red-600' : 'text-ink-400'}`}>
                       {formatDate(inv.dueDate)}
                       {inv.overdue ? ` · ${t('overdue')}` : ''}

@@ -106,10 +106,12 @@ export default async function GarantiePage() {
               return (
                 <div key={c.id} className="rounded-lg border border-ink-100 bg-white p-3 shadow-card">
                   <div className="flex items-center justify-between gap-2">
-                    <span className="font-medium text-ink-900">{c.claim_number}</span>
-                    <StatusBadge name={label} color={color} />
+                    <span className="min-w-0 truncate font-medium text-ink-900">{c.claim_number}</span>
+                    <span className="shrink-0">
+                      <StatusBadge name={label} color={color} />
+                    </span>
                   </div>
-                  <div className="mt-0.5 text-sm text-ink-700">
+                  <div className="mt-0.5 break-words text-sm text-ink-700">
                     {customer ? `${customer.first_name} ${customer.last_name}` : '—'}
                   </div>
                   <div className="text-xs text-ink-400">
