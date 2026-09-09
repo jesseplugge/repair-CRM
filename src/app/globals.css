@@ -25,6 +25,14 @@
   html[data-shell='native'],
   html[data-shell='native'] body {
     overscroll-behavior: none;
+    /* Disables double-tap-to-zoom in the native app only (a browser tab keeps
+       normal zoom for accessibility). Deliberately CSS-only: an earlier
+       attempt did this by rewriting the viewport meta tag at runtime, which
+       made WebKit miscalculate the layout viewport width and broke every
+       page's layout far worse than the zoom it was meant to fix. touch-action
+       still allows scrolling and pinch-zoom — it only drops the "other"
+       shortcut gestures like double-tap-zoom. */
+    touch-action: manipulation;
   }
 
   h1, h2, h3 {
