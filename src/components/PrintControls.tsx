@@ -72,21 +72,32 @@ export function PrintControls({
           <Download size={15} />
         </a>
       </div>
+      {/*
+        Kept off-screen rather than display:none — a zero-size hidden iframe
+        doesn't reliably get its embedded PDF viewer painted by the browser
+        before print() fires (this used to work but browsers have gotten
+        stricter about rendering truly-hidden content), which produced blank
+        pages. A real, positioned-off-screen iframe still gets painted.
+      */}
       <iframe
         ref={iframeRef}
         title="print-frame"
-        style={{ display: 'none' }}
+        style={{ position: 'fixed', top: 0, left: '-10000px', width: '800px', height: '1000px', border: 'none' }}
         onLoad={() => {
           const src = iframeRef.current?.getAttribute('src');
           if (!src || src === 'about:blank') return;
-          try {
-            iframeRef.current?.contentWindow?.focus();
-            iframeRef.current?.contentWindow?.print();
-          } catch {
-            // Some browsers block cross-origin frame printing — the download
-            // link above is the fallback in that case.
-          }
-          setPrinting(false);
+          // Give the browser's PDF viewer a beat to actually paint the
+          // document after the load event fires, before invoking print().
+          setTimeout(() => {
+            try {
+              iframeRef.current?.contentWindow?.focus();
+              iframeRef.current?.contentWindow?.print();
+            } catch {
+              // Some browsers block cross-origin frame printing — the download
+              // link above is the fallback in that case.
+            }
+            setPrinting(false);
+          }, 300);
         }}
       />
     </div>
