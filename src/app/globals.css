@@ -44,6 +44,19 @@
       scroll-behavior: auto !important;
     }
   }
+
+  /* iOS Safari auto-zooms the page on focus for any text input/select/textarea
+     rendered below 16px — that's the "zooms in when switching to certain text
+     fields" behavior. Our compact text-sm/text-xs form controls are 13-14px,
+     so force 16px on phone widths specifically (desktop keeps the tighter
+     sizing). !important is deliberate: this needs to win over every
+     component's own text-sm/text-xs utility class without hunting each one
+     down individually. */
+  @media (max-width: 640px) {
+    input, select, textarea {
+      font-size: 16px !important;
+    }
+  }
 }
 
 @layer utilities {
