@@ -82,7 +82,7 @@ export function CommandPalette() {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/40 pt-[15vh]" onClick={() => setOpen(false)}>
+    <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/40 px-4 pt-[15vh]" onClick={() => setOpen(false)}>
       <div className="w-full max-w-lg rounded-lg border border-ink-200 bg-white shadow-xl" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center gap-2 border-b border-ink-100 px-4 py-3">
           <Search size={16} className="text-ink-400" />

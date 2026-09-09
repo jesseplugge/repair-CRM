@@ -24,46 +24,72 @@ export default async function ProductenPage() {
         <p className="text-sm text-ink-600">{t('subtitle')}</p>
       </div>
 
-      <Card>
-        <Table>
-          <Thead>
-            <tr>
-              <Th>{t('colName')}</Th>
-              <Th>{t('colSku')}</Th>
-              <Th>{t('colCategory')}</Th>
-              <Th align="right">{t('colPurchaseExcl')}</Th>
-              <Th align="right">{t('colSellExcl')}</Th>
-              <Th align="right">{t('colVat')}</Th>
-              <Th align="right">{t('colStock')}</Th>
-            </tr>
-          </Thead>
-          <Tbody>
+      {(products ?? []).length === 0 ? (
+        <Card>
+          <EmptyState icon={Package} title={t('empty')} />
+        </Card>
+      ) : (
+        <>
+          <Card className="hidden md:block">
+            <Table>
+              <Thead>
+                <tr>
+                  <Th>{t('colName')}</Th>
+                  <Th>{t('colSku')}</Th>
+                  <Th>{t('colCategory')}</Th>
+                  <Th align="right">{t('colPurchaseExcl')}</Th>
+                  <Th align="right">{t('colSellExcl')}</Th>
+                  <Th align="right">{t('colVat')}</Th>
+                  <Th align="right">{t('colStock')}</Th>
+                </tr>
+              </Thead>
+              <Tbody>
+                {(products ?? []).map((p: any) => (
+                  <Tr key={p.id}>
+                    <Td className="font-medium text-ink-900">{p.name}</Td>
+                    <Td className="text-ink-500">{p.sku ?? '—'}</Td>
+                    <Td className="text-ink-500">{p.category?.name ?? '—'}</Td>
+                    <Td align="right" className="tabular-nums text-ink-600">{formatEuro(p.purchase_price_excl_vat)}</Td>
+                    <Td align="right" className="tabular-nums text-ink-900">{formatEuro(p.selling_price_excl_vat)}</Td>
+                    <Td align="right" className="text-ink-600">{p.vat_rate}%</Td>
+                    <Td
+                      align="right"
+                      className={`tabular-nums ${p.stock_quantity <= (p.minimum_stock ?? 0) ? 'font-semibold text-red-600' : 'text-ink-900'}`}
+                    >
+                      {p.stock_quantity}
+                    </Td>
+                  </Tr>
+                ))}
+              </Tbody>
+            </Table>
+          </Card>
+
+          <div className="space-y-2 md:hidden">
             {(products ?? []).map((p: any) => (
-              <Tr key={p.id}>
-                <Td className="font-medium text-ink-900">{p.name}</Td>
-                <Td className="text-ink-500">{p.sku ?? '—'}</Td>
-                <Td className="text-ink-500">{p.category?.name ?? '—'}</Td>
-                <Td align="right" className="tabular-nums text-ink-600">{formatEuro(p.purchase_price_excl_vat)}</Td>
-                <Td align="right" className="tabular-nums text-ink-900">{formatEuro(p.selling_price_excl_vat)}</Td>
-                <Td align="right" className="text-ink-600">{p.vat_rate}%</Td>
-                <Td
-                  align="right"
-                  className={`tabular-nums ${p.stock_quantity <= (p.minimum_stock ?? 0) ? 'font-semibold text-red-600' : 'text-ink-900'}`}
-                >
-                  {p.stock_quantity}
-                </Td>
-              </Tr>
+              <div key={p.id} className="rounded-lg border border-ink-100 bg-white p-3 shadow-card">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-medium text-ink-900">{p.name}</span>
+                  <span
+                    className={`shrink-0 tabular-nums text-sm ${p.stock_quantity <= (p.minimum_stock ?? 0) ? 'font-semibold text-red-600' : 'text-ink-900'}`}
+                  >
+                    {t('colStock')}: {p.stock_quantity}
+                  </span>
+                </div>
+                <div className="text-xs text-ink-400">
+                  {p.sku ?? '—'}
+                  {p.category?.name ? ` · ${p.category.name}` : ''}
+                </div>
+                <div className="mt-1.5 flex items-center justify-between text-sm">
+                  <span className="text-ink-600">
+                    {t('colPurchaseExcl')}: {formatEuro(p.purchase_price_excl_vat)}
+                  </span>
+                  <span className="font-medium text-ink-900">{formatEuro(p.selling_price_excl_vat)}</span>
+                </div>
+              </div>
             ))}
-            {(products ?? []).length === 0 && (
-              <tr>
-                <td colSpan={7}>
-                  <EmptyState icon={Package} title={t('empty')} />
-                </td>
-              </tr>
-            )}
-          </Tbody>
-        </Table>
-      </Card>
+          </div>
+        </>
+      )}
 
       <AddProductForm categories={categories ?? []} suppliers={suppliers ?? []} />
     </div>

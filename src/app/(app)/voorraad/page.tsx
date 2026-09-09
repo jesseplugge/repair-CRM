@@ -41,39 +41,57 @@ export default async function VoorraadPage() {
         </Card>
       )}
 
-      <Card>
-        <Table>
-          <Thead>
-            <tr>
-              <Th>{t('colProduct')}</Th>
-              <Th align="right">{t('colMinimum')}</Th>
-              <Th align="right">{t('colStock')}</Th>
-              <Th align="right">{t('colMutation')}</Th>
-            </tr>
-          </Thead>
-          <Tbody>
+      {(products ?? []).length === 0 ? (
+        <Card>
+          <EmptyState icon={Boxes} title={t('empty')} />
+        </Card>
+      ) : (
+        <>
+          <Card className="hidden md:block">
+            <Table>
+              <Thead>
+                <tr>
+                  <Th>{t('colProduct')}</Th>
+                  <Th align="right">{t('colMinimum')}</Th>
+                  <Th align="right">{t('colStock')}</Th>
+                  <Th align="right">{t('colMutation')}</Th>
+                </tr>
+              </Thead>
+              <Tbody>
+                {(products ?? []).map((p) => (
+                  <Tr key={p.id}>
+                    <Td className="font-medium text-ink-900">{p.name}</Td>
+                    <Td align="right" className="text-ink-500">{p.minimum_stock ?? 0}</Td>
+                    <Td align="right" className={`tabular-nums ${p.stock_quantity <= (p.minimum_stock ?? 0) ? 'font-semibold text-red-600' : 'text-ink-900'}`}>
+                      {p.stock_quantity}
+                    </Td>
+                    <Td align="right">
+                      <StockControls productId={p.id} />
+                    </Td>
+                  </Tr>
+                ))}
+              </Tbody>
+            </Table>
+          </Card>
+
+          <div className="space-y-2 md:hidden">
             {(products ?? []).map((p) => (
-              <Tr key={p.id}>
-                <Td className="font-medium text-ink-900">{p.name}</Td>
-                <Td align="right" className="text-ink-500">{p.minimum_stock ?? 0}</Td>
-                <Td align="right" className={`tabular-nums ${p.stock_quantity <= (p.minimum_stock ?? 0) ? 'font-semibold text-red-600' : 'text-ink-900'}`}>
-                  {p.stock_quantity}
-                </Td>
-                <Td align="right">
-                  <StockControls productId={p.id} />
-                </Td>
-              </Tr>
+              <div key={p.id} className="flex items-center justify-between gap-3 rounded-lg border border-ink-100 bg-white p-3 shadow-card">
+                <div className="min-w-0">
+                  <div className="truncate font-medium text-ink-900">{p.name}</div>
+                  <div className="text-xs text-ink-400">
+                    {t('colMinimum')}: {p.minimum_stock ?? 0} ·{' '}
+                    <span className={`tabular-nums ${p.stock_quantity <= (p.minimum_stock ?? 0) ? 'font-semibold text-red-600' : ''}`}>
+                      {t('colStock')}: {p.stock_quantity}
+                    </span>
+                  </div>
+                </div>
+                <StockControls productId={p.id} />
+              </div>
             ))}
-            {(products ?? []).length === 0 && (
-              <tr>
-                <td colSpan={4}>
-                  <EmptyState icon={Boxes} title={t('empty')} />
-                </td>
-              </tr>
-            )}
-          </Tbody>
-        </Table>
-      </Card>
+          </div>
+        </>
+      )}
     </div>
   );
 }

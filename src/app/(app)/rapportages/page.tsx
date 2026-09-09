@@ -125,43 +125,73 @@ export default async function RapportagesPage({ searchParams }: { searchParams: 
         {data.outstandingInvoices.length === 0 ? (
           <p className="text-sm text-ink-400">{t('noOutstandingInvoices')}</p>
         ) : (
-          <Table>
-            <Thead>
-              <tr>
-                <Th className="!px-0">{t('colNumber')}</Th>
-                <Th>{t('colCustomer')}</Th>
-                <Th>{t('colInvoiceDate')}</Th>
-                <Th>{t('colDueDate')}</Th>
-                <Th>{t('colStatus')}</Th>
-                <Th align="right" className="!px-0">{t('colOutstanding')}</Th>
-              </tr>
-            </Thead>
-            <Tbody>
+          <>
+            <div className="hidden md:block">
+              <Table>
+                <Thead>
+                  <tr>
+                    <Th className="!px-0">{t('colNumber')}</Th>
+                    <Th>{t('colCustomer')}</Th>
+                    <Th>{t('colInvoiceDate')}</Th>
+                    <Th>{t('colDueDate')}</Th>
+                    <Th>{t('colStatus')}</Th>
+                    <Th align="right" className="!px-0">{t('colOutstanding')}</Th>
+                  </tr>
+                </Thead>
+                <Tbody>
+                  {data.outstandingInvoices.map((inv) => {
+                    const label = STATUS_COLORS[inv.status] ? tStatus(inv.status as any) : inv.status;
+                    const color = STATUS_COLORS[inv.status] ?? '#495164';
+                    return (
+                      <Tr key={inv.id}>
+                        <Td className="!px-0">
+                          <Link href={`/facturen/${inv.id}`} className="font-medium text-[var(--accent)] hover:underline">
+                            {inv.invoiceNumber}
+                          </Link>
+                        </Td>
+                        <Td className="text-ink-700">{inv.customerName}</Td>
+                        <Td className="text-ink-600">{formatDate(inv.invoiceDate)}</Td>
+                        <Td className={inv.overdue ? 'font-medium text-red-600' : 'text-ink-600'}>
+                          {formatDate(inv.dueDate)}
+                          {inv.overdue ? ` · ${t('overdue')}` : ''}
+                        </Td>
+                        <Td>
+                          <StatusBadge name={label} color={color} />
+                        </Td>
+                        <Td align="right" className="!px-0 tabular-nums text-ink-900">{formatEuro(inv.outstanding)}</Td>
+                      </Tr>
+                    );
+                  })}
+                </Tbody>
+              </Table>
+            </div>
+            <div className="space-y-2 md:hidden">
               {data.outstandingInvoices.map((inv) => {
                 const label = STATUS_COLORS[inv.status] ? tStatus(inv.status as any) : inv.status;
                 const color = STATUS_COLORS[inv.status] ?? '#495164';
                 return (
-                  <Tr key={inv.id}>
-                    <Td className="!px-0">
-                      <Link href={`/facturen/${inv.id}`} className="font-medium text-[var(--accent)] hover:underline">
-                        {inv.invoiceNumber}
-                      </Link>
-                    </Td>
-                    <Td className="text-ink-700">{inv.customerName}</Td>
-                    <Td className="text-ink-600">{formatDate(inv.invoiceDate)}</Td>
-                    <Td className={inv.overdue ? 'font-medium text-red-600' : 'text-ink-600'}>
+                  <Link
+                    key={inv.id}
+                    href={`/facturen/${inv.id}`}
+                    className="block rounded-lg border border-ink-100 bg-white p-3 shadow-card"
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-medium text-[var(--accent)]">{inv.invoiceNumber}</span>
+                      <span className="shrink-0 tabular-nums font-medium text-ink-900">{formatEuro(inv.outstanding)}</span>
+                    </div>
+                    <div className="text-sm text-ink-700">{inv.customerName}</div>
+                    <div className={`text-xs ${inv.overdue ? 'font-medium text-red-600' : 'text-ink-400'}`}>
                       {formatDate(inv.dueDate)}
                       {inv.overdue ? ` · ${t('overdue')}` : ''}
-                    </Td>
-                    <Td>
+                    </div>
+                    <div className="mt-1.5">
                       <StatusBadge name={label} color={color} />
-                    </Td>
-                    <Td align="right" className="!px-0 tabular-nums text-ink-900">{formatEuro(inv.outstanding)}</Td>
-                  </Tr>
+                    </div>
+                  </Link>
                 );
               })}
-            </Tbody>
-          </Table>
+            </div>
+          </>
         )}
       </Card>
     </div>

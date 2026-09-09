@@ -132,8 +132,8 @@ export function PosTerminal() {
   }
 
   return (
-    <div className="grid grid-cols-3 gap-6">
-      <div className="col-span-2 space-y-4">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+      <div className="space-y-4 lg:col-span-2">
         <div className="relative">
           <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-400" />
           <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder={t('searchProductPlaceholder')} className="pl-9" autoFocus />

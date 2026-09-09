@@ -39,50 +39,78 @@ export function CatalogManager({ items }: { items: CatalogItem[] }) {
 
   return (
     <div className="space-y-3">
-      <Card>
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-ink-100 text-left text-xs uppercase tracking-wide text-ink-400">
-              <th className="px-4 py-2.5 font-medium">{t('colName')}</th>
-              <th className="px-4 py-2.5 font-medium">{t('colBrandModel')}</th>
-              <th className="px-4 py-2.5 text-right font-medium">{t('colPriceExcl')}</th>
-              <th className="px-4 py-2.5 text-right font-medium">{t('colVat')}</th>
-              <th className="px-4 py-2.5 text-right font-medium">{t('colWarranty')}</th>
-              <th className="px-4 py-2.5 font-medium">{t('colActive')}</th>
-            </tr>
-          </thead>
-          <tbody>
+      {items.length === 0 ? (
+        <Card>
+          <p className="px-4 py-8 text-center text-sm text-ink-400">{t('empty')}</p>
+        </Card>
+      ) : (
+        <>
+          <Card className="hidden overflow-x-auto md:block">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-ink-100 text-left text-xs uppercase tracking-wide text-ink-400">
+                  <th className="px-4 py-2.5 font-medium">{t('colName')}</th>
+                  <th className="px-4 py-2.5 font-medium">{t('colBrandModel')}</th>
+                  <th className="px-4 py-2.5 text-right font-medium">{t('colPriceExcl')}</th>
+                  <th className="px-4 py-2.5 text-right font-medium">{t('colVat')}</th>
+                  <th className="px-4 py-2.5 text-right font-medium">{t('colWarranty')}</th>
+                  <th className="px-4 py-2.5 font-medium">{t('colActive')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {items.map((item) => (
+                  <tr key={item.id} className="border-b border-ink-100 last:border-0">
+                    <td className="px-4 py-2.5 font-medium text-ink-900">{item.name}</td>
+                    <td className="px-4 py-2.5 text-ink-600">
+                      {item.brand} {item.model}
+                    </td>
+                    <td className="px-4 py-2.5 text-right tabular-nums text-ink-900">{formatEuro(item.selling_price)}</td>
+                    <td className="px-4 py-2.5 text-right tabular-nums text-ink-600">{item.vat_rate}%</td>
+                    <td className="px-4 py-2.5 text-right text-ink-600">{item.warranty_months ?? '–'} {t('months')}</td>
+                    <td className="px-4 py-2.5">
+                      <button
+                        onClick={() => toggleCatalogItem(item.id, !item.active)}
+                        className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                          item.active ? 'bg-green-100 text-green-700' : 'bg-ink-100 text-ink-500'
+                        }`}
+                      >
+                        {item.active ? t('active') : t('inactive')}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </Card>
+
+          <div className="space-y-2 md:hidden">
             {items.map((item) => (
-              <tr key={item.id} className="border-b border-ink-100 last:border-0">
-                <td className="px-4 py-2.5 font-medium text-ink-900">{item.name}</td>
-                <td className="px-4 py-2.5 text-ink-600">
-                  {item.brand} {item.model}
-                </td>
-                <td className="px-4 py-2.5 text-right tabular-nums text-ink-900">{formatEuro(item.selling_price)}</td>
-                <td className="px-4 py-2.5 text-right tabular-nums text-ink-600">{item.vat_rate}%</td>
-                <td className="px-4 py-2.5 text-right text-ink-600">{item.warranty_months ?? '–'} {t('months')}</td>
-                <td className="px-4 py-2.5">
+              <div key={item.id} className="rounded-lg border border-ink-100 bg-white p-3 shadow-card">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-medium text-ink-900">{item.name}</span>
                   <button
                     onClick={() => toggleCatalogItem(item.id, !item.active)}
-                    className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                    className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${
                       item.active ? 'bg-green-100 text-green-700' : 'bg-ink-100 text-ink-500'
                     }`}
                   >
                     {item.active ? t('active') : t('inactive')}
                   </button>
-                </td>
-              </tr>
+                </div>
+                <div className="text-xs text-ink-400">
+                  {item.brand} {item.model}
+                </div>
+                <div className="mt-1.5 flex items-center justify-between text-sm">
+                  <span className="text-ink-600">
+                    {t('colVat')} {item.vat_rate}% · {item.warranty_months ?? '–'} {t('months')}
+                  </span>
+                  <span className="font-medium text-ink-900">{formatEuro(item.selling_price)}</span>
+                </div>
+              </div>
             ))}
-            {items.length === 0 && (
-              <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-ink-400">
-                  {t('empty')}
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </Card>
+          </div>
+        </>
+      )}
 
       {open ? (
         <Card className="p-4">

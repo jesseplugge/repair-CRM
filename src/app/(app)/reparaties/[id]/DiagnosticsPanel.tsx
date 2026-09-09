@@ -90,7 +90,7 @@ export function DiagnosticsPanel({
 
       {open && (
         <div className="mt-2 space-y-1">
-          <div className="grid grid-cols-[1fr_120px_120px] gap-2 px-1 pb-1 text-xs font-medium uppercase tracking-wide text-ink-400">
+          <div className="grid grid-cols-[1fr_80px_80px] sm:grid-cols-[1fr_120px_120px] gap-2 px-1 pb-1 text-xs font-medium uppercase tracking-wide text-ink-400">
             <span>{t('component')}</span>
             <span>{t('beforeRepair')}</span>
             <span>{t('afterRepair')}</span>
@@ -98,7 +98,7 @@ export function DiagnosticsPanel({
           {items.map((item) => {
             const v = values[item] ?? { pre: 'not_tested', post: 'not_tested' };
             return (
-              <div key={item} className="grid grid-cols-[1fr_120px_120px] items-center gap-2 rounded px-1 py-1 text-sm hover:bg-ink-50">
+              <div key={item} className="grid grid-cols-[1fr_80px_80px] sm:grid-cols-[1fr_120px_120px] items-center gap-2 rounded px-1 py-1 text-sm hover:bg-ink-50">
                 <span className="text-ink-700">{item}</span>
                 <ResultSelect value={v.pre} disabled={pending} onChange={(r) => update(item, 'pre', r)} t={t} />
                 <ResultSelect value={v.post} disabled={pending} onChange={(r) => update(item, 'post', r)} t={t} />

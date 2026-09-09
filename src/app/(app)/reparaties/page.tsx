@@ -81,56 +81,79 @@ export default async function ReparatiesPage({ searchParams }: { searchParams: {
 
       {view === 'kanban' ? (
         <ReparatiesKanban statuses={statuses ?? []} repairs={(repairs ?? []) as any} />
+      ) : (repairs ?? []).length === 0 ? (
+        <Card>
+          <EmptyState icon={Wrench} title={t('empty')} />
+        </Card>
       ) : (
-      <Card>
-        <Table>
-          <Thead>
-            <tr>
-              <Th>{t('colNumber')}</Th>
-              <Th>{t('colCustomer')}</Th>
-              <Th>{t('colDevice')}</Th>
-              <Th>{t('colType')}</Th>
-              <Th>{t('colReceived')}</Th>
-              <Th>{t('colStatus')}</Th>
-              <Th>{t('colPayment')}</Th>
-              <Th align="right">{t('colAmount')}</Th>
-            </tr>
-          </Thead>
-          <Tbody>
+        <>
+          <Card className="hidden md:block">
+            <Table>
+              <Thead>
+                <tr>
+                  <Th>{t('colNumber')}</Th>
+                  <Th>{t('colCustomer')}</Th>
+                  <Th>{t('colDevice')}</Th>
+                  <Th>{t('colType')}</Th>
+                  <Th>{t('colReceived')}</Th>
+                  <Th>{t('colStatus')}</Th>
+                  <Th>{t('colPayment')}</Th>
+                  <Th align="right">{t('colAmount')}</Th>
+                </tr>
+              </Thead>
+              <Tbody>
+                {(repairs ?? []).map((r: any) => (
+                  <ClickableTr key={r.id} href={`/reparaties/${r.id}`}>
+                    <Td>
+                      <Link href={`/reparaties/${r.id}`} className="font-medium text-[var(--accent)] hover:underline">
+                        {r.repair_number}
+                      </Link>
+                    </Td>
+                    <Td className="text-ink-700">
+                      {r.customer?.first_name} {r.customer?.last_name}
+                    </Td>
+                    <Td className="text-ink-600">
+                      {r.device?.brand} {r.device?.model}
+                    </Td>
+                    <Td className="text-ink-600">{r.repair_type_label ?? '—'}</Td>
+                    <Td className="text-ink-600">{formatDate(r.date_received)}</Td>
+                    <Td>{r.status && <StatusBadge name={r.status.name} color={r.status.color} />}</Td>
+                    <Td>
+                      <PaymentStatusBadge status={r.payment_status} />
+                    </Td>
+                    <Td align="right" className="tabular-nums text-ink-900">
+                      {formatEuro(r.final_price ?? r.estimated_price)}
+                    </Td>
+                  </ClickableTr>
+                ))}
+              </Tbody>
+            </Table>
+          </Card>
+
+          <div className="space-y-2 md:hidden">
             {(repairs ?? []).map((r: any) => (
-              <ClickableTr key={r.id} href={`/reparaties/${r.id}`}>
-                <Td>
-                  <Link href={`/reparaties/${r.id}`} className="font-medium text-[var(--accent)] hover:underline">
-                    {r.repair_number}
-                  </Link>
-                </Td>
-                <Td className="text-ink-700">
+              <Link key={r.id} href={`/reparaties/${r.id}`} className="block rounded-lg border border-ink-100 bg-white p-3 shadow-card">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-medium text-[var(--accent)]">{r.repair_number}</span>
+                  <span className="shrink-0 tabular-nums font-medium text-ink-900">
+                    {formatEuro(r.final_price ?? r.estimated_price)}
+                  </span>
+                </div>
+                <div className="mt-0.5 text-sm text-ink-700">
                   {r.customer?.first_name} {r.customer?.last_name}
-                </Td>
-                <Td className="text-ink-600">
+                </div>
+                <div className="text-xs text-ink-400">
                   {r.device?.brand} {r.device?.model}
-                </Td>
-                <Td className="text-ink-600">{r.repair_type_label ?? '—'}</Td>
-                <Td className="text-ink-600">{formatDate(r.date_received)}</Td>
-                <Td>{r.status && <StatusBadge name={r.status.name} color={r.status.color} />}</Td>
-                <Td>
+                  {r.repair_type_label ? ` · ${r.repair_type_label}` : ''} · {formatDate(r.date_received)}
+                </div>
+                <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                  {r.status && <StatusBadge name={r.status.name} color={r.status.color} />}
                   <PaymentStatusBadge status={r.payment_status} />
-                </Td>
-                <Td align="right" className="tabular-nums text-ink-900">
-                  {formatEuro(r.final_price ?? r.estimated_price)}
-                </Td>
-              </ClickableTr>
+                </div>
+              </Link>
             ))}
-            {(repairs ?? []).length === 0 && (
-              <tr>
-                <td colSpan={8}>
-                  <EmptyState icon={Wrench} title={t('empty')} />
-                </td>
-              </tr>
-            )}
-          </Tbody>
-        </Table>
-      </Card>
+          </div>
+        </>
       )}
     </div>
   );

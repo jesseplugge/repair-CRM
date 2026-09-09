@@ -34,25 +34,25 @@ export default async function FactuurDetailPage({ params }: { params: { id: stri
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="font-display text-2xl font-semibold text-ink-950">{invoice.invoice_number}</h1>
           <p className="text-sm text-ink-600">
             {customer.first_name} {customer.last_name} &middot; {formatDate(invoice.invoice_date)}
           </p>
         </div>
-        <div className="flex items-start gap-2">
-          <div className="w-44">
+        <div className="flex flex-wrap items-start gap-2">
+          <div className="w-full sm:w-44">
             <PrintControls baseUrl={`/api/invoices/${invoice.id}/pdf`} label={t('print')} showFormatPicker={false} />
           </div>
-          <div className="w-40">
+          <div className="w-full sm:w-40">
             <EmailButton id={invoice.id} action={emailInvoice} defaultEmail={customer.email} />
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-6">
-        <div className="col-span-2 space-y-4">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="space-y-4 lg:col-span-2">
           <Card className="p-4">
             <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink-400">{t('lines')}</h3>
             <div className="space-y-2">

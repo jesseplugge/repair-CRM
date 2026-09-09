@@ -42,51 +42,80 @@ export default async function FacturenPage() {
         </Link>
       </div>
 
-      <Card>
-        <Table>
-          <Thead>
-            <tr>
-              <Th>{t('colNumber')}</Th>
-              <Th>{t('colCustomer')}</Th>
-              <Th>{t('colDate')}</Th>
-              <Th>{t('colStatus')}</Th>
-              <Th align="right">{t('colAmount')}</Th>
-            </tr>
-          </Thead>
-          <Tbody>
+      {(invoices ?? []).length === 0 ? (
+        <Card>
+          <EmptyState icon={FileText} title={t('empty')} />
+        </Card>
+      ) : (
+        <>
+          <Card className="hidden md:block">
+            <Table>
+              <Thead>
+                <tr>
+                  <Th>{t('colNumber')}</Th>
+                  <Th>{t('colCustomer')}</Th>
+                  <Th>{t('colDate')}</Th>
+                  <Th>{t('colStatus')}</Th>
+                  <Th align="right">{t('colAmount')}</Th>
+                </tr>
+              </Thead>
+              <Tbody>
+                {(invoices ?? []).map((inv: any) => {
+                  const label = STATUS_COLORS[inv.status] ? tStatus(inv.status as any) : inv.status;
+                  const color = STATUS_COLORS[inv.status] ?? '#495164';
+                  return (
+                    <Tr key={inv.id}>
+                      <Td>
+                        <Link href={`/facturen/${inv.id}`} className="font-medium text-[var(--accent)] hover:underline">
+                          {inv.invoice_number}
+                        </Link>
+                      </Td>
+                      <Td className="text-ink-700">
+                        {inv.customer?.first_name} {inv.customer?.last_name}
+                      </Td>
+                      <Td className="text-ink-600">{formatDate(inv.invoice_date)}</Td>
+                      <Td>
+                        <span className="rounded-full px-2.5 py-1 text-xs font-medium" style={{ backgroundColor: `${color}1a`, color }}>
+                          {label}
+                        </span>
+                      </Td>
+                      <Td align="right" className="tabular-nums text-ink-900">{formatEuro(inv.total_incl_vat)}</Td>
+                    </Tr>
+                  );
+                })}
+              </Tbody>
+            </Table>
+          </Card>
+
+          <div className="space-y-2 md:hidden">
             {(invoices ?? []).map((inv: any) => {
               const label = STATUS_COLORS[inv.status] ? tStatus(inv.status as any) : inv.status;
               const color = STATUS_COLORS[inv.status] ?? '#495164';
               return (
-                <Tr key={inv.id}>
-                  <Td>
-                    <Link href={`/facturen/${inv.id}`} className="font-medium text-[var(--accent)] hover:underline">
-                      {inv.invoice_number}
-                    </Link>
-                  </Td>
-                  <Td className="text-ink-700">
+                <Link
+                  key={inv.id}
+                  href={`/facturen/${inv.id}`}
+                  className="block rounded-lg border border-ink-100 bg-white p-3 shadow-card"
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="font-medium text-[var(--accent)]">{inv.invoice_number}</span>
+                    <span className="shrink-0 tabular-nums font-medium text-ink-900">{formatEuro(inv.total_incl_vat)}</span>
+                  </div>
+                  <div className="mt-0.5 text-sm text-ink-700">
                     {inv.customer?.first_name} {inv.customer?.last_name}
-                  </Td>
-                  <Td className="text-ink-600">{formatDate(inv.invoice_date)}</Td>
-                  <Td>
+                  </div>
+                  <div className="mt-2 flex items-center justify-between gap-2">
+                    <span className="text-xs text-ink-400">{formatDate(inv.invoice_date)}</span>
                     <span className="rounded-full px-2.5 py-1 text-xs font-medium" style={{ backgroundColor: `${color}1a`, color }}>
                       {label}
                     </span>
-                  </Td>
-                  <Td align="right" className="tabular-nums text-ink-900">{formatEuro(inv.total_incl_vat)}</Td>
-                </Tr>
+                  </div>
+                </Link>
               );
             })}
-            {(invoices ?? []).length === 0 && (
-              <tr>
-                <td colSpan={5}>
-                  <EmptyState icon={FileText} title={t('empty')} />
-                </td>
-              </tr>
-            )}
-          </Tbody>
-        </Table>
-      </Card>
+          </div>
+        </>
+      )}
     </div>
   );
 }

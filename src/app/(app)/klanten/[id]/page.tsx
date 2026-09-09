@@ -95,47 +95,66 @@ export default async function KlantProfielPage({ params }: { params: { id: strin
     </div>
   );
 
-  const repairsContent = (
-    <Table>
-      <Thead>
-        <tr>
-          <Th>{t('colNumber')}</Th>
-          <Th>{t('colType')}</Th>
-          <Th>{t('colDate')}</Th>
-          <Th>{t('colStatus')}</Th>
-          <Th>{t('colPayment')}</Th>
-          <Th align="right">{t('colAmount')}</Th>
-        </tr>
-      </Thead>
-      <Tbody>
-        {allRepairs.map((r) => (
-          <Tr key={r.id}>
-            <Td>
-              <Link href={`/reparaties/${r.id}`} className="font-medium text-[var(--accent)] hover:underline">
-                {r.repair_number}
-              </Link>
-            </Td>
-            <Td className="text-ink-600">{r.repair_type_label ?? '—'}</Td>
-            <Td className="text-ink-600">{formatDate(r.date_received)}</Td>
-            <Td>{r.status && <StatusBadge name={(r.status as any).name} color={(r.status as any).color} />}</Td>
-            <Td>
-              <PaymentStatusBadge status={r.payment_status} />
-            </Td>
-            <Td align="right" className="tabular-nums text-ink-900">
-              {formatEuro(r.final_price ?? r.estimated_price)}
-            </Td>
-          </Tr>
-        ))}
-        {allRepairs.length === 0 && (
-          <tr>
-            <td colSpan={6}>
-              <EmptyState icon={Wrench} title={t('noRepairsYet')} />
-            </td>
-          </tr>
-        )}
-      </Tbody>
-    </Table>
-  );
+  const repairsContent =
+    allRepairs.length === 0 ? (
+      <EmptyState icon={Wrench} title={t('noRepairsYet')} />
+    ) : (
+      <>
+        <div className="hidden md:block">
+          <Table>
+            <Thead>
+              <tr>
+                <Th>{t('colNumber')}</Th>
+                <Th>{t('colType')}</Th>
+                <Th>{t('colDate')}</Th>
+                <Th>{t('colStatus')}</Th>
+                <Th>{t('colPayment')}</Th>
+                <Th align="right">{t('colAmount')}</Th>
+              </tr>
+            </Thead>
+            <Tbody>
+              {allRepairs.map((r) => (
+                <Tr key={r.id}>
+                  <Td>
+                    <Link href={`/reparaties/${r.id}`} className="font-medium text-[var(--accent)] hover:underline">
+                      {r.repair_number}
+                    </Link>
+                  </Td>
+                  <Td className="text-ink-600">{r.repair_type_label ?? '—'}</Td>
+                  <Td className="text-ink-600">{formatDate(r.date_received)}</Td>
+                  <Td>{r.status && <StatusBadge name={(r.status as any).name} color={(r.status as any).color} />}</Td>
+                  <Td>
+                    <PaymentStatusBadge status={r.payment_status} />
+                  </Td>
+                  <Td align="right" className="tabular-nums text-ink-900">
+                    {formatEuro(r.final_price ?? r.estimated_price)}
+                  </Td>
+                </Tr>
+              ))}
+            </Tbody>
+          </Table>
+        </div>
+        <div className="space-y-2 p-4 md:hidden">
+          {allRepairs.map((r) => (
+            <Link key={r.id} href={`/reparaties/${r.id}`} className="block rounded-lg border border-ink-100 bg-white p-3 shadow-card">
+              <div className="flex items-center justify-between gap-2">
+                <span className="font-medium text-[var(--accent)]">{r.repair_number}</span>
+                <span className="shrink-0 tabular-nums font-medium text-ink-900">
+                  {formatEuro(r.final_price ?? r.estimated_price)}
+                </span>
+              </div>
+              <div className="text-xs text-ink-400">
+                {r.repair_type_label ?? '—'} · {formatDate(r.date_received)}
+              </div>
+              <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                {r.status && <StatusBadge name={(r.status as any).name} color={(r.status as any).color} />}
+                <PaymentStatusBadge status={r.payment_status} />
+              </div>
+            </Link>
+          ))}
+        </div>
+      </>
+    );
 
   const devicesContent = (
     <div className="space-y-3 p-4">
@@ -158,47 +177,65 @@ export default async function KlantProfielPage({ params }: { params: { id: strin
     </div>
   );
 
-  const invoicesContent = (
-    <Table>
-      <Thead>
-        <tr>
-          <Th>{t('colNumber')}</Th>
-          <Th>{t('colDate')}</Th>
-          <Th>{t('colStatus')}</Th>
-          <Th align="right">{t('colAmount')}</Th>
-        </tr>
-      </Thead>
-      <Tbody>
-        {allInvoices.map((inv) => {
-          const color = INVOICE_STATUS_COLORS[inv.status] ?? '#495164';
-          const label = INVOICE_STATUS_COLORS[inv.status] ? tInvoiceStatus(inv.status as any) : inv.status;
-          return (
-            <Tr key={inv.id}>
-              <Td>
-                <Link href={`/facturen/${inv.id}`} className="font-medium text-[var(--accent)] hover:underline">
-                  {inv.invoice_number}
-                </Link>
-              </Td>
-              <Td className="text-ink-600">{formatDate(inv.invoice_date)}</Td>
-              <Td>
-                <StatusBadge name={label} color={color} />
-              </Td>
-              <Td align="right" className="tabular-nums text-ink-900">
-                {formatEuro(inv.total_incl_vat)}
-              </Td>
-            </Tr>
-          );
-        })}
-        {allInvoices.length === 0 && (
-          <tr>
-            <td colSpan={4}>
-              <EmptyState icon={FileText} title={t('noInvoicesYet')} />
-            </td>
-          </tr>
-        )}
-      </Tbody>
-    </Table>
-  );
+  const invoicesContent =
+    allInvoices.length === 0 ? (
+      <EmptyState icon={FileText} title={t('noInvoicesYet')} />
+    ) : (
+      <>
+        <div className="hidden md:block">
+          <Table>
+            <Thead>
+              <tr>
+                <Th>{t('colNumber')}</Th>
+                <Th>{t('colDate')}</Th>
+                <Th>{t('colStatus')}</Th>
+                <Th align="right">{t('colAmount')}</Th>
+              </tr>
+            </Thead>
+            <Tbody>
+              {allInvoices.map((inv) => {
+                const color = INVOICE_STATUS_COLORS[inv.status] ?? '#495164';
+                const label = INVOICE_STATUS_COLORS[inv.status] ? tInvoiceStatus(inv.status as any) : inv.status;
+                return (
+                  <Tr key={inv.id}>
+                    <Td>
+                      <Link href={`/facturen/${inv.id}`} className="font-medium text-[var(--accent)] hover:underline">
+                        {inv.invoice_number}
+                      </Link>
+                    </Td>
+                    <Td className="text-ink-600">{formatDate(inv.invoice_date)}</Td>
+                    <Td>
+                      <StatusBadge name={label} color={color} />
+                    </Td>
+                    <Td align="right" className="tabular-nums text-ink-900">
+                      {formatEuro(inv.total_incl_vat)}
+                    </Td>
+                  </Tr>
+                );
+              })}
+            </Tbody>
+          </Table>
+        </div>
+        <div className="space-y-2 p-4 md:hidden">
+          {allInvoices.map((inv) => {
+            const color = INVOICE_STATUS_COLORS[inv.status] ?? '#495164';
+            const label = INVOICE_STATUS_COLORS[inv.status] ? tInvoiceStatus(inv.status as any) : inv.status;
+            return (
+              <Link key={inv.id} href={`/facturen/${inv.id}`} className="block rounded-lg border border-ink-100 bg-white p-3 shadow-card">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-medium text-[var(--accent)]">{inv.invoice_number}</span>
+                  <span className="shrink-0 tabular-nums font-medium text-ink-900">{formatEuro(inv.total_incl_vat)}</span>
+                </div>
+                <div className="mt-2 flex items-center justify-between gap-2">
+                  <span className="text-xs text-ink-400">{formatDate(inv.invoice_date)}</span>
+                  <StatusBadge name={label} color={color} />
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+      </>
+    );
 
   return (
     <div className="space-y-6">

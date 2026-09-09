@@ -46,19 +46,57 @@ export default async function GarantiePage() {
         <p className="text-sm text-ink-600">{t('openCount', { count: open.length })}</p>
       </div>
 
-      <Card>
-        <Table>
-          <Thead>
-            <tr>
-              <Th>{t('colClaim')}</Th>
-              <Th>{t('colRepair')}</Th>
-              <Th>{t('colCustomer')}</Th>
-              <Th>{t('colDevice')}</Th>
-              <Th>{t('colStatus')}</Th>
-              <Th>{t('colDate')}</Th>
-            </tr>
-          </Thead>
-          <Tbody>
+      {(claims ?? []).length === 0 ? (
+        <Card>
+          <EmptyState icon={ShieldCheck} title={t('empty')} />
+        </Card>
+      ) : (
+        <>
+          <Card className="hidden md:block">
+            <Table>
+              <Thead>
+                <tr>
+                  <Th>{t('colClaim')}</Th>
+                  <Th>{t('colRepair')}</Th>
+                  <Th>{t('colCustomer')}</Th>
+                  <Th>{t('colDevice')}</Th>
+                  <Th>{t('colStatus')}</Th>
+                  <Th>{t('colDate')}</Th>
+                </tr>
+              </Thead>
+              <Tbody>
+                {(claims ?? []).map((c) => {
+                  const repair = c.repair as any;
+                  const customer = repair?.customer;
+                  const device = repair?.device;
+                  const label = STATUS_KEYS[c.status] ? tTabs(STATUS_KEYS[c.status] as any) : c.status;
+                  const color = STATUS_COLORS[c.status] ?? '#495164';
+                  return (
+                    <Tr key={c.id}>
+                      <Td className="font-medium text-ink-900">{c.claim_number}</Td>
+                      <Td>
+                        {repair && (
+                          <Link href={`/reparaties/${repair.id}`} className="text-[var(--accent)] hover:underline">
+                            {repair.repair_number}
+                          </Link>
+                        )}
+                      </Td>
+                      <Td className="text-ink-700">
+                        {customer ? `${customer.first_name} ${customer.last_name}` : '—'}
+                      </Td>
+                      <Td className="text-ink-600">{device ? `${device.brand} ${device.model}` : '—'}</Td>
+                      <Td>
+                        <StatusBadge name={label} color={color} />
+                      </Td>
+                      <Td className="text-ink-600">{formatDate(c.created_at)}</Td>
+                    </Tr>
+                  );
+                })}
+              </Tbody>
+            </Table>
+          </Card>
+
+          <div className="space-y-2 md:hidden">
             {(claims ?? []).map((c) => {
               const repair = c.repair as any;
               const customer = repair?.customer;
@@ -66,36 +104,31 @@ export default async function GarantiePage() {
               const label = STATUS_KEYS[c.status] ? tTabs(STATUS_KEYS[c.status] as any) : c.status;
               const color = STATUS_COLORS[c.status] ?? '#495164';
               return (
-                <Tr key={c.id}>
-                  <Td className="font-medium text-ink-900">{c.claim_number}</Td>
-                  <Td>
-                    {repair && (
-                      <Link href={`/reparaties/${repair.id}`} className="text-[var(--accent)] hover:underline">
-                        {repair.repair_number}
-                      </Link>
-                    )}
-                  </Td>
-                  <Td className="text-ink-700">
-                    {customer ? `${customer.first_name} ${customer.last_name}` : '—'}
-                  </Td>
-                  <Td className="text-ink-600">{device ? `${device.brand} ${device.model}` : '—'}</Td>
-                  <Td>
+                <div key={c.id} className="rounded-lg border border-ink-100 bg-white p-3 shadow-card">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="font-medium text-ink-900">{c.claim_number}</span>
                     <StatusBadge name={label} color={color} />
-                  </Td>
-                  <Td className="text-ink-600">{formatDate(c.created_at)}</Td>
-                </Tr>
+                  </div>
+                  <div className="mt-0.5 text-sm text-ink-700">
+                    {customer ? `${customer.first_name} ${customer.last_name}` : '—'}
+                  </div>
+                  <div className="text-xs text-ink-400">
+                    {device ? `${device.brand} ${device.model}` : '—'} · {formatDate(c.created_at)}
+                    {repair && (
+                      <>
+                        {' · '}
+                        <Link href={`/reparaties/${repair.id}`} className="text-[var(--accent)] hover:underline">
+                          {repair.repair_number}
+                        </Link>
+                      </>
+                    )}
+                  </div>
+                </div>
               );
             })}
-            {(claims ?? []).length === 0 && (
-              <tr>
-                <td colSpan={6}>
-                  <EmptyState icon={ShieldCheck} title={t('empty')} />
-                </td>
-              </tr>
-            )}
-          </Tbody>
-        </Table>
-      </Card>
+          </div>
+        </>
+      )}
     </div>
   );
 }

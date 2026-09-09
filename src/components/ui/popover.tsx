@@ -61,7 +61,11 @@ export function Popover({
           <div
             role={role}
             className={clsx(
-              'absolute z-50 mt-2 animate-scale-in rounded-lg border border-ink-200 bg-white shadow-elevated',
+              // max-w guards against the panel overflowing a narrow phone
+              // viewport regardless of how wide `width` asks for — a fixed
+              // w-80 etc. is fine on desktop but can force page-level
+              // horizontal scroll on a ~360px-wide screen otherwise.
+              'absolute z-50 mt-2 max-w-[calc(100vw-2rem)] animate-scale-in rounded-lg border border-ink-200 bg-white shadow-elevated',
               align === 'right' ? 'right-0' : 'left-0',
               width
             )}

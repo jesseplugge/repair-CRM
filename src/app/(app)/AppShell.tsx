@@ -40,7 +40,14 @@ export function AppShell({
   return (
     <div className="flex min-h-screen" style={style}>
       {!native && <Sidebar {...sidebarProps} />}
-      <main className={clsx('flex-1 bg-ink-50 p-4 pb-24', native ? 'sm:p-6' : 'sm:p-6 lg:p-8 lg:pb-8')}>{children}</main>
+      <main
+        className={clsx(
+          'flex-1 bg-ink-50 p-4 pb-24',
+          native ? 'sm:p-6 pt-[calc(1rem+env(safe-area-inset-top))]' : 'sm:p-6 lg:p-8 lg:pb-8'
+        )}
+      >
+        {children}
+      </main>
       <MobileNav forceVisible={native} />
       <CommandPalette />
       <NativeStatusBar />

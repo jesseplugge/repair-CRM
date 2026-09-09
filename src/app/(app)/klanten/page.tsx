@@ -27,40 +27,62 @@ export default async function KlantenPage({ searchParams }: { searchParams: { q?
 
       <SearchBox defaultValue={searchParams.q ?? ''} />
 
-      <Card>
-        <Table>
-          <Thead>
-            <tr>
-              <Th>{t('colCustomer')}</Th>
-              <Th>{t('colNumber')}</Th>
-              <Th>{t('colPhone')}</Th>
-              <Th>{t('colEmail')}</Th>
-            </tr>
-          </Thead>
-          <Tbody>
+      {customers.length === 0 ? (
+        <Card>
+          <EmptyState icon={Users} title={t('empty')} />
+        </Card>
+      ) : (
+        <>
+          <Card className="hidden md:block">
+            <Table>
+              <Thead>
+                <tr>
+                  <Th>{t('colCustomer')}</Th>
+                  <Th>{t('colNumber')}</Th>
+                  <Th>{t('colPhone')}</Th>
+                  <Th>{t('colEmail')}</Th>
+                </tr>
+              </Thead>
+              <Tbody>
+                {customers.map((c) => (
+                  <Tr key={c.id}>
+                    <Td>
+                      <Link href={`/klanten/${c.id}`} className="font-medium text-ink-900 hover:text-[var(--accent)]">
+                        {c.first_name} {c.last_name}
+                      </Link>
+                      {c.company_name && <div className="text-xs text-ink-400">{c.company_name}</div>}
+                    </Td>
+                    <Td className="tabular-nums text-ink-600">{c.customer_number}</Td>
+                    <Td className="text-ink-600">{c.phone ?? '—'}</Td>
+                    <Td className="text-ink-600">{c.email ?? '—'}</Td>
+                  </Tr>
+                ))}
+              </Tbody>
+            </Table>
+          </Card>
+
+          <div className="space-y-2 md:hidden">
             {customers.map((c) => (
-              <Tr key={c.id}>
-                <Td>
-                  <Link href={`/klanten/${c.id}`} className="font-medium text-ink-900 hover:text-[var(--accent)]">
+              <Link key={c.id} href={`/klanten/${c.id}`} className="block rounded-lg border border-ink-100 bg-white p-3 shadow-card">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-medium text-ink-900">
                     {c.first_name} {c.last_name}
-                  </Link>
-                  {c.company_name && <div className="text-xs text-ink-400">{c.company_name}</div>}
-                </Td>
-                <Td className="tabular-nums text-ink-600">{c.customer_number}</Td>
-                <Td className="text-ink-600">{c.phone ?? '—'}</Td>
-                <Td className="text-ink-600">{c.email ?? '—'}</Td>
-              </Tr>
+                  </span>
+                  <span className="shrink-0 tabular-nums text-xs text-ink-400">{c.customer_number}</span>
+                </div>
+                {c.company_name && <div className="text-xs text-ink-400">{c.company_name}</div>}
+                {(c.phone || c.email) && (
+                  <div className="mt-1 text-xs text-ink-600">
+                    {c.phone}
+                    {c.phone && c.email ? ' · ' : ''}
+                    {c.email}
+                  </div>
+                )}
+              </Link>
             ))}
-            {customers.length === 0 && (
-              <tr>
-                <td colSpan={4}>
-                  <EmptyState icon={Users} title={t('empty')} />
-                </td>
-              </tr>
-            )}
-          </Tbody>
-        </Table>
-      </Card>
+          </div>
+        </>
+      )}
     </div>
   );
 }
