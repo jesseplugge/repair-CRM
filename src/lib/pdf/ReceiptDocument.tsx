@@ -64,7 +64,10 @@ function styles(format: DocFormat) {
     headerRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 2 },
     logo: { width: thermal ? 28 : 40, height: thermal ? 28 : 40, objectFit: 'contain' },
     small: { fontSize: base - 1, color: '#495164' },
-    row: { flexDirection: 'row', justifyContent: 'space-between' },
+    // Thermal receipts are too narrow to reliably fit a document number and a
+    // full date/time side by side without them running into each other —
+    // stack them instead. A4/A5 have room to keep them on one row.
+    row: thermal ? { marginBottom: 2 } : { flexDirection: 'row', justifyContent: 'space-between' },
     section: { marginTop: thermal ? 8 : 14 },
     sectionTitle: { fontSize: base, fontFamily: 'Helvetica-Bold', marginBottom: 4, textTransform: 'uppercase' },
     hr: { borderBottomWidth: 1, borderBottomColor: '#C7CCD6', marginVertical: thermal ? 6 : 10 },
