@@ -287,7 +287,8 @@
     "photoUploaded": "Foto geüpload",
     "photoDeleted": "Foto verwijderd",
     "activity": "Activiteit",
-    "testedCount": "{tested} van {total} getest"
+    "testedCount": "{tested} van {total} getest",
+    "choosePhoto": "Foto kiezen"
   },
   "warrantyPage": {
     "title": "Garantie",
@@ -819,7 +820,8 @@
   "logoUploader": {
     "uploading": "Uploaden…",
     "upload": "Uploaden",
-    "hint": "PNG/JPG/SVG, max 2MB. Verschijnt op bonnen en facturen."
+    "hint": "PNG/JPG/SVG, max 2MB. Verschijnt op bonnen en facturen.",
+    "chooseFile": "Bestand kiezen"
   },
   "accentColorPicker": {
     "hint": "Kleurt knoppen, actieve menu-items en documenten."

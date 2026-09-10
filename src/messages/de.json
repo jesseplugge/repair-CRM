@@ -287,7 +287,8 @@
     "photoUploaded": "Foto hochgeladen",
     "photoDeleted": "Foto gelöscht",
     "activity": "Aktivität",
-    "testedCount": "{tested} von {total} getestet"
+    "testedCount": "{tested} von {total} getestet",
+    "choosePhoto": "Foto wählen"
   },
   "warrantyPage": {
     "title": "Garantie",
@@ -819,7 +820,8 @@
   "logoUploader": {
     "uploading": "Wird hochgeladen…",
     "upload": "Hochladen",
-    "hint": "PNG/JPG/SVG, max. 2MB. Erscheint auf Belegen und Rechnungen."
+    "hint": "PNG/JPG/SVG, max. 2MB. Erscheint auf Belegen und Rechnungen.",
+    "chooseFile": "Datei wählen"
   },
   "accentColorPicker": {
     "hint": "Färbt Schaltflächen, aktive Menüpunkte und Dokumente."

@@ -287,7 +287,8 @@
     "photoUploaded": "Photo uploaded",
     "photoDeleted": "Photo deleted",
     "activity": "Activity",
-    "testedCount": "{tested} of {total} tested"
+    "testedCount": "{tested} of {total} tested",
+    "choosePhoto": "Choose photo"
   },
   "warrantyPage": {
     "title": "Warranty",
@@ -819,7 +820,8 @@
   "logoUploader": {
     "uploading": "Uploading…",
     "upload": "Upload",
-    "hint": "PNG/JPG/SVG, max 2MB. Appears on receipts and invoices."
+    "hint": "PNG/JPG/SVG, max 2MB. Appears on receipts and invoices.",
+    "chooseFile": "Choose file"
   },
   "accentColorPicker": {
     "hint": "Colours buttons, active menu items and documents."

@@ -287,7 +287,8 @@
     "photoUploaded": "Fotoğraf yüklendi",
     "photoDeleted": "Fotoğraf silindi",
     "activity": "Etkinlik",
-    "testedCount": "{total} üründen {tested} test edildi"
+    "testedCount": "{total} üründen {tested} test edildi",
+    "choosePhoto": "Fotoğraf seç"
   },
   "warrantyPage": {
     "title": "Garanti",
@@ -819,7 +820,8 @@
   "logoUploader": {
     "uploading": "Yükleniyor…",
     "upload": "Yükle",
-    "hint": "PNG/JPG/SVG, maks. 2MB. Fişlerde ve faturalarda görünür."
+    "hint": "PNG/JPG/SVG, maks. 2MB. Fişlerde ve faturalarda görünür.",
+    "chooseFile": "Dosya seç"
   },
   "accentColorPicker": {
     "hint": "Düğmeleri, aktif menü öğelerini ve belgeleri renklendirir."

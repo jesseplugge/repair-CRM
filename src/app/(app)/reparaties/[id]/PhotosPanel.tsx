@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { useFormState, useFormStatus } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
@@ -39,7 +39,9 @@ export function PhotosPanel({
 }) {
   const [state, formAction] = useFormState(uploadRepairPhoto, { error: '' });
   const [preview, setPreview] = useState<string | null>(null);
+  const [fileName, setFileName] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const fileInputId = useId();
   const router = useRouter();
   const t = useTranslations('repairTabs');
   const toast = useToast();
@@ -68,15 +70,23 @@ export function PhotosPanel({
         action={(fd) => {
           formAction(fd);
           setPreview(null);
+          setFileName(null);
           if (fileInputRef.current) fileInputRef.current.value = '';
         }}
         className="flex flex-wrap items-end gap-2"
       >
         <input type="hidden" name="repair_id" value={repairId} />
-        <div>
-          <label className="mb-1 block text-xs font-medium text-ink-600">{t('photo')}</label>
+        <div className="min-w-0">
+          <label htmlFor={fileInputId} className="mb-1 block text-xs font-medium text-ink-600">
+            {t('photo')}
+          </label>
+          {/* A raw <input type="file"> renders its native "Choose File" chrome
+              at an intrinsic width that ignores CSS width/max-width in many
+              WebKit versions — hide it and trigger it from a styled label
+              instead, which sidesteps the browser chrome entirely. */}
           <input
             ref={fileInputRef}
+            id={fileInputId}
             type="file"
             name="photo"
             accept="image/*"
@@ -84,9 +94,16 @@ export function PhotosPanel({
             onChange={(e) => {
               const file = e.target.files?.[0];
               setPreview(file ? URL.createObjectURL(file) : null);
+              setFileName(file?.name ?? null);
             }}
-            className="block text-sm text-ink-600"
+            className="sr-only"
           />
+          <label
+            htmlFor={fileInputId}
+            className="focus-ring inline-block max-w-[10rem] cursor-pointer truncate rounded border border-ink-200 bg-white px-2 py-1.5 text-sm text-ink-600 hover:bg-ink-50"
+          >
+            {fileName ?? t('choosePhoto')}
+          </label>
         </div>
         <div>
           <label className="mb-1 block text-xs font-medium text-ink-600">{t('label')}</label>
