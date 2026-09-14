@@ -4,7 +4,7 @@ import { createClient, getCurrentUser } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
-import { calculateFromInclVat } from '@/lib/utils/currency';
+import { calculateFromExclVat, calculateFromInclVat } from '@/lib/utils/currency';
 
 export async function createProduct(_prevState: { error?: string }, formData: FormData) {
   const user = await getCurrentUser();
@@ -23,14 +23,22 @@ export async function createProduct(_prevState: { error?: string }, formData: Fo
   const vatRate = parseFloat((formData.get('vat_rate') as string) || '21');
 
   // Buying and selling price each have their own independent "includes VAT"
-  // toggle — the stored *_excl_vat columns always stay excl.-VAT so every
-  // downstream consumer (POS, product list) keeps working unchanged.
+  // toggle. Whichever side the price was actually entered on is kept exact
+  // (never re-derived) and the other side is calculated from it — at 21% VAT
+  // some incl.-VAT amounts (e.g. 79,95) have no excl.-VAT cent value that
+  // converts back to them exactly, so storing only excl.-VAT and computing
+  // incl. at render/sale time could silently charge a cent off. Storing both,
+  // with the entered side authoritative, is what POS/product list read from.
   const purchasePriceRaw = parseFloat((formData.get('purchase_price') as string) || '0');
   const purchaseIncludesVat = formData.get('purchase_price_includes_vat') === 'on';
-  const purchasePriceExclVat = purchaseIncludesVat ? calculateFromInclVat(purchasePriceRaw, vatRate).exclVat : purchasePriceRaw;
+  const purchaseCalc = purchaseIncludesVat
+    ? calculateFromInclVat(purchasePriceRaw, vatRate)
+    : calculateFromExclVat(purchasePriceRaw, vatRate);
 
   const sellingIncludesVat = formData.get('selling_price_includes_vat') === 'on';
-  const sellingPriceExclVat = sellingIncludesVat ? calculateFromInclVat(sellingPriceRaw, vatRate).exclVat : sellingPriceRaw;
+  const sellingCalc = sellingIncludesVat
+    ? calculateFromInclVat(sellingPriceRaw, vatRate)
+    : calculateFromExclVat(sellingPriceRaw, vatRate);
 
   const { error } = await supabase.from('products').insert({
     business_id: user.business_id,
@@ -38,8 +46,10 @@ export async function createProduct(_prevState: { error?: string }, formData: Fo
     sku: (formData.get('sku') as string) || null,
     category_id: categoryId,
     supplier_id: supplierId,
-    purchase_price_excl_vat: purchasePriceExclVat,
-    selling_price_excl_vat: sellingPriceExclVat,
+    purchase_price_excl_vat: purchaseCalc.exclVat,
+    purchase_price_incl_vat: purchaseCalc.inclVat,
+    selling_price_excl_vat: sellingCalc.exclVat,
+    selling_price_incl_vat: sellingCalc.inclVat,
     vat_rate: vatRate,
     stock_quantity: parseFloat((formData.get('stock_quantity') as string) || '0'),
     minimum_stock: parseFloat((formData.get('minimum_stock') as string) || '0'),

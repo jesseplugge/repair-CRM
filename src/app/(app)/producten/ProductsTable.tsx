@@ -12,15 +12,20 @@ type Product = {
   sku: string | null;
   category: { name: string } | null;
   purchase_price_excl_vat: number | null;
+  purchase_price_incl_vat: number | null;
   selling_price_excl_vat: number;
+  selling_price_incl_vat: number | null;
   vat_rate: number;
   stock_quantity: number;
   minimum_stock: number | null;
 };
 
-function priceFor(exclVat: number | null | undefined, vatRate: number, showIncl: boolean) {
-  const excl = exclVat ?? 0;
-  return showIncl ? excl * (1 + vatRate / 100) : excl;
+// The incl.-VAT price is read from its own stored column rather than
+// recalculated from excl.-VAT — at 21% VAT some incl.-VAT amounts (e.g.
+// 79,95) have no excl.-VAT cent value that converts back to them exactly.
+function priceFor(exclVat: number | null | undefined, inclVat: number | null | undefined, showIncl: boolean) {
+  if (showIncl) return inclVat ?? exclVat ?? 0;
+  return exclVat ?? 0;
 }
 
 function VatToggle({ showIncl, onChange }: { showIncl: boolean; onChange: (showIncl: boolean) => void }) {
@@ -78,10 +83,10 @@ export function ProductsTable({ products }: { products: Product[] }) {
                 <Td className="text-ink-500">{p.sku ?? '—'}</Td>
                 <Td className="text-ink-500">{p.category?.name ?? '—'}</Td>
                 <Td align="right" className="tabular-nums text-ink-600">
-                  {formatEuro(priceFor(p.purchase_price_excl_vat, p.vat_rate, purchaseIncl))}
+                  {formatEuro(priceFor(p.purchase_price_excl_vat, p.purchase_price_incl_vat, purchaseIncl))}
                 </Td>
                 <Td align="right" className="tabular-nums text-ink-900">
-                  {formatEuro(priceFor(p.selling_price_excl_vat, p.vat_rate, sellIncl))}
+                  {formatEuro(priceFor(p.selling_price_excl_vat, p.selling_price_incl_vat, sellIncl))}
                 </Td>
                 <Td align="right" className="text-ink-600">{p.vat_rate}%</Td>
                 <Td
@@ -123,10 +128,10 @@ export function ProductsTable({ products }: { products: Product[] }) {
             </div>
             <div className="mt-1.5 flex items-center justify-between gap-2 text-sm">
               <span className="min-w-0 truncate text-ink-600">
-                {t('colPurchase')}: {formatEuro(priceFor(p.purchase_price_excl_vat, p.vat_rate, purchaseIncl))}
+                {t('colPurchase')}: {formatEuro(priceFor(p.purchase_price_excl_vat, p.purchase_price_incl_vat, purchaseIncl))}
               </span>
               <span className="shrink-0 font-medium text-ink-900">
-                {formatEuro(priceFor(p.selling_price_excl_vat, p.vat_rate, sellIncl))}
+                {formatEuro(priceFor(p.selling_price_excl_vat, p.selling_price_incl_vat, sellIncl))}
               </span>
             </div>
           </div>

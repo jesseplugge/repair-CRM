@@ -10,7 +10,15 @@ import { Button, Card, Input } from '@/components/ui/primitives';
 import { formatEuro } from '@/lib/utils/currency';
 import { Search, Trash2, Banknote, CreditCard, Landmark, Link2, CheckCircle2, User } from 'lucide-react';
 
-type Product = { id: string; name: string; sku: string | null; selling_price_excl_vat: number; vat_rate: number; stock_quantity: number };
+type Product = {
+  id: string;
+  name: string;
+  sku: string | null;
+  selling_price_excl_vat: number;
+  selling_price_incl_vat: number | null;
+  vat_rate: number;
+  stock_quantity: number;
+};
 type CustomerLite = { id: string; first_name: string; last_name: string; phone: string | null; email?: string | null };
 
 export function PosTerminal() {
@@ -74,6 +82,7 @@ export function PosTerminal() {
           description: p.name,
           quantity: 1,
           unitPriceExclVat: p.selling_price_excl_vat,
+          unitPriceInclVat: p.selling_price_incl_vat,
           vatRate: p.vat_rate,
         },
       ];
@@ -90,7 +99,10 @@ export function PosTerminal() {
     setCart((prev) => prev.map((l) => (l.key === key ? { ...l, quantity } : l)));
   }
 
-  const totalInclVat = cart.reduce((s, l) => s + l.unitPriceExclVat * l.quantity * (1 + l.vatRate / 100), 0);
+  const totalInclVat = cart.reduce(
+    (s, l) => s + (l.unitPriceInclVat ?? l.unitPriceExclVat * (1 + l.vatRate / 100)) * l.quantity,
+    0
+  );
 
   function checkout() {
     setError(null);
@@ -150,7 +162,9 @@ export function PosTerminal() {
                   <div className="font-medium text-ink-900">{p.name}</div>
                   <div className="text-xs text-ink-400">{p.sku ?? ''} &middot; {t('stock', { count: p.stock_quantity })}</div>
                 </div>
-                <div className="tabular-nums text-ink-900">{formatEuro(p.selling_price_excl_vat * (1 + p.vat_rate / 100))}</div>
+                <div className="tabular-nums text-ink-900">
+                  {formatEuro(p.selling_price_incl_vat ?? p.selling_price_excl_vat * (1 + p.vat_rate / 100))}
+                </div>
               </button>
             ))}
           </Card>
@@ -213,7 +227,9 @@ export function PosTerminal() {
                     </button>
                   </div>
                 </div>
-                <div className="tabular-nums text-ink-900">{formatEuro(l.unitPriceExclVat * l.quantity * (1 + l.vatRate / 100))}</div>
+                <div className="tabular-nums text-ink-900">
+                  {formatEuro((l.unitPriceInclVat ?? l.unitPriceExclVat * (1 + l.vatRate / 100)) * l.quantity)}
+                </div>
                 <button onClick={() => updateQty(l.key, 0)} className="ml-2 text-ink-300 hover:text-red-600">
                   <Trash2 size={14} />
                 </button>

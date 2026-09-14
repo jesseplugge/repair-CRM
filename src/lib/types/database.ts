@@ -155,7 +155,9 @@ export interface Database {
         category_id: string | null;
         supplier_id: string | null;
         purchase_price_excl_vat: number | null;
+        purchase_price_incl_vat: number | null;
         selling_price_excl_vat: number;
+        selling_price_incl_vat: number | null;
         vat_rate: number;
         stock_quantity: number;
         minimum_stock: number | null;

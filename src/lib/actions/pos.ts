@@ -3,7 +3,7 @@
 import { createClient, getCurrentUser } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { calculateFromExclVat } from '@/lib/utils/currency';
+import { calculateFromExclVat, calculateFromInclVat } from '@/lib/utils/currency';
 import { insertPayment } from './payments';
 import { getTranslations } from 'next-intl/server';
 
@@ -12,6 +12,7 @@ export type CartLine = {
   description: string;
   quantity: number;
   unitPriceExclVat: number;
+  unitPriceInclVat?: number | null;
   vatRate: number;
 };
 
@@ -29,8 +30,16 @@ export async function checkoutPosSale(
   }
   const supabase = createClient();
 
+  // Prefer the incl.-VAT unit price when we have one: at 21% VAT some incl.
+  // amounts (e.g. 79,95) have no excl.-VAT cent value that converts back to
+  // them exactly, so deriving the charge from excl.-VAT could bill a cent
+  // off from the advertised price. Basing the line total on incl.-VAT
+  // guarantees the customer is charged exactly what the product list shows.
   const computed = lines.map((l) => {
-    const { exclVat, inclVat } = calculateFromExclVat(l.unitPriceExclVat * l.quantity, l.vatRate);
+    const { exclVat, inclVat } =
+      l.unitPriceInclVat != null
+        ? calculateFromInclVat(l.unitPriceInclVat * l.quantity, l.vatRate)
+        : calculateFromExclVat(l.unitPriceExclVat * l.quantity, l.vatRate);
     return { ...l, totalExclVat: exclVat, totalInclVat: inclVat };
   });
   const subtotalExclVat = computed.reduce((s, l) => s + l.totalExclVat, 0);
