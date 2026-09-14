@@ -114,13 +114,23 @@ export function AddProductForm({ categories, suppliers }: { categories: Option[]
             />
           </Field>
         </div>
-        <div className="grid grid-cols-4 gap-3">
-          <Field label={t('purchaseExclVat')}>
-            <Input name="purchase_price_excl_vat" type="number" step="0.01" defaultValue="0" />
+        <div className="grid grid-cols-2 gap-3">
+          <Field label={t('purchasePrice')}>
+            <Input name="purchase_price" type="number" step="0.01" defaultValue="0" />
+            <label className="mt-1.5 flex items-center gap-1.5 text-xs text-ink-600">
+              <input type="checkbox" name="purchase_price_includes_vat" />
+              {t('priceIncludesVat')}
+            </label>
           </Field>
-          <Field label={t('sellExclVat')}>
-            <Input name="selling_price_excl_vat" type="number" step="0.01" required />
+          <Field label={t('sellPrice')}>
+            <Input name="selling_price" type="number" step="0.01" required />
+            <label className="mt-1.5 flex items-center gap-1.5 text-xs text-ink-600">
+              <input type="checkbox" name="selling_price_includes_vat" />
+              {t('priceIncludesVat')}
+            </label>
           </Field>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
           <Field label={t('vatRate')}>
             <select name="vat_rate" defaultValue="21" className="w-full rounded border border-ink-200 bg-white px-3 py-2 text-sm">
               <option value="21">21%</option>

@@ -4,6 +4,7 @@ import { createClient, getCurrentUser } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
+import { calculateFromInclVat } from '@/lib/utils/currency';
 
 export async function createProduct(_prevState: { error?: string }, formData: FormData) {
   const user = await getCurrentUser();
@@ -11,14 +12,25 @@ export async function createProduct(_prevState: { error?: string }, formData: Fo
   const supabase = createClient();
 
   const name = (formData.get('name') as string)?.trim();
-  const sellingPrice = parseFloat(formData.get('selling_price_excl_vat') as string);
-  if (!name || isNaN(sellingPrice)) {
+  const sellingPriceRaw = parseFloat(formData.get('selling_price') as string);
+  if (!name || isNaN(sellingPriceRaw)) {
     const t = await getTranslations('productErrors');
     return { error: t('nameAndPriceRequired') };
   }
 
   const categoryId = (formData.get('category_id') as string) || null;
   const supplierId = (formData.get('supplier_id') as string) || null;
+  const vatRate = parseFloat((formData.get('vat_rate') as string) || '21');
+
+  // Buying and selling price each have their own independent "includes VAT"
+  // toggle — the stored *_excl_vat columns always stay excl.-VAT so every
+  // downstream consumer (POS, product list) keeps working unchanged.
+  const purchasePriceRaw = parseFloat((formData.get('purchase_price') as string) || '0');
+  const purchaseIncludesVat = formData.get('purchase_price_includes_vat') === 'on';
+  const purchasePriceExclVat = purchaseIncludesVat ? calculateFromInclVat(purchasePriceRaw, vatRate).exclVat : purchasePriceRaw;
+
+  const sellingIncludesVat = formData.get('selling_price_includes_vat') === 'on';
+  const sellingPriceExclVat = sellingIncludesVat ? calculateFromInclVat(sellingPriceRaw, vatRate).exclVat : sellingPriceRaw;
 
   const { error } = await supabase.from('products').insert({
     business_id: user.business_id,
@@ -26,9 +38,9 @@ export async function createProduct(_prevState: { error?: string }, formData: Fo
     sku: (formData.get('sku') as string) || null,
     category_id: categoryId,
     supplier_id: supplierId,
-    purchase_price_excl_vat: parseFloat((formData.get('purchase_price_excl_vat') as string) || '0'),
-    selling_price_excl_vat: sellingPrice,
-    vat_rate: parseFloat((formData.get('vat_rate') as string) || '21'),
+    purchase_price_excl_vat: purchasePriceExclVat,
+    selling_price_excl_vat: sellingPriceExclVat,
+    vat_rate: vatRate,
     stock_quantity: parseFloat((formData.get('stock_quantity') as string) || '0'),
     minimum_stock: parseFloat((formData.get('minimum_stock') as string) || '0'),
     notes: (formData.get('notes') as string) || null,
