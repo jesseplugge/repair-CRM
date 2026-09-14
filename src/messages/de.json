@@ -284,6 +284,8 @@
     "statusRepairing": "In Reparatur",
     "statusResolved": "Erledigt",
     "claimCreated": "Garantiefall erstellt",
+    "deleteClaimConfirmTitle": "Garantiefall löschen",
+    "deleteClaimConfirmBody": "Möchtest du den Garantiefall {claimNumber} wirklich löschen? Dies kann nicht rückgängig gemacht werden.",
     "photoUploaded": "Foto hochgeladen",
     "photoDeleted": "Foto gelöscht",
     "activity": "Aktivität",

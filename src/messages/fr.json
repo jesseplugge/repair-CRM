@@ -284,6 +284,8 @@
     "statusRepairing": "En réparation",
     "statusResolved": "Résolue",
     "claimCreated": "Réclamation de garantie créée",
+    "deleteClaimConfirmTitle": "Supprimer la réclamation de garantie",
+    "deleteClaimConfirmBody": "Voulez-vous vraiment supprimer la réclamation {claimNumber} ? Cette action est irréversible.",
     "photoUploaded": "Photo ajoutée",
     "photoDeleted": "Photo supprimée",
     "activity": "Activité",

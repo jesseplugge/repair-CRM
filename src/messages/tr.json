@@ -284,6 +284,8 @@
     "statusRepairing": "Onarımda",
     "statusResolved": "Çözüldü",
     "claimCreated": "Garanti talebi oluşturuldu",
+    "deleteClaimConfirmTitle": "Garanti talebini sil",
+    "deleteClaimConfirmBody": "{claimNumber} talebini silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.",
     "photoUploaded": "Fotoğraf yüklendi",
     "photoDeleted": "Fotoğraf silindi",
     "activity": "Etkinlik",

@@ -284,6 +284,8 @@
     "statusRepairing": "En reparación",
     "statusResolved": "Resuelta",
     "claimCreated": "Reclamación de garantía creada",
+    "deleteClaimConfirmTitle": "Eliminar reclamación de garantía",
+    "deleteClaimConfirmBody": "¿Seguro que quieres eliminar la reclamación {claimNumber}? Esta acción no se puede deshacer.",
     "photoUploaded": "Foto subida",
     "photoDeleted": "Foto eliminada",
     "activity": "Actividad",

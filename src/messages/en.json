@@ -284,6 +284,8 @@
     "statusRepairing": "Repairing",
     "statusResolved": "Resolved",
     "claimCreated": "Warranty claim created",
+    "deleteClaimConfirmTitle": "Delete warranty claim",
+    "deleteClaimConfirmBody": "Are you sure you want to delete claim {claimNumber}? This cannot be undone.",
     "photoUploaded": "Photo uploaded",
     "photoDeleted": "Photo deleted",
     "activity": "Activity",

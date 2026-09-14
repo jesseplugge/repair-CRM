@@ -7,6 +7,7 @@ import { EmptyState } from '@/components/ui/empty-state';
 import { StatusBadge } from '@/components/StatusBadge';
 import { formatDate } from '@/lib/utils/format';
 import { ShieldCheck } from 'lucide-react';
+import { DeleteClaimButton } from './DeleteClaimButton';
 
 const STATUS_KEYS: Record<string, string> = {
   new: 'statusNew',
@@ -62,6 +63,7 @@ export default async function GarantiePage() {
                   <Th>{t('colDevice')}</Th>
                   <Th>{t('colStatus')}</Th>
                   <Th>{t('colDate')}</Th>
+                  <Th></Th>
                 </tr>
               </Thead>
               <Tbody>
@@ -89,6 +91,9 @@ export default async function GarantiePage() {
                         <StatusBadge name={label} color={color} />
                       </Td>
                       <Td className="text-ink-600">{formatDate(c.created_at)}</Td>
+                      <Td>
+                        <DeleteClaimButton claimId={c.id} repairId={c.repair_id} claimNumber={c.claim_number} />
+                      </Td>
                     </Tr>
                   );
                 })}
@@ -107,8 +112,9 @@ export default async function GarantiePage() {
                 <div key={c.id} className="rounded-lg border border-ink-100 bg-white p-3 shadow-card">
                   <div className="flex items-center justify-between gap-2">
                     <span className="min-w-0 truncate font-medium text-ink-900">{c.claim_number}</span>
-                    <span className="shrink-0">
+                    <span className="flex shrink-0 items-center gap-1">
                       <StatusBadge name={label} color={color} />
+                      <DeleteClaimButton claimId={c.id} repairId={c.repair_id} claimNumber={c.claim_number} />
                     </span>
                   </div>
                   <div className="mt-0.5 break-words text-sm text-ink-700">

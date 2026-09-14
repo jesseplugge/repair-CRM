@@ -284,6 +284,8 @@
     "statusRepairing": "In reparatie",
     "statusResolved": "Afgehandeld",
     "claimCreated": "Garantieclaim aangemaakt",
+    "deleteClaimConfirmTitle": "Garantieclaim verwijderen",
+    "deleteClaimConfirmBody": "Weet je zeker dat je claim {claimNumber} wilt verwijderen? Dit kan niet ongedaan worden gemaakt.",
     "photoUploaded": "Foto geüpload",
     "photoDeleted": "Foto verwijderd",
     "activity": "Activiteit",

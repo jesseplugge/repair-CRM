@@ -61,3 +61,21 @@ export async function updateWarrantyClaimStatus(claimId: string, status: string,
   revalidatePath('/garantie');
   return { error: undefined };
 }
+
+export async function deleteWarrantyClaim(claimId: string, repairId: string): Promise<{ error?: string }> {
+  const user = await getCurrentUser();
+  const tCommon = await getTranslations('common');
+  if (!user) return { error: tCommon('notLoggedIn') };
+
+  const supabase = createClient();
+  const { error } = await supabase
+    .from('warranty_claims')
+    .delete()
+    .eq('id', claimId)
+    .eq('business_id', user.business_id);
+  if (error) return { error: error.message };
+
+  revalidatePath(`/reparaties/${repairId}`);
+  revalidatePath('/garantie');
+  return { error: undefined };
+}

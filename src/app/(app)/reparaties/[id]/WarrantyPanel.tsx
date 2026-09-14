@@ -4,9 +4,10 @@ import { useEffect, useRef, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { useFormState, useFormStatus } from 'react-dom';
 import { useTranslations } from 'next-intl';
-import { createWarrantyClaim, updateWarrantyClaimStatus } from '@/lib/actions/warranty';
+import { createWarrantyClaim, updateWarrantyClaimStatus, deleteWarrantyClaim } from '@/lib/actions/warranty';
 import { Button, Field, Textarea } from '@/components/ui/primitives';
 import { StatusBadge } from '@/components/StatusBadge';
+import { ConfirmDeleteButton } from '@/components/ui/confirm-delete-button';
 import { useToast } from '@/components/ui/toast';
 import { formatDate } from '@/lib/utils/format';
 import { Plus } from 'lucide-react';
@@ -47,7 +48,7 @@ function SubmitButton() {
   );
 }
 
-function ClaimRow({ claim }: { claim: WarrantyClaim }) {
+function ClaimRow({ claim, repairId }: { claim: WarrantyClaim; repairId: string }) {
   const [pending, startTransition] = useTransition();
   const router = useRouter();
   const t = useTranslations('repairTabs');
@@ -56,9 +57,16 @@ function ClaimRow({ claim }: { claim: WarrantyClaim }) {
 
   return (
     <div className="rounded border border-ink-100 p-3 text-sm">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-2">
         <span className="font-medium text-ink-900">{claim.claim_number}</span>
-        <StatusBadge name={label} color={color} />
+        <div className="flex items-center gap-1">
+          <StatusBadge name={label} color={color} />
+          <ConfirmDeleteButton
+            title={t('deleteClaimConfirmTitle')}
+            body={t('deleteClaimConfirmBody', { claimNumber: claim.claim_number })}
+            onConfirm={() => deleteWarrantyClaim(claim.id, repairId)}
+          />
+        </div>
       </div>
       <p className="mt-1 text-ink-600">{claim.description}</p>
       {claim.resolution && <p className="mt-1 text-xs italic text-ink-500">{t('resolutionLabel', { resolution: claim.resolution })}</p>}
@@ -108,7 +116,7 @@ export function WarrantyPanel({ repairId, claims }: { repairId: string; claims: 
   return (
     <div className="space-y-3">
       {claims.map((c) => (
-        <ClaimRow key={c.id} claim={c} />
+        <ClaimRow key={c.id} claim={c} repairId={repairId} />
       ))}
       {claims.length === 0 && !open && <p className="text-sm text-ink-400">{t('noClaimsYet')}</p>}
 
