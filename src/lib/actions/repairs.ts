@@ -387,11 +387,17 @@ export async function addRepairItem(repairId: string, formData: FormData) {
     return { error: t('descriptionAndPriceRequired') };
   }
 
-  // priceRaw is a per-unit price; back it out to a per-unit excl.-VAT price
-  // first so the stored unit price and the quantity-scaled totals agree,
-  // regardless of which way the tech entered it.
+  // priceRaw is a per-unit price. selling_price_excl_vat is kept as an
+  // informational per-unit reference, but the line totals are what gets
+  // charged/shown — when the tech entered an incl.-VAT price, base the total
+  // directly on that incl.-VAT amount (like the POS checkout does) rather
+  // than converting to excl.-VAT and back, which can round to a different
+  // cent (e.g. 79,95 incl. at 21% has no excl.-VAT value that converts back
+  // to it exactly).
   const unitExclVat = priceIncludesVat ? calculateFromInclVat(priceRaw, vatRate).exclVat : priceRaw;
-  const { exclVat, inclVat } = calculateFromExclVat(unitExclVat * quantity, vatRate);
+  const { exclVat, inclVat } = priceIncludesVat
+    ? calculateFromInclVat(priceRaw * quantity, vatRate)
+    : calculateFromExclVat(unitExclVat * quantity, vatRate);
 
   const { error } = await supabase.from('repair_items').insert({
     repair_id: repairId,
