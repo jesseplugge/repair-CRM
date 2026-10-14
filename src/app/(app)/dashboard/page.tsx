@@ -3,7 +3,7 @@ import { getLocale, getTranslations } from 'next-intl/server';
 import { createClient, getCurrentUser } from '@/lib/supabase/server';
 import { formatEuro } from '@/lib/utils/currency';
 import { getNotifications } from '@/lib/actions/notifications';
-import { Phone, Plus } from 'lucide-react';
+import { FileText, Phone, Plus, Search, ShoppingCart, UserPlus } from 'lucide-react';
 
 export default async function DashboardPage() {
   const user = await getCurrentUser();
@@ -11,6 +11,13 @@ export default async function DashboardPage() {
   const t = await getTranslations('dashboard');
 
   const locale = await getLocale();
+
+  const SHORTCUTS = [
+    { href: '/kassa', label: t('quickSale'), icon: ShoppingCart },
+    { href: '/klanten/nieuw', label: t('quickNewCustomer'), icon: UserPlus },
+    { href: '/klanten', label: t('quickFindCustomer'), icon: Search },
+    { href: '/facturen', label: t('quickInvoice'), icon: FileText },
+  ];
 
   const startOfToday = new Date();
   startOfToday.setHours(0, 0, 0, 0);
@@ -126,13 +133,25 @@ export default async function DashboardPage() {
             {t('todaySentenceRepairs', { received: receivedToday, unpaid })}
           </p>
         </div>
-        <Link
-          href="/reparaties/nieuw"
-          className="focus-ring inline-flex items-center gap-2 rounded bg-signal-500 px-4 py-2.5 text-sm font-semibold text-ink-950 hover:bg-signal-600"
-        >
-          <Plus size={18} strokeWidth={2.5} />
-          {t('quickNewRepair')}
-        </Link>
+        <nav aria-label={t('quickStart')} className="flex flex-wrap items-center gap-2">
+          {SHORTCUTS.map(({ href, label, icon: Icon }) => (
+            <Link
+              key={href}
+              href={href}
+              className="focus-ring inline-flex items-center gap-2 rounded border border-ink-200 bg-white px-3 py-2.5 text-sm font-medium text-ink-900 hover:border-ink-400"
+            >
+              <Icon size={16} className="text-ink-600" />
+              {label}
+            </Link>
+          ))}
+          <Link
+            href="/reparaties/nieuw"
+            className="focus-ring inline-flex items-center gap-2 rounded bg-signal-500 px-4 py-2.5 text-sm font-semibold text-ink-950 hover:bg-signal-600"
+          >
+            <Plus size={18} strokeWidth={2.5} />
+            {t('quickNewRepair')}
+          </Link>
+        </nav>
       </header>
 
       <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,20rem)]">
