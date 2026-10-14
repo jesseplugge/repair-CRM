@@ -1,23 +1,16 @@
 import Link from 'next/link';
-import { getTranslations } from 'next-intl/server';
+import { getLocale, getTranslations } from 'next-intl/server';
 import { createClient, getCurrentUser } from '@/lib/supabase/server';
-import { Card } from '@/components/ui/primitives';
 import { formatEuro } from '@/lib/utils/currency';
 import { getNotifications } from '@/lib/actions/notifications';
-import { PlusCircle, UserPlus, ShoppingCart, FileText, Search, AlertTriangle, Euro, Clock } from 'lucide-react';
+import { Plus } from 'lucide-react';
 
 export default async function DashboardPage() {
   const user = await getCurrentUser();
   const supabase = createClient();
   const t = await getTranslations('dashboard');
 
-  const QUICK_ACTIONS = [
-    { href: '/reparaties/nieuw', label: t('quickNewRepair'), icon: PlusCircle },
-    { href: '/klanten/nieuw', label: t('quickNewCustomer'), icon: UserPlus },
-    { href: '/kassa', label: t('quickSale'), icon: ShoppingCart },
-    { href: '/facturen', label: t('quickInvoice'), icon: FileText },
-    { href: '/klanten', label: t('quickFindCustomer'), icon: Search },
-  ];
+  const locale = await getLocale();
 
   const startOfToday = new Date();
   startOfToday.setHours(0, 0, 0, 0);
@@ -30,7 +23,10 @@ export default async function DashboardPage() {
     supabase.from('repair_statuses').select('*').eq('business_id', user!.business_id).order('sort_order'),
     supabase
       .from('repairs')
-      .select('id, status_id, payment_status, final_price, date_received, date_completed, repair_type_label')
+      .select(
+        'id, repair_number, status_id, payment_status, final_price, date_received, date_completed, repair_type_label, customer:customers(first_name, last_name), device:devices(brand, model)'
+      )
+      .order('date_received')
       .eq('business_id', user!.business_id),
     supabase
       .from('pos_sales')
@@ -46,9 +42,6 @@ export default async function DashboardPage() {
   const byName = (name: string) => allStatuses.find((s) => s.name === name);
 
   const receivedToday = allRepairs.filter((r) => new Date(r.date_received) >= startOfToday).length;
-  const readyForPickup = allRepairs.filter((r) => r.status_id === byName('Gereed')?.id).length;
-  const waitingForParts = allRepairs.filter((r) => r.status_id === byName('Wacht op onderdeel')?.id).length;
-  const inProgress = allRepairs.filter((r) => r.status_id === byName('In behandeling')?.id).length;
   const unpaid = allRepairs.filter((r) => r.payment_status !== 'paid').length;
 
   const paidRepairsToday = allRepairs.filter(
@@ -59,10 +52,20 @@ export default async function DashboardPage() {
   const revenueToday = repairRevenueToday + posRevenueToday;
   const transactionsToday = paidRepairsToday.length + (posSalesToday ?? []).length;
 
-  const statusCounts = allStatuses.map((status) => ({
-    ...status,
-    count: allRepairs.filter((r) => r.status_id === status.id).length,
-  }));
+  // The bench: every status a repair still moves through, in workflow order, with
+  // "Gereed" pulled out as its own column because those go back over the counter.
+  // Finished statuses (picked up, cancelled) only get a count.
+  const readyStatusId = byName('Gereed')?.id;
+  const benchColumns = allStatuses
+    .filter((s) => s.active && !s.is_terminal)
+    .map((status) => ({ status, repairs: allRepairs.filter((r) => r.status_id === status.id) }));
+  const workColumns = benchColumns.filter((c) => c.status.id !== readyStatusId);
+  const readyColumn = benchColumns.find((c) => c.status.id === readyStatusId);
+  const openCount = benchColumns.reduce((sum, c) => sum + c.repairs.length, 0);
+  const finishedCounts = allStatuses
+    .filter((s) => s.active && s.is_terminal)
+    .map((status) => ({ status, count: allRepairs.filter((r) => r.status_id === status.id).length }));
+  const todayLabel = new Intl.DateTimeFormat(locale, { weekday: 'long', day: 'numeric', month: 'long' }).format(now);
 
   // Insight: completed repairs this month vs last month
   const completedThisMonth = allRepairs.filter((r) => r.date_completed && new Date(r.date_completed) >= startOfMonth).length;
@@ -94,117 +97,192 @@ export default async function DashboardPage() {
     .sort((a, b) => b[1].profit / b[1].revenue - a[1].profit / a[1].revenue)[0];
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="font-display text-2xl font-semibold text-ink-950">{t('title')}</h1>
-        <p className="text-sm text-ink-600">{user ? t('welcomeBackName', { name: user.full_name }) : t('welcomeBack')}</p>
-      </div>
-
-      {/* Today */}
-      <section>
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-400">{t('today')}</h2>
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-          <StatCard label={t('receivedToday')} value={receivedToday} />
-          <StatCard label={t('readyForPickup')} value={readyForPickup} />
-          <StatCard label={t('waitingForParts')} value={waitingForParts} />
-          <StatCard label={t('inProgress')} value={inProgress} />
-          <StatCard label={t('outstandingPayments')} value={unpaid} />
-          <StatCard label={t('revenueToday')} value={formatEuro(revenueToday)} />
-          <StatCard label={t('transactionsToday')} value={transactionsToday} />
+    <div className="flex flex-col gap-8">
+      <header className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 className="font-display text-3xl font-bold text-ink-950 first-letter:uppercase">{todayLabel}</h1>
+          <p className="mt-1 text-sm text-ink-600">{user ? t('welcomeBackName', { name: user.full_name }) : t('welcomeBack')}</p>
         </div>
-      </section>
+        <Link
+          href="/reparaties/nieuw"
+          className="focus-ring inline-flex items-center gap-2 rounded bg-signal-500 px-4 py-2.5 text-sm font-semibold text-ink-950 hover:bg-signal-600"
+        >
+          <Plus size={18} strokeWidth={2.5} />
+          {t('quickNewRepair')}
+        </Link>
+      </header>
 
-      {/* Needs attention */}
-      {needsAttention.length > 0 && (
-        <section>
-          <h2 className="mb-3 flex items-center gap-1.5 text-sm font-semibold uppercase tracking-wide text-ink-400">
-            <AlertTriangle size={14} /> {t('needsAttention')}
-          </h2>
-          <Card className="divide-y divide-ink-100">
-            {needsAttention.slice(0, 8).map((item) => (
-              <Link
-                key={item.key}
-                href={item.href}
-                className="flex items-center gap-3 px-4 py-2.5 text-sm text-ink-700 transition-colors hover:bg-ink-50"
-              >
-                <span>{item.icon}</span>
-                <span>{item.text}</span>
+      {/* The bench. On phones it comes after "Today" and scrolls sideways. */}
+      <section aria-labelledby="bench-heading" className="order-2 lg:order-1">
+        <h2 id="bench-heading" className="mb-3 font-display text-lg font-semibold text-ink-950">
+          {t('onTheBench', { count: openCount })}
+        </h2>
+        <div className="flex gap-px overflow-x-auto rounded-lg bg-mat-700 shadow-crafted">
+          {workColumns.map(({ status, repairs }) => (
+            <BenchColumn key={status.id} status={status} repairs={repairs} moreLabel={(n) => t('moreInColumn', { count: n })} />
+          ))}
+          {readyColumn && (
+            <BenchColumn
+              status={readyColumn.status}
+              repairs={readyColumn.repairs}
+              moreLabel={(n) => t('moreInColumn', { count: n })}
+              ready
+            />
+          )}
+        </div>
+        {openCount === 0 && <p className="mt-3 text-sm text-ink-600">{t('benchEmpty')}</p>}
+        {finishedCounts.length > 0 && (
+          <p className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-sm text-ink-600">
+            {finishedCounts.map(({ status, count }) => (
+              <Link key={status.id} href={`/reparaties?status=${status.id}`} className="focus-ring rounded hover:text-ink-950">
+                {status.name} <span className="tabular-nums font-semibold text-ink-900">{count}</span>
               </Link>
             ))}
-          </Card>
-        </section>
-      )}
-
-      {/* Insights */}
-      {(monthDelta !== null || topMarginType) && (
-        <section>
-          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-400">{t('insights')}</h2>
-          <div className="grid grid-cols-2 gap-4">
-            {monthDelta !== null && (
-              <Card className="flex items-start gap-3 p-4">
-                <Clock size={18} className="mt-0.5 text-[var(--accent)]" />
-                <p className="text-sm text-ink-700">
-                  {monthDelta >= 0
-                    ? t('insightCompletedThisMonthMore', { count: completedThisMonth, percent: monthDelta })
-                    : t('insightCompletedThisMonthLess', { count: completedThisMonth, percent: Math.abs(monthDelta) })}
-                </p>
-              </Card>
-            )}
-            {topMarginType && (
-              <Card className="flex items-start gap-3 p-4">
-                <Euro size={18} className="mt-0.5 text-[var(--accent)]" />
-                <p className="text-sm text-ink-700">
-                  {t('insightTopMargin', {
-                    type: topMarginType[0],
-                    percent: Math.round((topMarginType[1].profit / topMarginType[1].revenue) * 100),
-                  })}
-                </p>
-              </Card>
-            )}
-          </div>
-        </section>
-      )}
-
-      {/* Quick actions */}
-      <section>
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-400">{t('quickStart')}</h2>
-        <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
-          {QUICK_ACTIONS.map(({ href, label, icon: Icon }) => (
-            <Link key={href} href={href}>
-              <Card className="flex flex-col items-center gap-2 px-4 py-6 text-center transition-colors hover:border-[var(--accent)] hover:bg-[var(--accent-soft)]">
-                <Icon size={22} className="text-[var(--accent)]" />
-                <span className="text-sm font-medium text-ink-900">{label}</span>
-              </Card>
-            </Link>
-          ))}
-        </div>
+          </p>
+        )}
       </section>
 
-      {/* Status overview */}
-      <section>
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-400">{t('repairStatus')}</h2>
-        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-          {statusCounts.map((status) => (
-            <Link key={status.id} href={`/reparaties?status=${status.id}`}>
-              <Card className="px-4 py-4 transition-colors hover:border-[var(--accent)]">
-                <div className="text-2xl font-display font-semibold tabular-nums text-ink-950">{status.count}</div>
-                <div className="mt-1 text-sm" style={{ color: status.color ?? undefined }}>
-                  {status.name}
-                </div>
-              </Card>
-            </Link>
-          ))}
+      <div className="order-1 grid gap-8 lg:order-2 lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)]">
+        {/* Today */}
+        <section aria-labelledby="today-heading">
+          <h2 id="today-heading" className="mb-3 font-display text-lg font-semibold text-ink-950">
+            {t('today')}
+          </h2>
+          <div className="font-display text-4xl font-bold tabular-nums text-ink-950">{formatEuro(revenueToday)}</div>
+          <div className="text-sm text-ink-600">{t('revenueToday')}</div>
+          <dl className="mt-4 divide-y divide-ink-200 border-y border-ink-200 text-sm">
+            <TodayRow label={t('transactionsToday')} value={transactionsToday} />
+            <TodayRow label={t('receivedToday')} value={receivedToday} />
+            <TodayRow label={t('outstandingPayments')} value={unpaid} />
+          </dl>
+        </section>
+
+        <div className="space-y-8">
+          {needsAttention.length > 0 && (
+            <section aria-labelledby="attention-heading">
+              <h2 id="attention-heading" className="mb-3 font-display text-lg font-semibold text-ink-950">
+                {t('needsAttention')}
+              </h2>
+              <ul className="divide-y divide-ink-200 border-y border-ink-200">
+                {needsAttention.slice(0, 8).map((item) => (
+                  <li key={item.key}>
+                    <Link
+                      href={item.href}
+                      className="focus-ring flex items-center gap-3 py-2.5 text-sm text-ink-800 hover:text-ink-950 hover:underline"
+                    >
+                      <span aria-hidden>{item.icon}</span>
+                      <span>{item.text}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
+          {(monthDelta !== null || topMarginType) && (
+            <section aria-labelledby="insights-heading">
+              <h2 id="insights-heading" className="mb-2 font-display text-lg font-semibold text-ink-950">
+                {t('insights')}
+              </h2>
+              <div className="max-w-prose space-y-1.5 text-sm text-ink-700">
+                {monthDelta !== null && (
+                  <p>
+                    {monthDelta >= 0
+                      ? t('insightCompletedThisMonthMore', { count: completedThisMonth, percent: monthDelta })
+                      : t('insightCompletedThisMonthLess', { count: completedThisMonth, percent: Math.abs(monthDelta) })}
+                  </p>
+                )}
+                {topMarginType && (
+                  <p>
+                    {t('insightTopMargin', {
+                      type: topMarginType[0],
+                      percent: Math.round((topMarginType[1].profit / topMarginType[1].revenue) * 100),
+                    })}
+                  </p>
+                )}
+              </div>
+            </section>
+          )}
         </div>
-      </section>
+      </div>
     </div>
   );
 }
 
-function StatCard({ label, value }: { label: string; value: string | number }) {
+type BenchRepair = {
+  id: string;
+  repair_number: string;
+  customer: unknown;
+  device: unknown;
+};
+
+const TAGS_PER_COLUMN = 4;
+
+function BenchColumn({
+  status,
+  repairs,
+  moreLabel,
+  ready = false,
+}: {
+  status: { id: string; name: string; color: string | null };
+  repairs: BenchRepair[];
+  moreLabel: (count: number) => string;
+  ready?: boolean;
+}) {
+  const hidden = repairs.length - TAGS_PER_COLUMN;
   return (
-    <Card className="px-4 py-4">
-      <div className="text-2xl font-display font-semibold tabular-nums text-ink-950">{value}</div>
-      <div className="mt-1 text-sm text-ink-600">{label}</div>
-    </Card>
+    <div className={`flex min-w-[10.5rem] flex-1 flex-col bg-mat p-3 ${ready ? 'border-t-4 border-signal-500' : 'border-t-4 border-transparent'}`}>
+      <Link
+        href={`/reparaties?status=${status.id}`}
+        className="focus-ring mb-3 flex items-baseline justify-between gap-2 rounded text-sm text-ink-200 hover:text-white"
+      >
+        <span className="flex items-center gap-2">
+          <span aria-hidden className="h-2 w-2 shrink-0 rounded-full" style={{ background: status.color ?? '#6C7D84' }} />
+          {status.name}
+        </span>
+        <span
+          className={`font-display text-2xl font-bold tabular-nums ${
+            repairs.length === 0 ? 'text-ink-600' : ready ? 'text-signal-500' : 'text-white'
+          }`}
+        >
+          {repairs.length}
+        </span>
+      </Link>
+      <div className="space-y-2">
+        {repairs.slice(0, TAGS_PER_COLUMN).map((r) => {
+          const customer = r.customer as { first_name: string; last_name: string } | null;
+          const device = r.device as { brand: string; model: string } | null;
+          return (
+            <Link
+              key={r.id}
+              href={`/reparaties/${r.id}`}
+              className={`focus-ring relative block rounded-sm py-2 pl-7 pr-2.5 text-sm ${
+                ready ? 'bg-signal-500 text-ink-950 hover:bg-signal-100' : 'bg-ink-50 text-ink-900 hover:bg-white'
+              }`}
+            >
+              {/* the punched hole of a job tag */}
+              <span aria-hidden className="absolute left-2.5 top-3 h-2 w-2 rounded-full bg-mat" />
+              <span className="block font-display text-xs font-semibold tabular-nums">{r.repair_number}</span>
+              {device && <span className="block truncate font-medium">{`${device.brand} ${device.model}`}</span>}
+              {customer && <span className="block truncate text-xs opacity-75">{`${customer.first_name} ${customer.last_name}`}</span>}
+            </Link>
+          );
+        })}
+        {hidden > 0 && (
+          <Link href={`/reparaties?status=${status.id}`} className="focus-ring block rounded px-1 text-xs text-ink-200 hover:text-white">
+            {moreLabel(hidden)}
+          </Link>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function TodayRow({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="flex items-baseline justify-between py-2">
+      <dt className="text-ink-600">{label}</dt>
+      <dd className="tabular-nums font-semibold text-ink-950">{value}</dd>
+    </div>
   );
 }

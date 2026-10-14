@@ -15,7 +15,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     getNotifications(),
   ]);
 
-  const accentStyle = buildAccentTokens(business?.accent_color || '#0C7C82');
+  const accentStyle = buildAccentTokens(business?.accent_color || '#1F5F73');
 
   return (
     <AppShell

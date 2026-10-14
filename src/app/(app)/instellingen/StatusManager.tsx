@@ -78,7 +78,7 @@ export function StatusManager({ statuses }: { statuses: Status[] }) {
                 <Input name="name" required placeholder={t('namePlaceholder')} />
               </Field>
               <Field label={t('color')}>
-                <input type="color" name="color" defaultValue="#0C7C82" className="h-9 w-full cursor-pointer rounded border border-ink-200" />
+                <input type="color" name="color" defaultValue="#1F5F73" className="h-9 w-full cursor-pointer rounded border border-ink-200" />
               </Field>
             </div>
             <label className="flex items-center gap-2 text-sm text-ink-700">

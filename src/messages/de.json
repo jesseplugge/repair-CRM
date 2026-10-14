@@ -56,7 +56,10 @@
     "quickSale": "Verkauf",
     "quickInvoice": "Rechnung",
     "quickFindCustomer": "Kunde suchen",
-    "repairStatus": "Reparaturstatus"
+    "repairStatus": "Reparaturstatus",
+    "onTheBench": "Auf der Werkbank ({count})",
+    "benchEmpty": "Nichts offen. Neue Reparaturen erscheinen hier zuerst.",
+    "moreInColumn": "+{count} weitere"
   },
   "notifications": {
     "title": "Benachrichtigungen",

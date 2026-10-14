@@ -11,7 +11,7 @@ export function NativeStatusBar() {
     import('@capacitor/status-bar').then(({ StatusBar, Style }) => {
       StatusBar.setStyle({ style: Style.Dark }).catch(() => {});
       if (Capacitor.getPlatform() === 'android') {
-        StatusBar.setBackgroundColor({ color: '#FAF7F1' }).catch(() => {});
+        StatusBar.setBackgroundColor({ color: '#F4F6F5' }).catch(() => {});
       }
     });
   }, []);

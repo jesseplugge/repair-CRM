@@ -56,7 +56,10 @@
     "quickSale": "Sale",
     "quickInvoice": "Invoice",
     "quickFindCustomer": "Find customer",
-    "repairStatus": "Repair status"
+    "repairStatus": "Repair status",
+    "onTheBench": "On the bench ({count})",
+    "benchEmpty": "Nothing open. New repairs show up here first.",
+    "moreInColumn": "+{count} more"
   },
   "notifications": {
     "title": "Notifications",

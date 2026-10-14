@@ -6,17 +6,15 @@
   :root {
     /* Default accent tokens — overridden per-business via inline style once
        a business record with an accent_color exists (see AppLayout). */
-    --accent: #0c7c82;
-    --accent-hover: #0a6267;
-    --accent-light: #6bb3b7;
-    --accent-soft: rgba(12, 124, 130, 0.12);
-    --accent-border-soft: rgba(12, 124, 130, 0.35);
+    --accent: #1f5f73;
+    --accent-hover: #1b5465;
+    --accent-light: #799fab;
+    --accent-soft: rgba(31, 95, 115, 0.12);
+    --accent-border-soft: rgba(31, 95, 115, 0.35);
   }
 
   body {
     @apply bg-ink-50 text-ink-900 antialiased;
-    background-image: radial-gradient(circle at 0% 0%, rgba(12, 124, 130, 0.05), transparent 40%);
-    background-attachment: fixed;
   }
 
   /* Native app shell only (set by AppShell.tsx once Capacitor is detected client-side) — kills
@@ -68,6 +66,12 @@
 }
 
 @layer utilities {
+  /* Headings and big numbers use Archivo's expanded width rather than a second
+     typeface; body text stays at normal width. */
+  .font-display {
+    font-stretch: 125%;
+  }
+
   /* Shared focus treatment for interactive elements outside <Button> (menu items,
      tabs, sortable table headers, dialog close buttons) — keeps keyboard focus
      visually consistent without retyping the outline chain everywhere. */

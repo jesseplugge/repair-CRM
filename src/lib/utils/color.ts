@@ -33,7 +33,7 @@ function toRgba(hex: string, alpha: number) {
  * both light and dark surfaces without needing separate light/dark variants.
  */
 export function buildAccentTokens(hex: string): Record<string, string> {
-  const safe = /^#[0-9a-fA-F]{3,6}$/.test(hex) ? hex : '#0C7C82';
+  const safe = /^#[0-9a-fA-F]{3,6}$/.test(hex) ? hex : '#1F5F73';
   return {
     '--accent': safe,
     '--accent-hover': darken(safe, 0.12),

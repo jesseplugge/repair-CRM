@@ -1,23 +1,36 @@
 import type { Config } from 'tailwindcss';
 
-// Design tokens — see src/app/globals.css for the rationale.
-// Palette: warm stone neutrals + "diagnostic teal" primary + amber/green/red status colors.
-// Avoids the generic cold-gray/blue "AI SaaS" look. A geometric display face (Space Grotesk)
-// paired with a plain-spoken sans body (Inter) gives headings a precise, engineered feel.
+// Design tokens — "repair bench" identity.
+// Neutrals are cool and paper-like (a job tag on a device), the dark surface is the
+// blue-grey of an anti-static mat, and one tool-handle yellow ("signal") marks the
+// few things that need hands now: starting a repair and handing one back.
+// The per-business --accent stays a readable deep blue because it is used for link
+// text and white-on-accent buttons all over the app; yellow is never used for text.
+// One type family (Archivo) carries everything; headings and big numbers use its
+// expanded width (see .font-display in globals.css) instead of a second typeface.
 const config: Config = {
   content: ['./src/**/*.{ts,tsx}'],
   theme: {
     extend: {
       colors: {
         ink: {
-          950: '#1C1917',
-          900: '#292420',
-          800: '#3A332C',
-          600: '#5C5346',
-          400: '#948A79',
-          200: '#DDD6C7',
-          100: '#F0EBE1',
-          50: '#FAF7F1',
+          950: '#16222A',
+          900: '#1E2C33',
+          800: '#2C3C44',
+          600: '#4D5E66',
+          400: '#6C7D84',
+          200: '#D3DBDD',
+          100: '#E7ECED',
+          50: '#F4F6F5',
+        },
+        mat: {
+          DEFAULT: '#22343B',
+          700: '#1A2930',
+        },
+        signal: {
+          600: '#C9971A',
+          500: '#E9B425',
+          100: '#FBF0D0',
         },
         teal: {
           700: '#0A5F64',
@@ -65,8 +78,8 @@ const config: Config = {
         },
       },
       fontFamily: {
-        sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
-        display: ['var(--font-display)', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-archivo)', 'system-ui', 'sans-serif'],
+        display: ['var(--font-archivo)', 'system-ui', 'sans-serif'],
       },
       fontFeatureSettings: {
         tabular: '"tnum" 1, "lnum" 1',
@@ -80,9 +93,9 @@ const config: Config = {
         xl: '16px',
       },
       boxShadow: {
-        card: '0 1px 2px 0 rgb(28 25 23 / 0.05), 0 1px 1px -1px rgb(28 25 23 / 0.04)',
-        crafted: '0 4px 16px -4px rgb(28 25 23 / 0.10), 0 1px 2px 0 rgb(28 25 23 / 0.05)',
-        elevated: '0 12px 32px -8px rgb(28 25 23 / 0.16), 0 2px 8px -2px rgb(28 25 23 / 0.08)',
+        card: '0 1px 2px 0 rgb(22 34 42 / 0.05), 0 1px 1px -1px rgb(22 34 42 / 0.04)',
+        crafted: '0 4px 16px -4px rgb(22 34 42 / 0.10), 0 1px 2px 0 rgb(22 34 42 / 0.05)',
+        elevated: '0 12px 32px -8px rgb(22 34 42 / 0.16), 0 2px 8px -2px rgb(22 34 42 / 0.08)',
       },
       keyframes: {
         'fade-in': { from: { opacity: '0' }, to: { opacity: '1' } },

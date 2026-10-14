@@ -10,7 +10,7 @@ import { Plus, FileText } from 'lucide-react';
 
 const STATUS_COLORS: Record<string, string> = {
   draft: '#495164',
-  sent: '#0C7C82',
+  sent: '#1F5F73',
   paid: '#2F8F5B',
   partially_paid: '#C97A22',
   overdue: '#C4453A',

@@ -20,7 +20,7 @@ function today() {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  sent: '#0C7C82',
+  sent: '#1F5F73',
   partially_paid: '#C97A22',
   overdue: '#C4453A',
 };

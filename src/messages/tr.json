@@ -56,7 +56,10 @@
     "quickSale": "Satış",
     "quickInvoice": "Fatura",
     "quickFindCustomer": "Müşteri bul",
-    "repairStatus": "Onarım durumu"
+    "repairStatus": "Onarım durumu",
+    "onTheBench": "Tezgâhta ({count})",
+    "benchEmpty": "Açık iş yok. Yeni onarımlar önce burada görünür.",
+    "moreInColumn": "+{count} daha"
   },
   "notifications": {
     "title": "Bildirimler",

@@ -20,7 +20,7 @@ const STATUS_KEYS: Record<string, string> = {
 const STATUS_COLORS: Record<string, string> = {
   new: '#4C5FD5',
   investigating: '#C97A22',
-  approved: '#0C7C82',
+  approved: '#1F5F73',
   rejected: '#C4453A',
   repairing: '#C97A22',
   resolved: '#2F8F5B',

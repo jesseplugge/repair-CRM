@@ -60,7 +60,7 @@ export function SignatureCapture({
     const { x, y } = pointerPos(e);
     ctx.lineWidth = 2;
     ctx.lineCap = 'round';
-    ctx.strokeStyle = '#1C1917';
+    ctx.strokeStyle = '#16222A';
     ctx.lineTo(x, y);
     ctx.stroke();
     hasSignature.current = true;

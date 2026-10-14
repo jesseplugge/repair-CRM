@@ -56,7 +56,10 @@
     "quickSale": "Verkoop",
     "quickInvoice": "Factuur",
     "quickFindCustomer": "Klant zoeken",
-    "repairStatus": "Reparatiestatus"
+    "repairStatus": "Reparatiestatus",
+    "onTheBench": "Op de werkbank ({count})",
+    "benchEmpty": "Er staat niets open. Nieuwe reparaties komen hier als eerste binnen.",
+    "moreInColumn": "+{count} meer"
   },
   "notifications": {
     "title": "Meldingen",

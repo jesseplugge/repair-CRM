@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { updateAccentColor } from '@/lib/actions/settings';
 
-const PRESETS = ['#0C7C82', '#2D5DF0', '#C97A22', '#2F8F5B', '#C4453A', '#6B4EE6'];
+const PRESETS = ['#1F5F73', '#0C7C82', '#2D5DF0', '#C97A22', '#2F8F5B', '#C4453A', '#6B4EE6'];
 
 export function AccentColorPicker({ businessId, currentColor }: { businessId: string; currentColor: string }) {
   const [color, setColor] = useState(currentColor);

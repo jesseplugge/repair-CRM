@@ -10,7 +10,7 @@ import { SearchBox } from './SearchBox';
 import { Download, Receipt } from 'lucide-react';
 
 const TYPE_COLORS: Record<string, string> = {
-  intake: '#0C7C82',
+  intake: '#1F5F73',
   repair_completion: '#2F8F5B',
   pos_sale: '#495164',
 };
