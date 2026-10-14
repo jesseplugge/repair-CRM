@@ -350,6 +350,8 @@
     "chooseCatalogInstead": "Elegir un tipo de reparación del catálogo en su lugar",
     "searchCatalogPlaceholder": "Ej. Pantalla iPhone 13…",
     "manualLine": "+ Introducir línea manual",
+    "remove": "Eliminar",
+    "removeManualLine": "Eliminar línea manual",
     "step4Condition": "4. Estado del dispositivo y avería",
     "visibleDamage": "Daños visibles",
     "otherDamage": "Otros daños / observaciones",
@@ -601,6 +603,7 @@
     "colDate": "Fecha",
     "reasonManual": "Ajuste manual",
     "reasonPosSale": "Venta (caja)",
+    "reasonRepair": "Reparación",
     "reasonCorrection": "Corrección",
     "movementsEmpty": "Aún no hay movimientos de stock."
   },

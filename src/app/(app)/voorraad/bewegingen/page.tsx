@@ -13,12 +13,13 @@ export default async function StockMovementsPage() {
   const REASON_KEYS: Record<string, string> = {
     manual: 'reasonManual',
     pos_sale: 'reasonPosSale',
+    repair: 'reasonRepair',
     correction: 'reasonCorrection',
   };
 
   const { data: movements } = await supabase
     .from('stock_movements')
-    .select('id, change, reason, created_at, product:products(name), pos_sale:pos_sales(sale_number)')
+    .select('id, change, reason, created_at, product:products(name), pos_sale:pos_sales(sale_number), repair:repairs(repair_number)')
     .eq('business_id', user!.business_id)
     .order('created_at', { ascending: false })
     .limit(200);
@@ -53,6 +54,7 @@ export default async function StockMovementsPage() {
                 {(movements ?? []).map((m) => {
                   const product = m.product as any;
                   const posSale = m.pos_sale as any;
+                  const repair = m.repair as any;
                   return (
                     <tr key={m.id} className="border-b border-ink-100 last:border-0">
                       <td className="px-4 py-3 font-medium text-ink-900">{product?.name ?? '—'}</td>
@@ -63,6 +65,7 @@ export default async function StockMovementsPage() {
                       <td className="px-4 py-3 text-ink-600">
                         {REASON_KEYS[m.reason] ? t(REASON_KEYS[m.reason] as any) : m.reason}
                         {posSale?.sale_number ? ` · ${posSale.sale_number}` : ''}
+                        {repair?.repair_number ? ` · ${repair.repair_number}` : ''}
                       </td>
                       <td className="px-4 py-3 text-ink-600">{formatDateTime(m.created_at)}</td>
                     </tr>
@@ -76,6 +79,7 @@ export default async function StockMovementsPage() {
             {(movements ?? []).map((m) => {
               const product = m.product as any;
               const posSale = m.pos_sale as any;
+              const repair = m.repair as any;
               return (
                 <div key={m.id} className="rounded-lg border border-ink-100 bg-white p-3 shadow-card">
                   <div className="flex items-center justify-between gap-2">
@@ -87,7 +91,8 @@ export default async function StockMovementsPage() {
                   </div>
                   <div className="text-xs text-ink-400">
                     {REASON_KEYS[m.reason] ? t(REASON_KEYS[m.reason] as any) : m.reason}
-                    {posSale?.sale_number ? ` · ${posSale.sale_number}` : ''} · {formatDateTime(m.created_at)}
+                    {posSale?.sale_number ? ` · ${posSale.sale_number}` : ''}
+                    {repair?.repair_number ? ` · ${repair.repair_number}` : ''} · {formatDateTime(m.created_at)}
                   </div>
                 </div>
               );

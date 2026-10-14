@@ -350,6 +350,8 @@
     "chooseCatalogInstead": "Choose a repair type from the catalog instead",
     "searchCatalogPlaceholder": "E.g. iPhone 13 screen…",
     "manualLine": "+ Enter manual line",
+    "remove": "Remove",
+    "removeManualLine": "Remove manual line",
     "step4Condition": "4. Device condition & complaint",
     "visibleDamage": "Visible damage",
     "otherDamage": "Other damage / notes",
@@ -601,6 +603,7 @@
     "colDate": "Date",
     "reasonManual": "Manual adjustment",
     "reasonPosSale": "Sale (checkout)",
+    "reasonRepair": "Repair",
     "reasonCorrection": "Correction",
     "movementsEmpty": "No stock movements yet."
   },

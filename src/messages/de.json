@@ -350,6 +350,8 @@
     "chooseCatalogInstead": "Stattdessen Reparaturtyp aus dem Katalog wählen",
     "searchCatalogPlaceholder": "Z. B. iPhone 13 Display…",
     "manualLine": "+ Manuelle Position eingeben",
+    "remove": "Entfernen",
+    "removeManualLine": "Manuelle Zeile entfernen",
     "step4Condition": "4. Zustand des Geräts & Beanstandung",
     "visibleDamage": "Sichtbare Schäden",
     "otherDamage": "Weitere Schäden / Anmerkungen",
@@ -601,6 +603,7 @@
     "colDate": "Datum",
     "reasonManual": "Manuelle Anpassung",
     "reasonPosSale": "Verkauf (Kasse)",
+    "reasonRepair": "Reparatur",
     "reasonCorrection": "Korrektur",
     "movementsEmpty": "Noch keine Lagerbewegungen."
   },

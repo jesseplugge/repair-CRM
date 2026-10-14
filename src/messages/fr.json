@@ -350,6 +350,8 @@
     "chooseCatalogInstead": "Choisir un type de réparation dans le catalogue à la place",
     "searchCatalogPlaceholder": "Ex. Écran iPhone 13…",
     "manualLine": "+ Saisir une ligne manuelle",
+    "remove": "Supprimer",
+    "removeManualLine": "Supprimer la ligne manuelle",
     "step4Condition": "4. État de l'appareil & réclamation",
     "visibleDamage": "Dommages visibles",
     "otherDamage": "Autres dommages / remarques",
@@ -601,6 +603,7 @@
     "colDate": "Date",
     "reasonManual": "Ajustement manuel",
     "reasonPosSale": "Vente (caisse)",
+    "reasonRepair": "Réparation",
     "reasonCorrection": "Correction",
     "movementsEmpty": "Aucun mouvement de stock pour le moment."
   },

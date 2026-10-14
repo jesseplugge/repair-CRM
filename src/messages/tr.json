@@ -350,6 +350,8 @@
     "chooseCatalogInstead": "Bunun yerine katalogdan onarım türü seç",
     "searchCatalogPlaceholder": "Örn. iPhone 13 ekran…",
     "manualLine": "+ Manuel satır gir",
+    "remove": "Kaldır",
+    "removeManualLine": "Manuel satırı kaldır",
     "step4Condition": "4. Cihazın durumu ve şikayet",
     "visibleDamage": "Görünür hasar",
     "otherDamage": "Diğer hasarlar / notlar",
@@ -601,6 +603,7 @@
     "colDate": "Tarih",
     "reasonManual": "Manuel düzeltme",
     "reasonPosSale": "Satış (kasa)",
+    "reasonRepair": "Onarım",
     "reasonCorrection": "Düzeltme",
     "movementsEmpty": "Henüz stok hareketi yok."
   },

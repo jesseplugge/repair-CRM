@@ -90,14 +90,14 @@ export function RepairIntakeForm({
   }, [customer]);
 
   // --- repair type ---
-  const [catalogItem, setCatalogItem] = useState<CatalogLite | null>(null);
+  const [catalogItems, setCatalogItems] = useState<CatalogLite[]>([]);
   const [catalogQuery, setCatalogQuery] = useState('');
   const [catalogResults, setCatalogResults] = useState<CatalogLite[]>([]);
   const [manualMode, setManualMode] = useState(false);
   const [manualPrice, setManualPrice] = useState('');
 
   useEffect(() => {
-    if (catalogItem || catalogQuery.trim().length < 2) {
+    if (catalogQuery.trim().length < 2) {
       setCatalogResults([]);
       return;
     }
@@ -106,11 +106,16 @@ export function RepairIntakeForm({
       setCatalogResults(res.ok ? await res.json() : []);
     }, 250);
     return () => clearTimeout(timer);
-  }, [catalogQuery, catalogItem]);
+  }, [catalogQuery]);
 
-  const estimatedTotal = catalogItem
-    ? priceInclVat(catalogItem)
-    :  parseFloat(manualPrice || '0');
+  const hasRepairLine = catalogItems.length > 0 || manualMode;
+  const estimatedTotal =
+    catalogItems.reduce((sum, c) => sum + priceInclVat(c), 0) + (manualMode ? parseFloat(manualPrice || '0') : 0);
+
+  function addCatalogItem(c: CatalogLite) {
+    setCatalogItems((items) => [...items, c]);
+    setCatalogQuery('');
+  }
 
   return (
     <form action={formAction} className="space-y-6">
@@ -257,84 +262,93 @@ export function RepairIntakeForm({
       {(customer || newCustomer) && (device || newDevice) && (
         <Card className="p-5">
           <SectionTitle icon={Wrench} title={t('step3RepairType')} />
-          {catalogItem ? (
-            <SelectedRow
-              title={catalogItem.name}
-              subtitle={`${formatEuro(priceInclVat(catalogItem))} ${t('inclVat')}${catalogItem.sku ? ` · ${catalogItem.sku}` : ''}`}
-              onChange={() => setCatalogItem(null)}
-              changeLabel={t('change')}
-            />
-          ) : manualMode ? (
-            <div className="space-y-3">
-              <Field label={t('description')}>
-                <Input name="manual_description" required placeholder={t('descriptionPlaceholder')} />
-              </Field>
-              <div className="grid grid-cols-3 gap-3 items-end">
-                <Field label={t('price')}>
-                  <Input
-                    name="manual_price"
-                    type="number"
-                    step="0.01"
-                    required
-                    value={manualPrice}
-                    onChange={(e) => setManualPrice(e.target.value)}
-                  />
-                </Field>
-                <Field label={t('vatRate')}>
-                  <select name="manual_vat_rate" defaultValue="21" className="w-full rounded border border-ink-200 bg-white px-3 py-2 text-sm">
-                    <option value="21">21%</option>
-                    <option value="9">9%</option>
-                    <option value="0">0%</option>
-                  </select>
-                </Field>
-                <label className="flex items-center gap-2 pb-2 text-sm text-ink-600">
-                  <input type="checkbox" name="manual_price_includes_vat" defaultChecked />
-                  {t('priceIncludesVat')}
-                </label>
-              </div>
-              <button type="button" onClick={() => setManualMode(false)} className="text-sm text-[var(--accent)] underline">
-                {t('chooseCatalogInstead')}
-              </button>
-            </div>
-          ) : (
-            <div>
-              <div className="relative">
-                <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-400" />
-                <Input
-                  value={catalogQuery}
-                  onChange={(e) => setCatalogQuery(e.target.value)}
-                  placeholder={t('searchCatalogPlaceholder')}
-                  className="pl-9"
+          {catalogItems.length > 0 && (
+            <div className="mb-3 space-y-2">
+              {catalogItems.map((c, index) => (
+                <SelectedRow
+                  key={index}
+                  title={c.name}
+                  subtitle={`${formatEuro(priceInclVat(c))} ${t('inclVat')}${c.sku ? ` · ${c.sku}` : ''}`}
+                  onChange={() => setCatalogItems((items) => items.filter((_, i) => i !== index))}
+                  changeLabel={t('remove')}
                 />
+              ))}
+            </div>
+          )}
+          <div>
+            <div className="relative">
+              <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-400" />
+              <Input
+                value={catalogQuery}
+                onChange={(e) => setCatalogQuery(e.target.value)}
+                placeholder={t('searchCatalogPlaceholder')}
+                className="pl-9"
+              />
+            </div>
+            {catalogResults.length > 0 && (
+              <div className="mt-2 divide-y divide-ink-100 rounded border border-ink-100">
+                {catalogResults.map((c) => (
+                  <button
+                    key={c.id}
+                    type="button"
+                    onClick={() => addCatalogItem(c)}
+                    className="flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:bg-ink-50"
+                  >
+                    <span>
+                      <span className="font-medium text-ink-900">{c.name}</span>
+                      {c.sku && <span className="ml-2 text-xs text-ink-400">{c.sku}</span>}
+                    </span>
+                    <span className="tabular-nums text-ink-600">{formatEuro(priceInclVat(c))}</span>
+                  </button>
+                ))}
               </div>
-              {catalogResults.length > 0 && (
-                <div className="mt-2 divide-y divide-ink-100 rounded border border-ink-100">
-                  {catalogResults.map((c) => (
-                    <button
-                      key={c.id}
-                      type="button"
-                      onClick={() => setCatalogItem(c)}
-                      className="flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:bg-ink-50"
-                    >
-                      <span>
-                        <span className="font-medium text-ink-900">{c.name}</span>
-                        {c.sku && <span className="ml-2 text-xs text-ink-400">{c.sku}</span>}
-                      </span>
-                      <span className="tabular-nums text-ink-600">{formatEuro(priceInclVat(c))}</span>
-                    </button>
-                  ))}
-                </div>
-              )}
+            )}
+            {!manualMode && (
               <button type="button" onClick={() => setManualMode(true)} className="mt-2 text-sm text-[var(--accent)] underline">
                 {t('manualLine')}
               </button>
+            )}
+          </div>
+          {manualMode && (
+            <div className="mt-4 border-t border-ink-100 pt-4">
+              <div className="space-y-3">
+                <Field label={t('description')}>
+                  <Input name="manual_description" required placeholder={t('descriptionPlaceholder')} />
+                </Field>
+                <div className="grid grid-cols-3 gap-3 items-end">
+                  <Field label={t('price')}>
+                    <Input
+                      name="manual_price"
+                      type="number"
+                      step="0.01"
+                      required
+                      value={manualPrice}
+                      onChange={(e) => setManualPrice(e.target.value)}
+                    />
+                  </Field>
+                  <Field label={t('vatRate')}>
+                    <select name="manual_vat_rate" defaultValue="21" className="w-full rounded border border-ink-200 bg-white px-3 py-2 text-sm">
+                      <option value="21">21%</option>
+                      <option value="9">9%</option>
+                      <option value="0">0%</option>
+                    </select>
+                  </Field>
+                  <label className="flex items-center gap-2 pb-2 text-sm text-ink-600">
+                    <input type="checkbox" name="manual_price_includes_vat" defaultChecked />
+                    {t('priceIncludesVat')}
+                  </label>
+                </div>
+                <button type="button" onClick={() => setManualMode(false)} className="text-sm text-[var(--accent)] underline">
+                  {t('removeManualLine')}
+                </button>
+              </div>
             </div>
           )}
         </Card>
       )}
 
       {/* 4. Condition & notes */}
-      {(catalogItem || manualMode) && (
+      {hasRepairLine && (
         <Card className="p-5">
           <SectionTitle icon={Smartphone} title={t('step4Condition')} />
           <div className="space-y-4">
@@ -363,7 +377,7 @@ export function RepairIntakeForm({
       )}
 
       {/* 5. Summary & submit */}
-      {(catalogItem || manualMode) && (
+      {hasRepairLine && (
         <Card className="flex items-center justify-between p-5">
           <div>
             <div className="text-xs uppercase tracking-wide text-ink-400">{t('estimatedPrice')}</div>
@@ -375,7 +389,9 @@ export function RepairIntakeForm({
           {/* hidden inputs carrying resolved selection state into the server action */}
           {customer && <input type="hidden" name="customer_id" value={customer.id} />}
           {device && <input type="hidden" name="device_id" value={device.id} />}
-          {catalogItem && <input type="hidden" name="product_id" value={catalogItem.id} />}
+          {catalogItems.map((c, index) => (
+            <input key={index} type="hidden" name="product_id" value={c.id} />
+          ))}
 
           {state?.error && <p className="text-sm text-red-700">{state.error}</p>}
           <SubmitButton />

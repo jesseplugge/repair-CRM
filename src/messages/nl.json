@@ -350,6 +350,8 @@
     "chooseCatalogInstead": "Toch reparatietype uit catalogus kiezen",
     "searchCatalogPlaceholder": "Bijv. iPhone 13 scherm…",
     "manualLine": "+ Handmatige regel invoeren",
+    "remove": "Verwijderen",
+    "removeManualLine": "Handmatige regel verwijderen",
     "step4Condition": "4. Staat van het apparaat & klacht",
     "visibleDamage": "Zichtbare schade",
     "otherDamage": "Overige schade / opmerkingen",
@@ -601,6 +603,7 @@
     "colDate": "Datum",
     "reasonManual": "Handmatige aanpassing",
     "reasonPosSale": "Verkoop (kassa)",
+    "reasonRepair": "Reparatie",
     "reasonCorrection": "Correctie",
     "movementsEmpty": "Nog geen voorraadbewegingen."
   },

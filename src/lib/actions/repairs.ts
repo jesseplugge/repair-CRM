@@ -101,10 +101,9 @@ export async function createRepair(_prevState: RepairFormState, formData: FormDa
     deviceId = newDevice.id;
   }
 
-  // 3. Resolve repair line (product or manual)
-  const productId = formData.get('product_id') as string | null;
-  let repairTypeLabel: string;
-  let item: {
+  // 3. Resolve repair lines (any number of products, plus an optional manual line)
+  const productIds = formData.getAll('product_id') as string[];
+  type RepairItemInsert = {
     item_type: string;
     catalog_repair_type_id: string | null;
     product_id: string | null;
@@ -115,41 +114,46 @@ export async function createRepair(_prevState: RepairFormState, formData: FormDa
     total_excl_vat: number;
     total_incl_vat: number;
   };
+  const items: RepairItemInsert[] = [];
   const { data: business } = await supabase
     .from('businesses')
     .select('default_warranty_months')
     .eq('id', businessId)
     .single();
-  let warrantyMonths: number | null = business?.default_warranty_months ?? null;
+  const warrantyMonths: number | null = business?.default_warranty_months ?? null;
 
-  if (productId) {
-    const { data: product } = await supabase
+  if (productIds.length > 0) {
+    const { data: products } = await supabase
       .from('products')
       .select('*')
-      .eq('id', productId)
-      .eq('business_id', businessId)
-      .single();
-    if (!product) return { error: t('catalogItemNotFound') };
+      .in('id', productIds)
+      .eq('business_id', businessId);
+    for (const productId of productIds) {
+      const product = products?.find((p) => p.id === productId);
+      if (!product) return { error: t('catalogItemNotFound') };
 
-    // The stored incl.-VAT price is what the customer pays; fall back to
-    // deriving it only for products that predate that column.
-    const { exclVat, inclVat } =
-      product.selling_price_incl_vat != null
-        ? calculateFromInclVat(product.selling_price_incl_vat, product.vat_rate)
-        : calculateFromExclVat(product.selling_price_excl_vat, product.vat_rate);
-    repairTypeLabel = product.name;
-    item = {
-      item_type: 'product',
-      catalog_repair_type_id: null,
-      product_id: product.id,
-      description: product.name,
-      cost_price_excl_vat: product.purchase_price_excl_vat ?? 0,
-      selling_price_excl_vat: exclVat,
-      vat_rate: product.vat_rate,
-      total_excl_vat: exclVat,
-      total_incl_vat: inclVat,
-    };
-  } else {
+      // The stored incl.-VAT price is what the customer pays; fall back to
+      // deriving it only for products that predate that column.
+      const { exclVat, inclVat } =
+        product.selling_price_incl_vat != null
+          ? calculateFromInclVat(product.selling_price_incl_vat, product.vat_rate)
+          : calculateFromExclVat(product.selling_price_excl_vat, product.vat_rate);
+      items.push({
+        item_type: 'product',
+        catalog_repair_type_id: null,
+        product_id: product.id,
+        description: product.name,
+        cost_price_excl_vat: product.purchase_price_excl_vat ?? 0,
+        selling_price_excl_vat: exclVat,
+        vat_rate: product.vat_rate,
+        total_excl_vat: exclVat,
+        total_incl_vat: inclVat,
+      });
+    }
+  }
+
+  // The manual fields are only rendered when the tech opened the manual line.
+  if (formData.has('manual_description')) {
     const description = (formData.get('manual_description') as string)?.trim();
     const priceRaw = parseFloat(formData.get('manual_price') as string);
     const vatRate = parseFloat((formData.get('manual_vat_rate') as string) ?? '21');
@@ -157,8 +161,7 @@ export async function createRepair(_prevState: RepairFormState, formData: FormDa
     if (!description || isNaN(priceRaw)) return { error: t('fillDescriptionAndPrice') };
 
     const calc = includesVat ? calculateFromInclVat(priceRaw, vatRate) : calculateFromExclVat(priceRaw, vatRate);
-    repairTypeLabel = description;
-    item = {
+    items.push({
       item_type: 'custom',
       catalog_repair_type_id: null,
       product_id: null,
@@ -168,8 +171,11 @@ export async function createRepair(_prevState: RepairFormState, formData: FormDa
       vat_rate: vatRate,
       total_excl_vat: calc.exclVat,
       total_incl_vat: calc.inclVat,
-    };
+    });
   }
+
+  if (items.length === 0) return { error: t('fillDescriptionAndPrice') };
+  const repairTypeLabel = items.map((i) => i.description).join(', ');
 
   // 4. Default status ('Nieuw')
   const { data: newStatus } = await supabase
@@ -215,8 +221,8 @@ export async function createRepair(_prevState: RepairFormState, formData: FormDa
       customer_complaint: (formData.get('customer_complaint') as string) || null,
       technician_notes: (formData.get('technician_notes') as string) || null,
       device_condition_snapshot: deviceCondition,
-      estimated_price: item.total_incl_vat,
-      parts_cost: item.cost_price_excl_vat,
+      estimated_price: items.reduce((sum, i) => sum + i.total_incl_vat, 0),
+      parts_cost: items.reduce((sum, i) => sum + i.cost_price_excl_vat, 0),
       labour_cost: 0,
       warranty_months: warrantyMonths,
       payment_status: 'open',
@@ -227,8 +233,28 @@ export async function createRepair(_prevState: RepairFormState, formData: FormDa
 
   if (repairError || !repair) return { error: repairError?.message ?? t('createRepairFailed') };
 
-  // 7. Line item
-  await supabase.from('repair_items').insert({ repair_id: repair.id, ...item, quantity: 1, discount: 0 });
+  // 7. Line items
+  await supabase.from('repair_items').insert(items.map((i) => ({ repair_id: repair.id, ...i, quantity: 1, discount: 0 })));
+
+  // 7b. Take used products out of stock. Like the kassa, a product at 0 stock
+  // never blocks the repair; stock just stays at 0.
+  for (const i of items) {
+    if (!i.product_id) continue;
+    const { data: product } = await supabase.from('products').select('stock_quantity').eq('id', i.product_id).single();
+    if (!product) continue;
+    const newQuantity = Math.max(0, product.stock_quantity - 1);
+    const actualChange = newQuantity - product.stock_quantity;
+    if (actualChange === 0) continue;
+    await supabase.from('products').update({ stock_quantity: newQuantity }).eq('id', i.product_id);
+    await supabase.from('stock_movements').insert({
+      business_id: businessId,
+      product_id: i.product_id,
+      change: actualChange,
+      reason: 'repair',
+      related_repair_id: repair.id,
+      created_by: user.id,
+    });
+  }
 
   // 8. Intake bon — logged immediately (not just lazily on first print/email) so it
   // shows up in Bonnen right away. The PDF itself is still rendered on demand from
@@ -240,6 +266,8 @@ export async function createRepair(_prevState: RepairFormState, formData: FormDa
 
   revalidatePath('/reparaties');
   revalidatePath('/dashboard');
+  revalidatePath('/producten');
+  revalidatePath('/voorraad');
   redirect(`/reparaties/${repair.id}`);
 }
 
