@@ -57,9 +57,14 @@
     "quickInvoice": "Invoice",
     "quickFindCustomer": "Find customer",
     "repairStatus": "Repair status",
-    "onTheBench": "On the bench ({count})",
-    "benchEmpty": "Nothing open. New repairs show up here first.",
-    "moreInColumn": "+{count} more"
+    "benchEmpty": "No repairs in progress. New repairs show up here.",
+    "todaySentence": "{revenue} taken today from {transactions, plural, one {# transaction} other {# transactions}}.",
+    "todaySentenceRepairs": "{received, plural, =0 {No repairs in yet} one {# repair came in} other {# repairs came in}}, {unpaid, plural, =0 {everything paid} other {# still unpaid}}.",
+    "benchHeading": "On the bench",
+    "allRepairs": "All repairs",
+    "moreRepairs": "See {count} more open repairs",
+    "daysInShop": "{count, plural, one {day} other {days}}",
+    "call": "Call"
   },
   "notifications": {
     "title": "Notifications",

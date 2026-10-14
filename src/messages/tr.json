@@ -57,9 +57,14 @@
     "quickInvoice": "Fatura",
     "quickFindCustomer": "Müşteri bul",
     "repairStatus": "Onarım durumu",
-    "onTheBench": "Tezgâhta ({count})",
-    "benchEmpty": "Açık iş yok. Yeni onarımlar önce burada görünür.",
-    "moreInColumn": "+{count} daha"
+    "benchEmpty": "Devam eden onarım yok. Yeni onarımlar burada görünür.",
+    "todaySentence": "Bugün {transactions, plural, other {# işlemden}} {revenue} ciro.",
+    "todaySentenceRepairs": "{received, plural, =0 {Henüz onarım gelmedi} other {# onarım geldi}}, {unpaid, plural, =0 {hepsi ödendi} other {# henüz ödenmedi}}.",
+    "benchHeading": "Tezgâhta",
+    "allRepairs": "Tüm onarımlar",
+    "moreRepairs": "{count} açık onarım daha gör",
+    "daysInShop": "{count, plural, other {gün}}",
+    "call": "Ara"
   },
   "notifications": {
     "title": "Bildirimler",

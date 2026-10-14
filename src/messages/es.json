@@ -57,9 +57,14 @@
     "quickInvoice": "Factura",
     "quickFindCustomer": "Buscar cliente",
     "repairStatus": "Estado de reparaciones",
-    "onTheBench": "En el banco de trabajo ({count})",
-    "benchEmpty": "Nada abierto. Las reparaciones nuevas aparecen aquí primero.",
-    "moreInColumn": "+{count} más"
+    "benchEmpty": "No hay reparaciones en curso. Las nuevas aparecen aquí.",
+    "todaySentence": "Hoy {revenue} de {transactions, plural, one {# transacción} other {# transacciones}}.",
+    "todaySentenceRepairs": "{received, plural, =0 {Aún no han entrado reparaciones} one {Ha entrado # reparación} other {Han entrado # reparaciones}}, {unpaid, plural, =0 {todo pagado} other {# sin pagar}}.",
+    "benchHeading": "En el banco de trabajo",
+    "allRepairs": "Todas las reparaciones",
+    "moreRepairs": "Ver {count} reparaciones abiertas más",
+    "daysInShop": "{count, plural, one {día} other {días}}",
+    "call": "Llamar"
   },
   "notifications": {
     "title": "Notificaciones",

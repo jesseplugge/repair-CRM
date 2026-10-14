@@ -57,9 +57,14 @@
     "quickInvoice": "Factuur",
     "quickFindCustomer": "Klant zoeken",
     "repairStatus": "Reparatiestatus",
-    "onTheBench": "Op de werkbank ({count})",
-    "benchEmpty": "Er staat niets open. Nieuwe reparaties komen hier als eerste binnen.",
-    "moreInColumn": "+{count} meer"
+    "benchEmpty": "Geen reparaties in behandeling. Nieuwe reparaties verschijnen hier.",
+    "todaySentence": "Vandaag {revenue} omzet uit {transactions, plural, one {# transactie} other {# transacties}}.",
+    "todaySentenceRepairs": "{received, plural, =0 {Nog geen reparaties binnen} one {# reparatie binnengekomen} other {# reparaties binnengekomen}}, {unpaid, plural, =0 {alles betaald} other {# nog niet betaald}}.",
+    "benchHeading": "Op de werkbank",
+    "allRepairs": "Alle reparaties",
+    "moreRepairs": "Nog {count} open reparaties bekijken",
+    "daysInShop": "{count, plural, one {dag} other {dagen}}",
+    "call": "Bellen"
   },
   "notifications": {
     "title": "Meldingen",

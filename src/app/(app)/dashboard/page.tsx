@@ -3,7 +3,7 @@ import { getLocale, getTranslations } from 'next-intl/server';
 import { createClient, getCurrentUser } from '@/lib/supabase/server';
 import { formatEuro } from '@/lib/utils/currency';
 import { getNotifications } from '@/lib/actions/notifications';
-import { Plus } from 'lucide-react';
+import { Phone, Plus } from 'lucide-react';
 
 export default async function DashboardPage() {
   const user = await getCurrentUser();
@@ -24,7 +24,7 @@ export default async function DashboardPage() {
     supabase
       .from('repairs')
       .select(
-        'id, repair_number, status_id, payment_status, final_price, date_received, date_completed, repair_type_label, customer:customers(first_name, last_name), device:devices(brand, model)'
+        'id, repair_number, status_id, payment_status, final_price, date_received, date_completed, expected_completion_date, repair_type_label, customer:customers(first_name, last_name, phone), device:devices(brand, model)'
       )
       .order('date_received')
       .eq('business_id', user!.business_id),
@@ -52,19 +52,22 @@ export default async function DashboardPage() {
   const revenueToday = repairRevenueToday + posRevenueToday;
   const transactionsToday = paidRepairsToday.length + (posSalesToday ?? []).length;
 
-  // The bench: every status a repair still moves through, in workflow order, with
-  // "Gereed" pulled out as its own column because those go back over the counter.
-  // Finished statuses (picked up, cancelled) only get a count.
+  // Open repairs as one list, not columns: what can go back over the counter first,
+  // then everything still on the bench, oldest first. Finished statuses (picked up,
+  // cancelled) only get a count.
   const readyStatusId = byName('Gereed')?.id;
-  const benchColumns = allStatuses
-    .filter((s) => s.active && !s.is_terminal)
-    .map((status) => ({ status, repairs: allRepairs.filter((r) => r.status_id === status.id) }));
-  const workColumns = benchColumns.filter((c) => c.status.id !== readyStatusId);
-  const readyColumn = benchColumns.find((c) => c.status.id === readyStatusId);
-  const openCount = benchColumns.reduce((sum, c) => sum + c.repairs.length, 0);
+  const statusById = new Map(allStatuses.map((s) => [s.id, s]));
+  const openRepairs = allRepairs.filter((r) => {
+    const status = statusById.get(r.status_id);
+    return status && !status.is_terminal;
+  });
+  const readyRepairs = openRepairs.filter((r) => r.status_id === readyStatusId);
+  const benchRepairs = openRepairs.filter((r) => r.status_id !== readyStatusId);
   const finishedCounts = allStatuses
     .filter((s) => s.active && s.is_terminal)
     .map((status) => ({ status, count: allRepairs.filter((r) => r.status_id === status.id).length }));
+  const daysInShop = (received: string) => Math.max(0, Math.floor((startOfToday.getTime() - new Date(received).setHours(0, 0, 0, 0)) / 86_400_000));
+  const isOverdue = (expected: string | null) => !!expected && new Date(expected) < startOfToday;
   const todayLabel = new Intl.DateTimeFormat(locale, { weekday: 'long', day: 'numeric', month: 'long' }).format(now);
 
   // Insight: completed repairs this month vs last month
@@ -96,12 +99,32 @@ export default async function DashboardPage() {
     .filter(([, v]) => v.revenue > 0)
     .sort((a, b) => b[1].profit / b[1].revenue - a[1].profit / a[1].revenue)[0];
 
+  const toRow = (r: (typeof openRepairs)[number]): JobRowData => {
+    const customer = r.customer as unknown as { first_name: string; last_name: string; phone: string | null } | null;
+    const device = r.device as unknown as { brand: string; model: string } | null;
+    const status = statusById.get(r.status_id);
+    return {
+      id: r.id,
+      repairNumber: r.repair_number,
+      device: device ? `${device.brand} ${device.model}` : (r.repair_type_label ?? ''),
+      customer: customer ? `${customer.first_name} ${customer.last_name}` : '',
+      phone: customer?.phone ?? null,
+      days: daysInShop(r.date_received),
+      overdue: isOverdue(r.expected_completion_date),
+      statusName: status?.name ?? '',
+      statusColor: status?.color ?? null,
+    };
+  };
+
   return (
-    <div className="flex flex-col gap-8">
+    <div className="space-y-10">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="font-display text-3xl font-bold text-ink-950 first-letter:uppercase">{todayLabel}</h1>
-          <p className="mt-1 text-sm text-ink-600">{user ? t('welcomeBackName', { name: user.full_name }) : t('welcomeBack')}</p>
+          <p className="mt-2 max-w-prose text-base text-ink-700">
+            {t('todaySentence', { revenue: formatEuro(revenueToday), transactions: transactionsToday })}{' '}
+            {t('todaySentenceRepairs', { received: receivedToday, unpaid })}
+          </p>
         </div>
         <Link
           href="/reparaties/nieuw"
@@ -112,63 +135,68 @@ export default async function DashboardPage() {
         </Link>
       </header>
 
-      {/* The bench. On phones it comes after "Today" and scrolls sideways. */}
-      <section aria-labelledby="bench-heading" className="order-2 lg:order-1">
-        <h2 id="bench-heading" className="mb-3 font-display text-lg font-semibold text-ink-950">
-          {t('onTheBench', { count: openCount })}
-        </h2>
-        <div className="flex gap-px overflow-x-auto rounded-lg bg-mat-700 shadow-crafted">
-          {workColumns.map(({ status, repairs }) => (
-            <BenchColumn key={status.id} status={status} repairs={repairs} moreLabel={(n) => t('moreInColumn', { count: n })} />
-          ))}
-          {readyColumn && (
-            <BenchColumn
-              status={readyColumn.status}
-              repairs={readyColumn.repairs}
-              moreLabel={(n) => t('moreInColumn', { count: n })}
-              ready
-            />
+      <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,20rem)]">
+        <div className="space-y-10">
+          {readyRepairs.length > 0 && (
+            <section aria-labelledby="ready-heading" className="border-l-4 border-signal-500 pl-4">
+              <h2 id="ready-heading" className="font-display text-lg font-semibold text-ink-950">
+                {t('readyForPickup')} <span className="tabular-nums text-ink-600">{readyRepairs.length}</span>
+              </h2>
+              <ul className="mt-2 divide-y divide-ink-200">
+                {readyRepairs.map((r) => (
+                  <JobRow key={r.id} job={toRow(r)} callLabel={t('call')} daysLabel={(n) => t('daysInShop', { count: n })} showCall />
+                ))}
+              </ul>
+            </section>
           )}
-        </div>
-        {openCount === 0 && <p className="mt-3 text-sm text-ink-600">{t('benchEmpty')}</p>}
-        {finishedCounts.length > 0 && (
-          <p className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-sm text-ink-600">
-            {finishedCounts.map(({ status, count }) => (
-              <Link key={status.id} href={`/reparaties?status=${status.id}`} className="focus-ring rounded hover:text-ink-950">
-                {status.name} <span className="tabular-nums font-semibold text-ink-900">{count}</span>
+
+          <section aria-labelledby="bench-heading">
+            <div className="flex items-baseline justify-between gap-4">
+              <h2 id="bench-heading" className="font-display text-lg font-semibold text-ink-950">
+                {t('benchHeading')} <span className="tabular-nums text-ink-600">{benchRepairs.length}</span>
+              </h2>
+              <Link href="/reparaties" className="focus-ring rounded text-sm text-[var(--accent)] hover:underline">
+                {t('allRepairs')}
               </Link>
-            ))}
-          </p>
-        )}
-      </section>
+            </div>
+            {benchRepairs.length === 0 ? (
+              <p className="mt-2 border-y border-ink-200 py-4 text-sm text-ink-600">{t('benchEmpty')}</p>
+            ) : (
+              <ul className="mt-2 divide-y divide-ink-200 border-y border-ink-200">
+                {benchRepairs.slice(0, BENCH_LIMIT).map((r) => (
+                  <JobRow key={r.id} job={toRow(r)} callLabel={t('call')} daysLabel={(n) => t('daysInShop', { count: n })} />
+                ))}
+              </ul>
+            )}
+            {benchRepairs.length > BENCH_LIMIT && (
+              <Link href="/reparaties" className="focus-ring mt-2 inline-block rounded text-sm text-[var(--accent)] hover:underline">
+                {t('moreRepairs', { count: benchRepairs.length - BENCH_LIMIT })}
+              </Link>
+            )}
+            {finishedCounts.length > 0 && (
+              <p className="mt-4 flex flex-wrap gap-x-5 gap-y-1 text-sm text-ink-600">
+                {finishedCounts.map(({ status, count }) => (
+                  <Link key={status.id} href={`/reparaties?status=${status.id}`} className="focus-ring rounded hover:text-ink-950">
+                    {status.name} <span className="tabular-nums font-semibold text-ink-900">{count}</span>
+                  </Link>
+                ))}
+              </p>
+            )}
+          </section>
+        </div>
 
-      <div className="order-1 grid gap-8 lg:order-2 lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)]">
-        {/* Today */}
-        <section aria-labelledby="today-heading">
-          <h2 id="today-heading" className="mb-3 font-display text-lg font-semibold text-ink-950">
-            {t('today')}
-          </h2>
-          <div className="font-display text-4xl font-bold tabular-nums text-ink-950">{formatEuro(revenueToday)}</div>
-          <div className="text-sm text-ink-600">{t('revenueToday')}</div>
-          <dl className="mt-4 divide-y divide-ink-200 border-y border-ink-200 text-sm">
-            <TodayRow label={t('transactionsToday')} value={transactionsToday} />
-            <TodayRow label={t('receivedToday')} value={receivedToday} />
-            <TodayRow label={t('outstandingPayments')} value={unpaid} />
-          </dl>
-        </section>
-
-        <div className="space-y-8">
+        <aside className="space-y-10">
           {needsAttention.length > 0 && (
             <section aria-labelledby="attention-heading">
-              <h2 id="attention-heading" className="mb-3 font-display text-lg font-semibold text-ink-950">
+              <h2 id="attention-heading" className="font-display text-lg font-semibold text-ink-950">
                 {t('needsAttention')}
               </h2>
-              <ul className="divide-y divide-ink-200 border-y border-ink-200">
+              <ul className="mt-2 divide-y divide-ink-200 border-y border-ink-200">
                 {needsAttention.slice(0, 8).map((item) => (
                   <li key={item.key}>
                     <Link
                       href={item.href}
-                      className="focus-ring flex items-center gap-3 py-2.5 text-sm text-ink-800 hover:text-ink-950 hover:underline"
+                      className="focus-ring flex items-start gap-3 py-2.5 text-sm text-ink-800 hover:text-ink-950 hover:underline"
                     >
                       <span aria-hidden>{item.icon}</span>
                       <span>{item.text}</span>
@@ -181,10 +209,10 @@ export default async function DashboardPage() {
 
           {(monthDelta !== null || topMarginType) && (
             <section aria-labelledby="insights-heading">
-              <h2 id="insights-heading" className="mb-2 font-display text-lg font-semibold text-ink-950">
+              <h2 id="insights-heading" className="font-display text-lg font-semibold text-ink-950">
                 {t('insights')}
               </h2>
-              <div className="max-w-prose space-y-1.5 text-sm text-ink-700">
+              <div className="mt-2 space-y-2 text-sm leading-relaxed text-ink-700">
                 {monthDelta !== null && (
                   <p>
                     {monthDelta >= 0
@@ -203,86 +231,66 @@ export default async function DashboardPage() {
               </div>
             </section>
           )}
-        </div>
+        </aside>
       </div>
     </div>
   );
 }
 
-type BenchRepair = {
+const BENCH_LIMIT = 10;
+
+type JobRowData = {
   id: string;
-  repair_number: string;
-  customer: unknown;
-  device: unknown;
+  repairNumber: string;
+  device: string;
+  customer: string;
+  phone: string | null;
+  days: number;
+  overdue: boolean;
+  statusName: string;
+  statusColor: string | null;
 };
 
-const TAGS_PER_COLUMN = 4;
-
-function BenchColumn({
-  status,
-  repairs,
-  moreLabel,
-  ready = false,
+/** One open repair. The days-in-shop figure leads the row: it is what the shop manages by. */
+function JobRow({
+  job,
+  callLabel,
+  daysLabel,
+  showCall = false,
 }: {
-  status: { id: string; name: string; color: string | null };
-  repairs: BenchRepair[];
-  moreLabel: (count: number) => string;
-  ready?: boolean;
+  job: JobRowData;
+  callLabel: string;
+  daysLabel: (count: number) => string;
+  showCall?: boolean;
 }) {
-  const hidden = repairs.length - TAGS_PER_COLUMN;
   return (
-    <div className={`flex min-w-[10.5rem] flex-1 flex-col bg-mat p-3 ${ready ? 'border-t-4 border-signal-500' : 'border-t-4 border-transparent'}`}>
-      <Link
-        href={`/reparaties?status=${status.id}`}
-        className="focus-ring mb-3 flex items-baseline justify-between gap-2 rounded text-sm text-ink-200 hover:text-white"
-      >
-        <span className="flex items-center gap-2">
-          <span aria-hidden className="h-2 w-2 shrink-0 rounded-full" style={{ background: status.color ?? '#6C7D84' }} />
-          {status.name}
-        </span>
-        <span
-          className={`font-display text-2xl font-bold tabular-nums ${
-            repairs.length === 0 ? 'text-ink-600' : ready ? 'text-signal-500' : 'text-white'
-          }`}
-        >
-          {repairs.length}
-        </span>
-      </Link>
-      <div className="space-y-2">
-        {repairs.slice(0, TAGS_PER_COLUMN).map((r) => {
-          const customer = r.customer as { first_name: string; last_name: string } | null;
-          const device = r.device as { brand: string; model: string } | null;
-          return (
-            <Link
-              key={r.id}
-              href={`/reparaties/${r.id}`}
-              className={`focus-ring relative block rounded-sm py-2 pl-7 pr-2.5 text-sm ${
-                ready ? 'bg-signal-500 text-ink-950 hover:bg-signal-100' : 'bg-ink-50 text-ink-900 hover:bg-white'
-              }`}
-            >
-              {/* the punched hole of a job tag */}
-              <span aria-hidden className="absolute left-2.5 top-3 h-2 w-2 rounded-full bg-mat" />
-              <span className="block font-display text-xs font-semibold tabular-nums">{r.repair_number}</span>
-              {device && <span className="block truncate font-medium">{`${device.brand} ${device.model}`}</span>}
-              {customer && <span className="block truncate text-xs opacity-75">{`${customer.first_name} ${customer.last_name}`}</span>}
-            </Link>
-          );
-        })}
-        {hidden > 0 && (
-          <Link href={`/reparaties?status=${status.id}`} className="focus-ring block rounded px-1 text-xs text-ink-200 hover:text-white">
-            {moreLabel(hidden)}
-          </Link>
-        )}
+    <li className="flex items-center gap-4 py-3">
+      <div className={`w-14 shrink-0 text-right ${job.overdue ? 'text-danger-600' : 'text-ink-950'}`}>
+        <div className="font-display text-3xl font-bold leading-none tabular-nums">{job.days}</div>
+        <div className="mt-1 text-xs text-ink-600">{daysLabel(job.days)}</div>
       </div>
-    </div>
-  );
-}
-
-function TodayRow({ label, value }: { label: string; value: number }) {
-  return (
-    <div className="flex items-baseline justify-between py-2">
-      <dt className="text-ink-600">{label}</dt>
-      <dd className="tabular-nums font-semibold text-ink-950">{value}</dd>
-    </div>
+      <Link href={`/reparaties/${job.id}`} className="focus-ring group min-w-0 flex-1 rounded">
+        <div className="truncate font-medium text-ink-950 group-hover:underline">{job.device}</div>
+        <div className="truncate text-sm text-ink-600">
+          {job.customer}
+          <span className="ml-2 tabular-nums text-ink-400">{job.repairNumber}</span>
+        </div>
+      </Link>
+      {!showCall && (
+        <span className="hidden shrink-0 items-center gap-2 text-sm text-ink-700 sm:flex">
+          <span aria-hidden className="h-2 w-2 rounded-full" style={{ background: job.statusColor ?? '#6C7D84' }} />
+          {job.statusName}
+        </span>
+      )}
+      {showCall && job.phone && (
+        <a
+          href={`tel:${job.phone.replace(/\s+/g, '')}`}
+          className="focus-ring inline-flex shrink-0 items-center gap-1.5 rounded border border-ink-200 bg-white px-3 py-1.5 text-sm font-medium text-ink-900 hover:border-ink-400"
+        >
+          <Phone size={14} />
+          {callLabel}
+        </a>
+      )}
+    </li>
   );
 }
