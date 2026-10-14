@@ -13,12 +13,15 @@ type DeviceLite = { id: string; brand: string; model: string; imei: string | nul
 type CatalogLite = {
   id: string;
   name: string;
-  brand: string | null;
-  model: string | null;
-  selling_price: number;
+  sku: string | null;
+  selling_price_excl_vat: number;
+  selling_price_incl_vat: number | null;
   vat_rate: number;
-  warranty_months: number | null;
 };
+
+function priceInclVat(p: CatalogLite) {
+  return p.selling_price_incl_vat ?? p.selling_price_excl_vat * (1 + p.vat_rate / 100);
+}
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -106,8 +109,8 @@ export function RepairIntakeForm({
   }, [catalogQuery, catalogItem]);
 
   const estimatedTotal = catalogItem
-    ? catalogItem.selling_price * (1 + catalogItem.vat_rate / 100)
-    : parseFloat(manualPrice || '0');
+    ? priceInclVat(catalogItem)
+    :  parseFloat(manualPrice || '0');
 
   return (
     <form action={formAction} className="space-y-6">
@@ -257,7 +260,7 @@ export function RepairIntakeForm({
           {catalogItem ? (
             <SelectedRow
               title={catalogItem.name}
-              subtitle={`${formatEuro(catalogItem.selling_price * (1 + catalogItem.vat_rate / 100))} ${t('inclVat')} · ${t('warrantyMonthsShort', { months: catalogItem.warranty_months ?? '–' })}`}
+              subtitle={`${formatEuro(priceInclVat(catalogItem))} ${t('inclVat')}${catalogItem.sku ? ` · ${catalogItem.sku}` : ''}`}
               onChange={() => setCatalogItem(null)}
               changeLabel={t('change')}
             />
@@ -313,10 +316,11 @@ export function RepairIntakeForm({
                       onClick={() => setCatalogItem(c)}
                       className="flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:bg-ink-50"
                     >
-                      <span className="font-medium text-ink-900">{c.name}</span>
-                      <span className="tabular-nums text-ink-600">
-                        {formatEuro(c.selling_price * (1 + c.vat_rate / 100))}
+                      <span>
+                        <span className="font-medium text-ink-900">{c.name}</span>
+                        {c.sku && <span className="ml-2 text-xs text-ink-400">{c.sku}</span>}
                       </span>
+                      <span className="tabular-nums text-ink-600">{formatEuro(priceInclVat(c))}</span>
                     </button>
                   ))}
                 </div>
@@ -371,7 +375,7 @@ export function RepairIntakeForm({
           {/* hidden inputs carrying resolved selection state into the server action */}
           {customer && <input type="hidden" name="customer_id" value={customer.id} />}
           {device && <input type="hidden" name="device_id" value={device.id} />}
-          {catalogItem && <input type="hidden" name="catalog_repair_type_id" value={catalogItem.id} />}
+          {catalogItem && <input type="hidden" name="product_id" value={catalogItem.id} />}
 
           {state?.error && <p className="text-sm text-red-700">{state.error}</p>}
           <SubmitButton />

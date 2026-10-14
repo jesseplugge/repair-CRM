@@ -101,8 +101,8 @@ export async function createRepair(_prevState: RepairFormState, formData: FormDa
     deviceId = newDevice.id;
   }
 
-  // 3. Resolve repair line (catalogue item or manual)
-  const catalogId = formData.get('catalog_repair_type_id') as string | null;
+  // 3. Resolve repair line (product or manual)
+  const productId = formData.get('product_id') as string | null;
   let repairTypeLabel: string;
   let item: {
     item_type: string;
@@ -122,29 +122,33 @@ export async function createRepair(_prevState: RepairFormState, formData: FormDa
     .single();
   let warrantyMonths: number | null = business?.default_warranty_months ?? null;
 
-  if (catalogId) {
-    const { data: catalogItem } = await supabase
-      .from('catalog_repair_types')
+  if (productId) {
+    const { data: product } = await supabase
+      .from('products')
       .select('*')
-      .eq('id', catalogId)
+      .eq('id', productId)
       .eq('business_id', businessId)
       .single();
-    if (!catalogItem) return { error: t('catalogItemNotFound') };
+    if (!product) return { error: t('catalogItemNotFound') };
 
-    const { exclVat, inclVat } = calculateFromExclVat(catalogItem.selling_price, catalogItem.vat_rate);
-    repairTypeLabel = catalogItem.name;
+    // The stored incl.-VAT price is what the customer pays; fall back to
+    // deriving it only for products that predate that column.
+    const { exclVat, inclVat } =
+      product.selling_price_incl_vat != null
+        ? calculateFromInclVat(product.selling_price_incl_vat, product.vat_rate)
+        : calculateFromExclVat(product.selling_price_excl_vat, product.vat_rate);
+    repairTypeLabel = product.name;
     item = {
-      item_type: 'service',
-      catalog_repair_type_id: catalogItem.id,
-      product_id: catalogItem.default_product_id,
-      description: catalogItem.name,
-      cost_price_excl_vat: (catalogItem.part_cost ?? 0) + (catalogItem.labour_price ?? 0),
+      item_type: 'product',
+      catalog_repair_type_id: null,
+      product_id: product.id,
+      description: product.name,
+      cost_price_excl_vat: product.purchase_price_excl_vat ?? 0,
       selling_price_excl_vat: exclVat,
-      vat_rate: catalogItem.vat_rate,
+      vat_rate: product.vat_rate,
       total_excl_vat: exclVat,
       total_incl_vat: inclVat,
     };
-    warrantyMonths = catalogItem.warranty_months ?? warrantyMonths;
   } else {
     const description = (formData.get('manual_description') as string)?.trim();
     const priceRaw = parseFloat(formData.get('manual_price') as string);
@@ -616,8 +620,13 @@ export async function deleteRepair(repairId: string) {
 export async function searchCatalog(query: string, businessId: string) {
   const supabase = createClient();
   const q = query.trim().replace(/[,()]/g, ' ').trim();
-  let request = supabase.from('catalog_repair_types').select('*').eq('business_id', businessId).eq('active', true);
-  if (q) request = request.or(`name.ilike.%${q}%,brand.ilike.%${q}%,model.ilike.%${q}%`);
+  let request = supabase
+    .from('products')
+    .select('id, name, sku, selling_price_excl_vat, selling_price_incl_vat, vat_rate')
+    .eq('business_id', businessId)
+    .eq('active', true)
+    .order('name');
+  if (q) request = request.or(`name.ilike.%${q}%,sku.ilike.%${q}%`);
   const { data } = await request.limit(15);
   return data ?? [];
 }
