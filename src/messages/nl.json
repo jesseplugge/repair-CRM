@@ -40,6 +40,8 @@
     "today": "Vandaag",
     "receivedToday": "Ontvangen vandaag",
     "readyForPickup": "Klaar om op te halen",
+  "kpiOpenRepairs": "Open reparaties",
+  "kpiNeedsAction": "Vraagt nu om actie",
     "waitingForParts": "Wacht op onderdeel",
     "inProgress": "In behandeling",
     "outstandingPayments": "Openstaande betalingen",
@@ -64,7 +66,12 @@
     "allRepairs": "Alle reparaties",
     "moreRepairs": "Nog {count} open reparaties bekijken",
     "daysInShop": "{count, plural, one {dag} other {dagen}}",
-    "call": "Bellen"
+    "call": "Bellen",
+  "ticketClaim": "Bon",
+  "ticketDevice": "Apparaat",
+  "ticketStatus": "Status",
+  "ticketAmount": "Bedrag",
+  "ticketOpen": "Reparatie openen"
   },
   "notifications": {
     "title": "Meldingen",

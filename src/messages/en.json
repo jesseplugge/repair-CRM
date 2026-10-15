@@ -40,6 +40,8 @@
     "today": "Today",
     "receivedToday": "Received today",
     "readyForPickup": "Ready for pickup",
+  "kpiOpenRepairs": "Open repairs",
+  "kpiNeedsAction": "Needs action now",
     "waitingForParts": "Waiting for parts",
     "inProgress": "In progress",
     "outstandingPayments": "Outstanding payments",
@@ -64,7 +66,12 @@
     "allRepairs": "All repairs",
     "moreRepairs": "See {count} more open repairs",
     "daysInShop": "{count, plural, one {day} other {days}}",
-    "call": "Call"
+    "call": "Call",
+  "ticketClaim": "Claim",
+  "ticketDevice": "Device",
+  "ticketStatus": "Status",
+  "ticketAmount": "Amount",
+  "ticketOpen": "Open repair"
   },
   "notifications": {
     "title": "Notifications",

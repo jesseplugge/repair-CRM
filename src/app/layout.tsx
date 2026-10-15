@@ -1,13 +1,14 @@
 import type { Metadata, Viewport } from 'next';
-import { Archivo } from 'next/font/google';
+import { Hanken_Grotesk, JetBrains_Mono } from 'next/font/google';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages } from 'next-intl/server';
 import { ToastProvider } from '@/components/ui/toast';
 import { ServiceWorkerRegister } from '@/components/ServiceWorkerRegister';
 import './globals.css';
 
-// Variable font with a width axis: normal width for body, expanded for display.
-const archivo = Archivo({ subsets: ['latin'], axes: ['wdth'], variable: '--font-archivo' });
+const hankenGrotesk = Hanken_Grotesk({ subsets: ['latin'], variable: '--font-hanken' });
+// Claim/repair numbers, days-in-shop counters and amounts set in tabular mono figures.
+const jetbrainsMono = JetBrains_Mono({ subsets: ['latin'], weight: ['500', '700'], variable: '--font-mono' });
 
 export const metadata: Metadata = {
   title: 'Reparatie CRM',
@@ -27,7 +28,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  themeColor: '#22343B',
+  themeColor: '#241C5B',
   // Lets the page reach the physical screen edges in standalone/native contexts so the
   // env(safe-area-inset-*) values used by MobileNav/AppShell actually resolve to real
   // insets instead of always computing to 0. No visible effect in an ordinary browser tab.
@@ -40,7 +41,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   return (
     <html lang={locale}>
-      <body className={`${archivo.variable} font-sans`}>
+      <body className={`${hankenGrotesk.variable} ${jetbrainsMono.variable} font-sans`}>
         <NextIntlClientProvider locale={locale} messages={messages}>
           <ToastProvider>{children}</ToastProvider>
         </NextIntlClientProvider>

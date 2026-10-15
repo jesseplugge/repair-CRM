@@ -40,6 +40,8 @@
     "today": "Bugün",
     "receivedToday": "Bugün alınan",
     "readyForPickup": "Teslime hazır",
+  "kpiOpenRepairs": "Açık onarımlar",
+  "kpiNeedsAction": "Şimdi işlem gerekiyor",
     "waitingForParts": "Parça bekleniyor",
     "inProgress": "İşlemde",
     "outstandingPayments": "Bekleyen ödemeler",
@@ -64,7 +66,12 @@
     "allRepairs": "Tüm onarımlar",
     "moreRepairs": "{count} açık onarım daha gör",
     "daysInShop": "{count, plural, other {gün}}",
-    "call": "Ara"
+    "call": "Ara",
+  "ticketClaim": "Fiş",
+  "ticketDevice": "Cihaz",
+  "ticketStatus": "Durum",
+  "ticketAmount": "Tutar",
+  "ticketOpen": "Onarımı aç"
   },
   "notifications": {
     "title": "Bildirimler",

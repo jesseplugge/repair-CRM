@@ -40,6 +40,8 @@
     "today": "Aujourd'hui",
     "receivedToday": "Reçues aujourd'hui",
     "readyForPickup": "Prêtes à retirer",
+  "kpiOpenRepairs": "Réparations ouvertes",
+  "kpiNeedsAction": "Nécessite une action",
     "waitingForParts": "En attente de pièce",
     "inProgress": "En cours",
     "outstandingPayments": "Paiements en attente",
@@ -64,7 +66,12 @@
     "allRepairs": "Toutes les réparations",
     "moreRepairs": "Voir {count} autres réparations ouvertes",
     "daysInShop": "{count, plural, one {jour} other {jours}}",
-    "call": "Appeler"
+    "call": "Appeler",
+  "ticketClaim": "Bon",
+  "ticketDevice": "Appareil",
+  "ticketStatus": "Statut",
+  "ticketAmount": "Montant",
+  "ticketOpen": "Ouvrir la réparation"
   },
   "notifications": {
     "title": "Notifications",

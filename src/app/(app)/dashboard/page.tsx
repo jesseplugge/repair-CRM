@@ -1,9 +1,18 @@
 import Link from 'next/link';
+import { clsx } from 'clsx';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { createClient, getCurrentUser } from '@/lib/supabase/server';
 import { formatEuro } from '@/lib/utils/currency';
 import { getNotifications } from '@/lib/actions/notifications';
-import { FileText, Phone, Plus, Search, ShoppingCart, UserPlus } from 'lucide-react';
+import { FileText, Plus, Search, ShoppingCart, UserPlus, ShieldAlert, Clock, PackageX, Receipt, type LucideIcon } from 'lucide-react';
+import { JobBoard, type JobRowData } from './JobBoard';
+
+const NOTIFICATION_ICON: Record<string, { icon: LucideIcon; className: string }> = {
+  claim: { icon: ShieldAlert, className: 'text-danger-600' },
+  ready: { icon: Clock, className: 'text-signal-600' },
+  stock: { icon: PackageX, className: 'text-warning-600' },
+  inv: { icon: Receipt, className: 'text-danger-600' },
+};
 
 export default async function DashboardPage() {
   const user = await getCurrentUser();
@@ -68,8 +77,6 @@ export default async function DashboardPage() {
     const status = statusById.get(r.status_id);
     return status && !status.is_terminal;
   });
-  const readyRepairs = openRepairs.filter((r) => r.status_id === readyStatusId);
-  const benchRepairs = openRepairs.filter((r) => r.status_id !== readyStatusId);
   const finishedCounts = allStatuses
     .filter((s) => s.active && s.is_terminal)
     .map((status) => ({ status, count: allRepairs.filter((r) => r.status_id === status.id).length }));
@@ -106,6 +113,15 @@ export default async function DashboardPage() {
     .filter(([, v]) => v.revenue > 0)
     .sort((a, b) => b[1].profit / b[1].revenue - a[1].profit / a[1].revenue)[0];
 
+  // Ranked as one list, most urgent first: ready for pickup or past its expected date
+  // (needs a hand now), then everything else still on the bench, oldest-received first.
+  const isUrgent = (r: (typeof openRepairs)[number]) => r.status_id === readyStatusId || isOverdue(r.expected_completion_date);
+  const urgentRepairs = openRepairs.filter(isUrgent);
+  const normalRepairs = openRepairs.filter((r) => !isUrgent(r));
+  const rankedRepairs = [...urgentRepairs, ...normalRepairs];
+  const visibleRepairs = rankedRepairs.slice(0, LIST_LIMIT);
+  const hiddenCount = rankedRepairs.length - visibleRepairs.length;
+
   const toRow = (r: (typeof openRepairs)[number]): JobRowData => {
     const customer = r.customer as unknown as { first_name: string; last_name: string; phone: string | null } | null;
     const device = r.device as unknown as { brand: string; model: string } | null;
@@ -118,8 +134,10 @@ export default async function DashboardPage() {
       phone: customer?.phone ?? null,
       days: daysInShop(r.date_received),
       overdue: isOverdue(r.expected_completion_date),
+      urgent: isUrgent(r),
       statusName: status?.name ?? '',
       statusColor: status?.color ?? null,
+      finalPrice: r.final_price ?? null,
     };
   };
 
@@ -146,7 +164,7 @@ export default async function DashboardPage() {
           ))}
           <Link
             href="/reparaties/nieuw"
-            className="focus-ring inline-flex items-center gap-2 rounded bg-signal-500 px-4 py-2.5 text-sm font-semibold text-ink-950 hover:bg-signal-600"
+            className="focus-ring inline-flex items-center gap-2 rounded bg-signal-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-signal-600"
           >
             <Plus size={18} strokeWidth={2.5} />
             {t('quickNewRepair')}
@@ -154,49 +172,54 @@ export default async function DashboardPage() {
         </nav>
       </header>
 
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <KpiTile label={t('kpiOpenRepairs')} value={openRepairs.length} />
+        <KpiTile label={t('kpiNeedsAction')} value={urgentRepairs.length} emphasize={urgentRepairs.length > 0} />
+        <KpiTile label={t('revenueToday')} value={formatEuro(revenueToday)} />
+        <KpiTile label={t('outstandingPayments')} value={unpaid} emphasize={unpaid > 0} />
+      </div>
+
       <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,20rem)]">
         <div className="space-y-10">
-          {readyRepairs.length > 0 && (
-            <section aria-labelledby="ready-heading" className="border-l-4 border-signal-500 pl-4">
-              <h2 id="ready-heading" className="font-display text-lg font-semibold text-ink-950">
-                {t('readyForPickup')} <span className="tabular-nums text-ink-600">{readyRepairs.length}</span>
-              </h2>
-              <ul className="mt-2 divide-y divide-ink-200">
-                {readyRepairs.map((r) => (
-                  <JobRow key={r.id} job={toRow(r)} callLabel={t('call')} daysLabel={(n) => t('daysInShop', { count: n })} showCall />
-                ))}
-              </ul>
-            </section>
-          )}
-
           <section aria-labelledby="bench-heading">
             <div className="flex items-baseline justify-between gap-4">
               <h2 id="bench-heading" className="font-display text-lg font-semibold text-ink-950">
-                {t('benchHeading')} <span className="tabular-nums text-ink-600">{benchRepairs.length}</span>
+                {t('benchHeading')} <span className="font-mono tabular-nums text-ink-600">{openRepairs.length}</span>
               </h2>
               <Link href="/reparaties" className="focus-ring rounded text-sm text-[var(--accent)] hover:underline">
                 {t('allRepairs')}
               </Link>
             </div>
-            {benchRepairs.length === 0 ? (
-              <p className="mt-2 border-y border-ink-200 py-4 text-sm text-ink-600">{t('benchEmpty')}</p>
+            {openRepairs.length === 0 ? (
+              <p className="mt-2 rounded-lg border border-ink-100 py-4 text-center text-sm text-ink-600">{t('benchEmpty')}</p>
             ) : (
-              <ul className="mt-2 divide-y divide-ink-200 border-y border-ink-200">
-                {benchRepairs.slice(0, BENCH_LIMIT).map((r) => (
-                  <JobRow key={r.id} job={toRow(r)} callLabel={t('call')} daysLabel={(n) => t('daysInShop', { count: n })} />
-                ))}
-              </ul>
+              <div className="mt-2 rounded-lg border border-ink-100">
+                <JobBoard
+                  rows={visibleRepairs.map(toRow)}
+                  daysLabel={(n) => t('daysInShop', { count: n })}
+                  formatAmount={formatEuro}
+                  ticketLabels={{
+                    claim: t('ticketClaim'),
+                    device: t('ticketDevice'),
+                    status: t('ticketStatus'),
+                    daysInShop: t('daysInShop', { count: 1 }),
+                    amount: t('ticketAmount'),
+                    call: t('call'),
+                    open: t('ticketOpen'),
+                  }}
+                />
+              </div>
             )}
-            {benchRepairs.length > BENCH_LIMIT && (
+            {hiddenCount > 0 && (
               <Link href="/reparaties" className="focus-ring mt-2 inline-block rounded text-sm text-[var(--accent)] hover:underline">
-                {t('moreRepairs', { count: benchRepairs.length - BENCH_LIMIT })}
+                {t('moreRepairs', { count: hiddenCount })}
               </Link>
             )}
             {finishedCounts.length > 0 && (
               <p className="mt-4 flex flex-wrap gap-x-5 gap-y-1 text-sm text-ink-600">
                 {finishedCounts.map(({ status, count }) => (
                   <Link key={status.id} href={`/reparaties?status=${status.id}`} className="focus-ring rounded hover:text-ink-950">
-                    {status.name} <span className="tabular-nums font-semibold text-ink-900">{count}</span>
+                    {status.name} <span className="font-mono tabular-nums font-semibold text-ink-900">{count}</span>
                   </Link>
                 ))}
               </p>
@@ -211,17 +234,21 @@ export default async function DashboardPage() {
                 {t('needsAttention')}
               </h2>
               <ul className="mt-2 divide-y divide-ink-200 border-y border-ink-200">
-                {needsAttention.slice(0, 8).map((item) => (
-                  <li key={item.key}>
-                    <Link
-                      href={item.href}
-                      className="focus-ring flex items-start gap-3 py-2.5 text-sm text-ink-800 hover:text-ink-950 hover:underline"
-                    >
-                      <span aria-hidden>{item.icon}</span>
-                      <span>{item.text}</span>
-                    </Link>
-                  </li>
-                ))}
+                {needsAttention.slice(0, 8).map((item) => {
+                  const prefix = item.key.split('-')[0];
+                  const { icon: Icon, className } = NOTIFICATION_ICON[prefix] ?? { icon: ShieldAlert, className: 'text-ink-500' };
+                  return (
+                    <li key={item.key}>
+                      <Link
+                        href={item.href}
+                        className="focus-ring flex items-start gap-3 py-2.5 text-sm text-ink-800 hover:text-ink-950 hover:underline"
+                      >
+                        <Icon size={16} className={`mt-0.5 shrink-0 ${className}`} aria-hidden />
+                        <span>{item.text}</span>
+                      </Link>
+                    </li>
+                  );
+                })}
               </ul>
             </section>
           )}
@@ -256,60 +283,14 @@ export default async function DashboardPage() {
   );
 }
 
-const BENCH_LIMIT = 10;
+const LIST_LIMIT = 12;
 
-type JobRowData = {
-  id: string;
-  repairNumber: string;
-  device: string;
-  customer: string;
-  phone: string | null;
-  days: number;
-  overdue: boolean;
-  statusName: string;
-  statusColor: string | null;
-};
-
-/** One open repair. The days-in-shop figure leads the row: it is what the shop manages by. */
-function JobRow({
-  job,
-  callLabel,
-  daysLabel,
-  showCall = false,
-}: {
-  job: JobRowData;
-  callLabel: string;
-  daysLabel: (count: number) => string;
-  showCall?: boolean;
-}) {
+/** One KPI tile. The two that call for a hand now ride the committed brand surface; the calm two stay on its soft tint. */
+function KpiTile({ label, value, emphasize = false }: { label: string; value: string | number; emphasize?: boolean }) {
   return (
-    <li className="flex items-center gap-4 py-3">
-      <div className={`w-14 shrink-0 text-right ${job.overdue ? 'text-danger-600' : 'text-ink-950'}`}>
-        <div className="font-display text-3xl font-bold leading-none tabular-nums">{job.days}</div>
-        <div className="mt-1 text-xs text-ink-600">{daysLabel(job.days)}</div>
-      </div>
-      <Link href={`/reparaties/${job.id}`} className="focus-ring group min-w-0 flex-1 rounded">
-        <div className="truncate font-medium text-ink-950 group-hover:underline">{job.device}</div>
-        <div className="truncate text-sm text-ink-600">
-          {job.customer}
-          <span className="ml-2 tabular-nums text-ink-400">{job.repairNumber}</span>
-        </div>
-      </Link>
-      {!showCall && (
-        <span className="hidden shrink-0 items-center gap-2 text-sm text-ink-700 sm:flex">
-          <span aria-hidden className="h-2 w-2 rounded-full" style={{ background: job.statusColor ?? '#6C7D84' }} />
-          {job.statusName}
-        </span>
-      )}
-      {showCall && job.phone && (
-        <a
-          href={`tel:${job.phone.replace(/\s+/g, '')}`}
-          className="focus-ring inline-flex shrink-0 items-center gap-1.5 rounded border border-ink-200 bg-white px-3 py-1.5 text-sm font-medium text-ink-900 hover:border-ink-400"
-        >
-          <Phone size={14} />
-          {callLabel}
-        </a>
-      )}
-    </li>
+    <div className={clsx('rounded-lg px-4 py-3.5', emphasize ? 'bg-mat' : 'bg-signal-50')}>
+      <div className={clsx('font-mono text-2xl font-bold tabular-nums', emphasize ? 'text-white' : 'text-ink-950')}>{value}</div>
+      <div className={clsx('mt-1 text-xs font-medium', emphasize ? 'text-signal-100' : 'text-ink-600')}>{label}</div>
+    </div>
   );
 }

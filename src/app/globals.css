@@ -66,10 +66,10 @@
 }
 
 @layer utilities {
-  /* Headings and big numbers use Archivo's expanded width rather than a second
-     typeface; body text stays at normal width. */
+  /* Headings and big numbers sit slightly tighter than body text so the type scale
+     reads as deliberate steps rather than the same voice at different sizes. */
   .font-display {
-    font-stretch: 125%;
+    letter-spacing: -0.02em;
   }
 
   /* Shared focus treatment for interactive elements outside <Button> (menu items,

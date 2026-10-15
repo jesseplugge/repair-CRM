@@ -1,13 +1,14 @@
 import type { Config } from 'tailwindcss';
 
-// Design tokens — "repair bench" identity.
-// Neutrals are cool and paper-like (a job tag on a device), the dark surface is the
-// blue-grey of an anti-static mat, and one tool-handle yellow ("signal") marks the
-// few things that need hands now: starting a repair and handing one back.
-// The per-business --accent stays a readable deep blue because it is used for link
-// text and white-on-accent buttons all over the app; yellow is never used for text.
-// One type family (Archivo) carries everything; headings and big numbers use its
-// expanded width (see .font-display in globals.css) instead of a second typeface.
+// Design tokens — "repair counter" identity.
+// Neutrals stay cool and paper-like (a job tag on a device). The shell commits to one
+// saturated indigo-violet ("mat"/"signal") doing real structural work: the sidebar,
+// active nav, and the two actions that need hands now (starting a repair, handing one
+// back) — not a washed neutral shell with a single timid accent.
+// The per-business --accent stays independently configurable (link text, white-on-accent
+// buttons) because that is shop-specific branding, not this shell's own identity.
+// Hanken Grotesk carries UI text; JetBrains Mono sets claim/repair numbers, day counters
+// and amounts in tabular figures (see .font-mono usage and --font-mono below).
 const config: Config = {
   content: ['./src/**/*.{ts,tsx}'],
   theme: {
@@ -24,13 +25,15 @@ const config: Config = {
           50: '#F4F6F5',
         },
         mat: {
-          DEFAULT: '#22343B',
-          700: '#1A2930',
+          DEFAULT: '#241C5B',
+          700: '#190F47',
         },
         signal: {
-          600: '#C9971A',
-          500: '#E9B425',
-          100: '#FBF0D0',
+          700: '#4C34B8',
+          600: '#5B3FD1',
+          500: '#6D4CF0',
+          100: '#EEE9FF',
+          50: '#F5F2FF',
         },
         teal: {
           700: '#0A5F64',
@@ -78,8 +81,9 @@ const config: Config = {
         },
       },
       fontFamily: {
-        sans: ['var(--font-archivo)', 'system-ui', 'sans-serif'],
-        display: ['var(--font-archivo)', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-hanken)', 'system-ui', 'sans-serif'],
+        display: ['var(--font-hanken)', 'system-ui', 'sans-serif'],
+        mono: ['var(--font-mono)', 'ui-monospace', 'monospace'],
       },
       fontFeatureSettings: {
         tabular: '"tnum" 1, "lnum" 1',
