@@ -1,11 +1,12 @@
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import { createClient, getCurrentUser } from '@/lib/supabase/server';
-import { Card, Button } from '@/components/ui/primitives';
+import { Card } from '@/components/ui/primitives';
 import { Table, Thead, Tbody, Th, Td } from '@/components/ui/table';
 import { ClickableTr } from '@/components/ui/clickable-tr';
 import { EmptyState } from '@/components/ui/empty-state';
 import { StatusBadge, PaymentStatusBadge } from '@/components/StatusBadge';
+import { KpiTile, KpiStrip } from '@/components/ui/kpi-tile';
 import { formatDate } from '@/lib/utils/format';
 import { formatEuro } from '@/lib/utils/currency';
 import { Plus, List, Kanban, Wrench } from 'lucide-react';
@@ -27,7 +28,7 @@ export default async function ReparatiesPage({ searchParams }: { searchParams: {
   let query = supabase
     .from('repairs')
     .select(
-      'id, repair_number, repair_type_label, estimated_price, final_price, payment_status, date_received, status:repair_statuses(id, name, color), customer:customers(first_name, last_name), device:devices(brand, model)'
+      'id, repair_number, repair_type_label, estimated_price, final_price, payment_status, date_received, expected_completion_date, status:repair_statuses(id, name, color), customer:customers(first_name, last_name), device:devices(brand, model)'
     )
     .eq('business_id', user!.business_id)
     .order('date_received', { ascending: false });
@@ -35,13 +36,23 @@ export default async function ReparatiesPage({ searchParams }: { searchParams: {
   if (searchParams.status) query = query.eq('status_id', searchParams.status);
 
   const { data: repairs } = await query;
+  const allRepairs = repairs ?? [];
+
+  const startOfToday = new Date();
+  startOfToday.setHours(0, 0, 0, 0);
+  const daysInShop = (received: string) => Math.max(0, Math.floor((startOfToday.getTime() - new Date(received).setHours(0, 0, 0, 0)) / 86_400_000));
+  const isOverdue = (expected: string | null) => !!expected && new Date(expected) < startOfToday;
+
+  const unpaidCount = allRepairs.filter((r) => r.payment_status !== 'paid').length;
+  const overdueCount = allRepairs.filter((r) => isOverdue(r.expected_completion_date)).length;
+  const totalAmount = allRepairs.reduce((sum, r) => sum + (r.final_price ?? r.estimated_price ?? 0), 0);
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="font-display text-2xl font-semibold text-ink-950">{t('title')}</h1>
-          <p className="text-sm text-ink-600">{t('count', { count: repairs?.length ?? 0 })}</p>
+          <p className="text-sm text-ink-600">{t('count', { count: allRepairs.length })}</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <div className="flex rounded border border-ink-200 bg-white p-0.5">
@@ -58,13 +69,21 @@ export default async function ReparatiesPage({ searchParams }: { searchParams: {
               <Kanban size={14} /> {t('kanban')}
             </Link>
           </div>
-          <Link href="/reparaties/nieuw">
-            <Button variant="primary">
-              <Plus size={16} /> {t('newRepair')}
-            </Button>
+          <Link
+            href="/reparaties/nieuw"
+            className="focus-ring inline-flex items-center gap-2 rounded px-3.5 py-2 text-sm font-semibold bg-signal-500 text-white hover:bg-signal-600"
+          >
+            <Plus size={16} /> {t('newRepair')}
           </Link>
         </div>
       </div>
+
+      <KpiStrip>
+        <KpiTile label={t('kpiTotal')} value={allRepairs.length} />
+        <KpiTile label={t('kpiUnpaid')} value={unpaidCount} emphasize={unpaidCount > 0} />
+        <KpiTile label={t('kpiAmount')} value={formatEuro(totalAmount)} />
+        <KpiTile label={t('kpiOverdue')} value={overdueCount} emphasize={overdueCount > 0} />
+      </KpiStrip>
 
       {view === 'list' && (
         <div className="flex flex-wrap gap-2">
@@ -80,8 +99,8 @@ export default async function ReparatiesPage({ searchParams }: { searchParams: {
       )}
 
       {view === 'kanban' ? (
-        <ReparatiesKanban statuses={statuses ?? []} repairs={(repairs ?? []) as any} />
-      ) : (repairs ?? []).length === 0 ? (
+        <ReparatiesKanban statuses={statuses ?? []} repairs={allRepairs as any} />
+      ) : allRepairs.length === 0 ? (
         <Card>
           <EmptyState icon={Wrench} title={t('empty')} />
         </Card>
@@ -95,63 +114,80 @@ export default async function ReparatiesPage({ searchParams }: { searchParams: {
                   <Th>{t('colCustomer')}</Th>
                   <Th>{t('colDevice')}</Th>
                   <Th>{t('colType')}</Th>
-                  <Th>{t('colReceived')}</Th>
+                  <Th>{t('colDays')}</Th>
                   <Th>{t('colStatus')}</Th>
                   <Th>{t('colPayment')}</Th>
                   <Th align="right">{t('colAmount')}</Th>
                 </tr>
               </Thead>
               <Tbody>
-                {(repairs ?? []).map((r: any) => (
-                  <ClickableTr key={r.id} href={`/reparaties/${r.id}`}>
-                    <Td>
-                      <Link href={`/reparaties/${r.id}`} className="font-medium text-[var(--accent)] hover:underline">
-                        {r.repair_number}
-                      </Link>
-                    </Td>
-                    <Td className="text-ink-700">
-                      {r.customer?.first_name} {r.customer?.last_name}
-                    </Td>
-                    <Td className="text-ink-600">
-                      {r.device?.brand} {r.device?.model}
-                    </Td>
-                    <Td className="text-ink-600">{r.repair_type_label ?? '—'}</Td>
-                    <Td className="text-ink-600">{formatDate(r.date_received)}</Td>
-                    <Td>{r.status && <StatusBadge name={r.status.name} color={r.status.color} />}</Td>
-                    <Td>
-                      <PaymentStatusBadge status={r.payment_status} />
-                    </Td>
-                    <Td align="right" className="tabular-nums text-ink-900">
-                      {formatEuro(r.final_price ?? r.estimated_price)}
-                    </Td>
-                  </ClickableTr>
-                ))}
+                {allRepairs.map((r: any) => {
+                  const overdue = isOverdue(r.expected_completion_date);
+                  return (
+                    <ClickableTr key={r.id} href={`/reparaties/${r.id}`}>
+                      <Td>
+                        <Link href={`/reparaties/${r.id}`} className="font-mono font-medium text-[var(--accent)] hover:underline">
+                          {r.repair_number}
+                        </Link>
+                      </Td>
+                      <Td className="text-ink-700">
+                        {r.customer?.first_name} {r.customer?.last_name}
+                      </Td>
+                      <Td className="text-ink-600">
+                        {r.device?.brand} {r.device?.model}
+                      </Td>
+                      <Td className="text-ink-600">{r.repair_type_label ?? '—'}</Td>
+                      <Td className={`font-mono tabular-nums font-semibold ${overdue ? 'text-danger-600' : 'text-ink-900'}`}>
+                        {daysInShop(r.date_received)}
+                      </Td>
+                      <Td>{r.status && <StatusBadge name={r.status.name} color={r.status.color} />}</Td>
+                      <Td>
+                        <PaymentStatusBadge status={r.payment_status} />
+                      </Td>
+                      <Td align="right" className="font-mono tabular-nums text-ink-900">
+                        {formatEuro(r.final_price ?? r.estimated_price)}
+                      </Td>
+                    </ClickableTr>
+                  );
+                })}
               </Tbody>
             </Table>
           </Card>
 
           <div className="space-y-2 md:hidden">
-            {(repairs ?? []).map((r: any) => (
-              <Link key={r.id} href={`/reparaties/${r.id}`} className="block rounded-lg border border-ink-100 bg-white p-3 shadow-card">
-                <div className="flex items-center justify-between gap-2">
-                  <span className="min-w-0 truncate font-medium text-[var(--accent)]">{r.repair_number}</span>
-                  <span className="shrink-0 tabular-nums font-medium text-ink-900">
-                    {formatEuro(r.final_price ?? r.estimated_price)}
-                  </span>
-                </div>
-                <div className="mt-0.5 break-words text-sm text-ink-700">
-                  {r.customer?.first_name} {r.customer?.last_name}
-                </div>
-                <div className="break-words text-xs text-ink-400">
-                  {r.device?.brand} {r.device?.model}
-                  {r.repair_type_label ? ` · ${r.repair_type_label}` : ''} · {formatDate(r.date_received)}
-                </div>
-                <div className="mt-2 flex flex-wrap items-center gap-1.5">
-                  {r.status && <StatusBadge name={r.status.name} color={r.status.color} />}
-                  <PaymentStatusBadge status={r.payment_status} />
-                </div>
-              </Link>
-            ))}
+            {allRepairs.map((r: any) => {
+              const overdue = isOverdue(r.expected_completion_date);
+              return (
+                <Link
+                  key={r.id}
+                  href={`/reparaties/${r.id}`}
+                  className="flex items-start gap-3 rounded-lg border border-ink-100 bg-white p-3 shadow-card"
+                >
+                  <div className={`w-10 shrink-0 text-right font-mono text-xl font-bold tabular-nums ${overdue ? 'text-danger-600' : 'text-ink-950'}`}>
+                    {daysInShop(r.date_received)}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="min-w-0 truncate font-mono font-medium text-[var(--accent)]">{r.repair_number}</span>
+                      <span className="shrink-0 font-mono tabular-nums font-medium text-ink-900">
+                        {formatEuro(r.final_price ?? r.estimated_price)}
+                      </span>
+                    </div>
+                    <div className="mt-0.5 break-words text-sm text-ink-700">
+                      {r.customer?.first_name} {r.customer?.last_name}
+                    </div>
+                    <div className="break-words text-xs text-ink-400">
+                      {r.device?.brand} {r.device?.model}
+                      {r.repair_type_label ? ` · ${r.repair_type_label}` : ''} · {formatDate(r.date_received)}
+                    </div>
+                    <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                      {r.status && <StatusBadge name={r.status.name} color={r.status.color} />}
+                      <PaymentStatusBadge status={r.payment_status} />
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         </>
       )}

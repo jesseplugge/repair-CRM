@@ -68,7 +68,7 @@ export function ReparatiesKanban({ statuses, repairs }: { statuses: Status[]; re
                     onDragEnd={() => setDragging(null)}
                     className={`cursor-grab rounded-lg border border-ink-100 bg-white p-3 shadow-card active:cursor-grabbing ${pending && dragging === r.id ? 'opacity-50' : ''}`}
                   >
-                    <div className="text-sm font-medium text-ink-900">{r.repair_number}</div>
+                    <div className="font-mono text-sm font-medium text-ink-900">{r.repair_number}</div>
                     <div className="mt-0.5 text-xs text-ink-500">
                       {r.customer?.first_name} {r.customer?.last_name}
                     </div>
@@ -77,7 +77,7 @@ export function ReparatiesKanban({ statuses, repairs }: { statuses: Status[]; re
                     </div>
                     <div className="mt-1.5 flex items-center justify-between">
                       <span className="text-xs text-ink-500">{r.repair_type_label ?? ''}</span>
-                      <span className="tabular-nums text-xs font-medium text-ink-900">
+                      <span className="font-mono tabular-nums text-xs font-medium text-ink-900">
                         {formatEuro(r.final_price ?? r.estimated_price)}
                       </span>
                     </div>

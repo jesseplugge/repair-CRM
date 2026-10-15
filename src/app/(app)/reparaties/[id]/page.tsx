@@ -89,6 +89,11 @@ export default async function ReparatieDetailPage({ params }: { params: { id: st
   const condition = (repair.device_condition_snapshot as Record<string, unknown>) ?? {};
   const activeTerms = (terms ?? []).find((t) => t.document_type === 'algemene_voorwaarden');
 
+  const startOfToday = new Date();
+  startOfToday.setHours(0, 0, 0, 0);
+  const daysInShop = Math.max(0, Math.floor((startOfToday.getTime() - new Date(repair.date_received).setHours(0, 0, 0, 0)) / 86_400_000));
+  const overdue = !!repair.expected_completion_date && new Date(repair.expected_completion_date) < startOfToday && !status.is_terminal;
+
   const subtotalExclVat = (items ?? []).reduce((s, i) => s + i.total_excl_vat, 0);
   const totalVat = (items ?? []).reduce((s, i) => s + (i.total_incl_vat - i.total_excl_vat), 0);
   const totalInclVat = (items ?? []).reduce((s, i) => s + i.total_incl_vat, 0);
@@ -136,9 +141,14 @@ export default async function ReparatieDetailPage({ params }: { params: { id: st
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
-        <h1 className="font-display text-2xl font-semibold text-ink-950">{repair.repair_number}</h1>
+        <h1 className="font-mono text-2xl font-bold text-ink-950">{repair.repair_number}</h1>
         <StatusBadge name={status.name} color={status.color} />
         <PaymentStatusBadge status={repair.payment_status} />
+        {!status.is_terminal && (
+          <span className={`ml-auto font-mono text-sm font-semibold tabular-nums ${overdue ? 'text-danger-600' : 'text-ink-600'}`}>
+            {daysInShop} {t('daysInShopLabel')}
+          </span>
+        )}
       </div>
 
       <div className="grid grid-cols-12 gap-6">
@@ -285,10 +295,10 @@ export default async function ReparatieDetailPage({ params }: { params: { id: st
                     {(items ?? []).map((item) => (
                       <tr key={item.id} className="border-b border-ink-50 last:border-0">
                         <td className="py-2 pr-2 font-medium text-ink-900">{item.description}</td>
-                        <td className="py-2 pr-2 text-right tabular-nums text-ink-600">{item.quantity}x</td>
-                        <td className="py-2 pr-2 text-right tabular-nums text-ink-600">{formatEuro(item.selling_price_excl_vat)}</td>
-                        <td className="py-2 pr-2 text-right tabular-nums text-ink-600">{item.vat_rate}%</td>
-                        <td className="py-2 pr-2 text-right tabular-nums font-medium text-ink-900">{formatEuro(item.total_incl_vat)}</td>
+                        <td className="py-2 pr-2 text-right font-mono tabular-nums text-ink-600">{item.quantity}x</td>
+                        <td className="py-2 pr-2 text-right font-mono tabular-nums text-ink-600">{formatEuro(item.selling_price_excl_vat)}</td>
+                        <td className="py-2 pr-2 text-right font-mono tabular-nums text-ink-600">{item.vat_rate}%</td>
+                        <td className="py-2 pr-2 text-right font-mono tabular-nums font-medium text-ink-900">{formatEuro(item.total_incl_vat)}</td>
                         <td className="py-2 text-right">
                           <RemoveItemButton repairId={repair.id} itemId={item.id} />
                         </td>
@@ -317,19 +327,19 @@ export default async function ReparatieDetailPage({ params }: { params: { id: st
         <div className="col-span-12 space-y-4 lg:col-span-4 lg:sticky lg:top-6 lg:self-start">
           <Card className="p-4">
             <h3 className="mb-1 text-xs font-semibold uppercase tracking-wide text-ink-400">{t('price')}</h3>
-            <div className="font-display text-2xl font-semibold tabular-nums text-ink-950">{formatEuro(totalInclVat)}</div>
+            <div className="font-mono text-2xl font-bold tabular-nums text-ink-950">{formatEuro(totalInclVat)}</div>
             <div className="mt-2 space-y-1 text-sm">
               <div className="flex justify-between text-ink-600">
                 <span>{t('subtotalExclVat')}</span>
-                <span className="tabular-nums">{formatEuro(subtotalExclVat)}</span>
+                <span className="font-mono tabular-nums">{formatEuro(subtotalExclVat)}</span>
               </div>
               <div className="flex justify-between text-ink-600">
                 <span>{t('vat')}</span>
-                <span className="tabular-nums">{formatEuro(totalVat)}</span>
+                <span className="font-mono tabular-nums">{formatEuro(totalVat)}</span>
               </div>
               <div className="flex justify-between border-t border-ink-100 pt-2 text-xs text-ink-400">
                 <span>{t('profitExclVat')}</span>
-                <span className="tabular-nums">
+                <span className="font-mono tabular-nums">
                   {formatEuro(profit)} &middot; {margin.toFixed(0)}%
                 </span>
               </div>
