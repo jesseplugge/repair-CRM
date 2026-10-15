@@ -607,6 +607,9 @@
   "inventoryPage": {
     "title": "Lager",
     "lowStockCount": "{count} Produkt(e) auf oder unter Mindestbestand.",
+    "kpiTotal": "Produkte gesamt",
+    "kpiLowStock": "Niedriger Bestand",
+    "kpiValue": "Lagerwert",
     "movements": "Bewegungen",
     "almostOut": "Fast aufgebraucht: {names}",
     "colProduct": "Produkt",

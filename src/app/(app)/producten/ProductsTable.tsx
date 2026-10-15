@@ -80,18 +80,18 @@ export function ProductsTable({ products }: { products: Product[] }) {
             {products.map((p) => (
               <Tr key={p.id}>
                 <Td className="font-medium text-ink-900">{p.name}</Td>
-                <Td className="text-ink-500">{p.sku ?? '—'}</Td>
+                <Td className="font-mono text-ink-500">{p.sku ?? '—'}</Td>
                 <Td className="text-ink-500">{p.category?.name ?? '—'}</Td>
-                <Td align="right" className="tabular-nums text-ink-600">
+                <Td align="right" className="font-mono tabular-nums text-ink-600">
                   {formatEuro(priceFor(p.purchase_price_excl_vat, p.purchase_price_incl_vat, purchaseIncl))}
                 </Td>
-                <Td align="right" className="tabular-nums text-ink-900">
+                <Td align="right" className="font-mono tabular-nums text-ink-900">
                   {formatEuro(priceFor(p.selling_price_excl_vat, p.selling_price_incl_vat, sellIncl))}
                 </Td>
-                <Td align="right" className="text-ink-600">{p.vat_rate}%</Td>
+                <Td align="right" className="font-mono text-ink-600">{p.vat_rate}%</Td>
                 <Td
                   align="right"
-                  className={`tabular-nums ${p.stock_quantity <= (p.minimum_stock ?? 0) ? 'font-semibold text-red-600' : 'text-ink-900'}`}
+                  className={`font-mono tabular-nums ${p.stock_quantity <= (p.minimum_stock ?? 0) ? 'font-semibold text-danger-600' : 'text-ink-900'}`}
                 >
                   {p.stock_quantity}
                 </Td>
@@ -117,20 +117,20 @@ export function ProductsTable({ products }: { products: Product[] }) {
             <div className="flex items-center justify-between gap-2">
               <span className="min-w-0 truncate font-medium text-ink-900">{p.name}</span>
               <span
-                className={`shrink-0 tabular-nums text-sm ${p.stock_quantity <= (p.minimum_stock ?? 0) ? 'font-semibold text-red-600' : 'text-ink-900'}`}
+                className={`shrink-0 font-mono tabular-nums text-sm ${p.stock_quantity <= (p.minimum_stock ?? 0) ? 'font-semibold text-danger-600' : 'text-ink-900'}`}
               >
                 {t('colStock')}: {p.stock_quantity}
               </span>
             </div>
             <div className="break-words text-xs text-ink-400">
-              {p.sku ?? '—'}
+              <span className="font-mono">{p.sku ?? '—'}</span>
               {p.category?.name ? ` · ${p.category.name}` : ''}
             </div>
             <div className="mt-1.5 flex items-center justify-between gap-2 text-sm">
-              <span className="min-w-0 truncate text-ink-600">
+              <span className="min-w-0 truncate font-mono text-ink-600">
                 {t('colPurchase')}: {formatEuro(priceFor(p.purchase_price_excl_vat, p.purchase_price_incl_vat, purchaseIncl))}
               </span>
-              <span className="shrink-0 font-medium text-ink-900">
+              <span className="shrink-0 font-mono font-medium text-ink-900">
                 {formatEuro(priceFor(p.selling_price_excl_vat, p.selling_price_incl_vat, sellIncl))}
               </span>
             </div>

@@ -3,6 +3,8 @@ import { getTranslations } from 'next-intl/server';
 import { createClient, getCurrentUser } from '@/lib/supabase/server';
 import { Card } from '@/components/ui/primitives';
 import { EmptyState } from '@/components/ui/empty-state';
+import { KpiTile, KpiStrip } from '@/components/ui/kpi-tile';
+import { formatEuro } from '@/lib/utils/currency';
 import { VoorraadList } from './VoorraadList';
 import { AlertTriangle, History, Boxes } from 'lucide-react';
 
@@ -17,7 +19,12 @@ export default async function VoorraadPage() {
     .eq('active', true)
     .order('name');
 
-  const lowStock = (products ?? []).filter((p) => p.stock_quantity <= (p.minimum_stock ?? 0));
+  const allProducts = products ?? [];
+  const lowStock = allProducts.filter((p) => p.stock_quantity <= (p.minimum_stock ?? 0));
+  const stockValue = allProducts.reduce(
+    (sum, p) => sum + p.stock_quantity * (p.selling_price_incl_vat ?? p.selling_price_excl_vat ?? 0),
+    0
+  );
 
   return (
     <div className="space-y-6">
@@ -30,6 +37,12 @@ export default async function VoorraadPage() {
           <History size={15} /> {t('movements')}
         </Link>
       </div>
+
+      <KpiStrip>
+        <KpiTile label={t('kpiTotal')} value={allProducts.length} />
+        <KpiTile label={t('kpiLowStock')} value={lowStock.length} emphasize={lowStock.length > 0} />
+        <KpiTile label={t('kpiValue')} value={formatEuro(stockValue)} />
+      </KpiStrip>
 
       {lowStock.length > 0 && (
         <Card className="flex items-start gap-2 border-amber-200 bg-amber-50 p-4">

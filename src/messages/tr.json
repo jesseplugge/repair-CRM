@@ -607,6 +607,9 @@
   "inventoryPage": {
     "title": "Stok",
     "lowStockCount": "{count} ürün minimum stok seviyesinde veya altında.",
+    "kpiTotal": "Toplam ürün",
+    "kpiLowStock": "Düşük stok",
+    "kpiValue": "Stok değeri",
     "movements": "Hareketler",
     "almostOut": "Tükenmek üzere: {names}",
     "colProduct": "Ürün",

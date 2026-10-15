@@ -58,7 +58,7 @@ export default async function StockMovementsPage() {
                   return (
                     <tr key={m.id} className="border-b border-ink-100 last:border-0">
                       <td className="px-4 py-3 font-medium text-ink-900">{product?.name ?? '—'}</td>
-                      <td className={`px-4 py-3 tabular-nums font-medium ${m.change > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      <td className={`px-4 py-3 font-mono tabular-nums font-semibold ${m.change > 0 ? 'text-success-600' : 'text-danger-600'}`}>
                         {m.change > 0 ? '+' : ''}
                         {m.change}
                       </td>
@@ -84,7 +84,7 @@ export default async function StockMovementsPage() {
                 <div key={m.id} className="rounded-lg border border-ink-100 bg-white p-3 shadow-card">
                   <div className="flex items-center justify-between gap-2">
                     <span className="min-w-0 truncate font-medium text-ink-900">{product?.name ?? '—'}</span>
-                    <span className={`shrink-0 tabular-nums font-medium ${m.change > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    <span className={`shrink-0 font-mono tabular-nums font-semibold ${m.change > 0 ? 'text-success-600' : 'text-danger-600'}`}>
                       {m.change > 0 ? '+' : ''}
                       {m.change}
                     </span>

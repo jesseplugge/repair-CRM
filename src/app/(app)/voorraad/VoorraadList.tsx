@@ -82,8 +82,8 @@ export function VoorraadList({ products }: { products: Product[] }) {
                   <Tr key={p.id}>
                     <Td className="font-medium text-ink-900">{p.name}</Td>
                     <Td className="text-ink-500">{p.category?.name ?? '—'}</Td>
-                    <Td align="right" className="text-ink-500">{p.minimum_stock ?? 0}</Td>
-                    <Td align="right" className={`tabular-nums ${p.stock_quantity <= (p.minimum_stock ?? 0) ? 'font-semibold text-red-600' : 'text-ink-900'}`}>
+                    <Td align="right" className="font-mono tabular-nums text-ink-500">{p.minimum_stock ?? 0}</Td>
+                    <Td align="right" className={`font-mono tabular-nums ${p.stock_quantity <= (p.minimum_stock ?? 0) ? 'font-semibold text-danger-600' : 'text-ink-900'}`}>
                       {p.stock_quantity}
                     </Td>
                     <Td align="right">
@@ -102,8 +102,8 @@ export function VoorraadList({ products }: { products: Product[] }) {
                   <div className="truncate font-medium text-ink-900">{p.name}</div>
                   <div className="text-xs text-ink-400">
                     {p.category?.name ? `${p.category.name} · ` : ''}
-                    {t('colMinimum')}: {p.minimum_stock ?? 0} ·{' '}
-                    <span className={`tabular-nums ${p.stock_quantity <= (p.minimum_stock ?? 0) ? 'font-semibold text-red-600' : ''}`}>
+                    {t('colMinimum')}: <span className="font-mono tabular-nums">{p.minimum_stock ?? 0}</span> ·{' '}
+                    <span className={`font-mono tabular-nums ${p.stock_quantity <= (p.minimum_stock ?? 0) ? 'font-semibold text-danger-600' : ''}`}>
                       {t('colStock')}: {p.stock_quantity}
                     </span>
                   </div>

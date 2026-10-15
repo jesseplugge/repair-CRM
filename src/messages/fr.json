@@ -607,6 +607,9 @@
   "inventoryPage": {
     "title": "Stock",
     "lowStockCount": "{count} produit(s) au niveau ou en dessous du stock minimum.",
+    "kpiTotal": "Produits au total",
+    "kpiLowStock": "Stock faible",
+    "kpiValue": "Valeur du stock",
     "movements": "Mouvements",
     "almostOut": "Presque épuisé : {names}",
     "colProduct": "Produit",

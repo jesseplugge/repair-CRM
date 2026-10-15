@@ -607,6 +607,9 @@
   "inventoryPage": {
     "title": "Voorraad",
     "lowStockCount": "{count} product(en) op of onder minimumvoorraad.",
+    "kpiTotal": "Totaal producten",
+    "kpiLowStock": "Lage voorraad",
+    "kpiValue": "Voorraadwaarde",
     "movements": "Bewegingen",
     "almostOut": "Bijna op: {names}",
     "colProduct": "Product",
