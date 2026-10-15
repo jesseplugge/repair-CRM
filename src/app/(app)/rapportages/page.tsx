@@ -74,11 +74,11 @@ export default async function RapportagesPage({ searchParams }: { searchParams: 
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-ink-600">{t('repairs')}</span>
-                <span className="tabular-nums font-medium">{formatEuro(data.repairRevenueIncl)}</span>
+                <span className="font-mono tabular-nums font-medium">{formatEuro(data.repairRevenueIncl)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-ink-600">{t('productsPos')}</span>
-                <span className="tabular-nums font-medium">{formatEuro(data.productRevenueIncl)}</span>
+                <span className="font-mono tabular-nums font-medium">{formatEuro(data.productRevenueIncl)}</span>
               </div>
             </div>
           </div>
@@ -89,7 +89,7 @@ export default async function RapportagesPage({ searchParams }: { searchParams: 
               {data.popular.map(([label, count]) => (
                 <div key={label} className="flex justify-between">
                   <span className="text-ink-600">{label}</span>
-                  <span className="tabular-nums font-medium">{count}x</span>
+                  <span className="font-mono tabular-nums font-medium">{count}x</span>
                 </div>
               ))}
               {data.popular.length === 0 && <p className="text-ink-400">{t('noDataInPeriod')}</p>}
@@ -102,7 +102,7 @@ export default async function RapportagesPage({ searchParams }: { searchParams: 
               {data.vatBreakdown.map(([rate, vat]) => (
                 <div key={rate} className="flex justify-between">
                   <span className="text-ink-600">{rate}%</span>
-                  <span className="tabular-nums font-medium">{formatEuro(vat)}</span>
+                  <span className="font-mono tabular-nums font-medium">{formatEuro(vat)}</span>
                 </div>
               ))}
               {data.vatBreakdown.length === 0 && <p className="text-ink-400">{t('noDataInPeriod')}</p>}
@@ -116,7 +116,7 @@ export default async function RapportagesPage({ searchParams }: { searchParams: 
           <h3 className="text-xs font-semibold uppercase tracking-wide text-ink-400">
             {t('outstandingInvoices', { count: data.outstandingInvoices.length })}
           </h3>
-          <span className="text-sm font-medium tabular-nums text-ink-900">
+          <span className="font-mono text-sm font-medium tabular-nums text-ink-900">
             {t('total', { amount: formatEuro(data.totalOutstanding) })}
           </span>
         </div>
@@ -143,20 +143,20 @@ export default async function RapportagesPage({ searchParams }: { searchParams: 
                     return (
                       <Tr key={inv.id}>
                         <Td className="!px-0">
-                          <Link href={`/facturen/${inv.id}`} className="font-medium text-[var(--accent)] hover:underline">
+                          <Link href={`/facturen/${inv.id}`} className="font-mono font-medium text-[var(--accent)] hover:underline">
                             {inv.invoiceNumber}
                           </Link>
                         </Td>
                         <Td className="text-ink-700">{inv.customerName}</Td>
                         <Td className="text-ink-600">{formatDate(inv.invoiceDate)}</Td>
-                        <Td className={inv.overdue ? 'font-medium text-red-600' : 'text-ink-600'}>
+                        <Td className={inv.overdue ? 'font-medium text-danger-600' : 'text-ink-600'}>
                           {formatDate(inv.dueDate)}
                           {inv.overdue ? ` · ${t('overdue')}` : ''}
                         </Td>
                         <Td>
                           <StatusBadge name={label} color={color} />
                         </Td>
-                        <Td align="right" className="!px-0 tabular-nums text-ink-900">{formatEuro(inv.outstanding)}</Td>
+                        <Td align="right" className="!px-0 font-mono tabular-nums text-ink-900">{formatEuro(inv.outstanding)}</Td>
                       </Tr>
                     );
                   })}
@@ -174,11 +174,11 @@ export default async function RapportagesPage({ searchParams }: { searchParams: 
                     className="block rounded-lg border border-ink-100 bg-white p-3 shadow-card"
                   >
                     <div className="flex items-center justify-between gap-2">
-                      <span className="min-w-0 truncate font-medium text-[var(--accent)]">{inv.invoiceNumber}</span>
-                      <span className="shrink-0 tabular-nums font-medium text-ink-900">{formatEuro(inv.outstanding)}</span>
+                      <span className="min-w-0 truncate font-mono font-medium text-[var(--accent)]">{inv.invoiceNumber}</span>
+                      <span className="shrink-0 font-mono tabular-nums font-medium text-ink-900">{formatEuro(inv.outstanding)}</span>
                     </div>
                     <div className="break-words text-sm text-ink-700">{inv.customerName}</div>
-                    <div className={`text-xs ${inv.overdue ? 'font-medium text-red-600' : 'text-ink-400'}`}>
+                    <div className={`text-xs ${inv.overdue ? 'font-medium text-danger-600' : 'text-ink-400'}`}>
                       {formatDate(inv.dueDate)}
                       {inv.overdue ? ` · ${t('overdue')}` : ''}
                     </div>

@@ -75,10 +75,10 @@ export default async function GarantiePage() {
                   const color = STATUS_COLORS[c.status] ?? '#3C4C54';
                   return (
                     <Tr key={c.id}>
-                      <Td className="font-medium text-ink-900">{c.claim_number}</Td>
+                      <Td className="font-mono font-medium text-ink-900">{c.claim_number}</Td>
                       <Td>
                         {repair && (
-                          <Link href={`/reparaties/${repair.id}`} className="text-[var(--accent)] hover:underline">
+                          <Link href={`/reparaties/${repair.id}`} className="font-mono text-[var(--accent)] hover:underline">
                             {repair.repair_number}
                           </Link>
                         )}
@@ -111,7 +111,7 @@ export default async function GarantiePage() {
               return (
                 <div key={c.id} className="rounded-lg border border-ink-100 bg-white p-3 shadow-card">
                   <div className="flex items-center justify-between gap-2">
-                    <span className="min-w-0 truncate font-medium text-ink-900">{c.claim_number}</span>
+                    <span className="min-w-0 truncate font-mono font-medium text-ink-900">{c.claim_number}</span>
                     <span className="flex shrink-0 items-center gap-1">
                       <StatusBadge name={label} color={color} />
                       <DeleteClaimButton claimId={c.id} repairId={c.repair_id} claimNumber={c.claim_number} />
@@ -125,7 +125,7 @@ export default async function GarantiePage() {
                     {repair && (
                       <>
                         {' · '}
-                        <Link href={`/reparaties/${repair.id}`} className="text-[var(--accent)] hover:underline">
+                        <Link href={`/reparaties/${repair.id}`} className="font-mono text-[var(--accent)] hover:underline">
                           {repair.repair_number}
                         </Link>
                       </>
