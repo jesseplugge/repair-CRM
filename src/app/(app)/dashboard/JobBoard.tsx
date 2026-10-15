@@ -14,11 +14,12 @@ export type JobRowData = {
   customer: string;
   phone: string | null;
   days: number;
+  daysText: string;
   overdue: boolean;
   urgent: boolean;
   statusName: string;
   statusColor: string | null;
-  finalPrice: number | null;
+  amountText: string | null;
 };
 
 type TicketLabels = {
@@ -38,14 +39,10 @@ type TicketLabels = {
  */
 export function JobBoard({
   rows,
-  daysLabel,
   ticketLabels,
-  formatAmount,
 }: {
   rows: JobRowData[];
-  daysLabel: (n: number) => string;
   ticketLabels: TicketLabels;
-  formatAmount: (n: number) => string;
 }) {
   const [selected, setSelected] = useState<JobRowData | null>(null);
 
@@ -69,7 +66,7 @@ export function JobBoard({
                 )}
               >
                 <div className="text-2xl font-bold leading-none tabular-nums">{job.days}</div>
-                <div className="mt-1 text-[11px] text-ink-500">{daysLabel(job.days)}</div>
+                <div className="mt-1 text-[11px] text-ink-500">{job.daysText}</div>
               </div>
               <div className="min-w-0 flex-1">
                 <div className="truncate font-semibold text-ink-950 group-hover:underline">{job.device}</div>
@@ -109,13 +106,11 @@ export function JobBoard({
               </div>
               <div>
                 <dt className="text-xs uppercase tracking-wide text-ink-500">{ticketLabels.daysInShop}</dt>
-                <dd className="mt-1 font-mono font-semibold tabular-nums text-ink-950">{daysLabel(selected.days)}</dd>
+                <dd className="mt-1 font-mono font-semibold tabular-nums text-ink-950">{selected.daysText}</dd>
               </div>
               <div>
                 <dt className="text-xs uppercase tracking-wide text-ink-500">{ticketLabels.amount}</dt>
-                <dd className="mt-1 font-mono font-semibold tabular-nums text-ink-950">
-                  {selected.finalPrice != null ? formatAmount(selected.finalPrice) : '—'}
-                </dd>
+                <dd className="mt-1 font-mono font-semibold tabular-nums text-ink-950">{selected.amountText ?? '—'}</dd>
               </div>
             </dl>
 

@@ -126,18 +126,20 @@ export default async function DashboardPage() {
     const customer = r.customer as unknown as { first_name: string; last_name: string; phone: string | null } | null;
     const device = r.device as unknown as { brand: string; model: string } | null;
     const status = statusById.get(r.status_id);
+    const days = daysInShop(r.date_received);
     return {
       id: r.id,
       repairNumber: r.repair_number,
       device: device ? `${device.brand} ${device.model}` : (r.repair_type_label ?? ''),
       customer: customer ? `${customer.first_name} ${customer.last_name}` : '',
       phone: customer?.phone ?? null,
-      days: daysInShop(r.date_received),
+      days,
+      daysText: t('daysInShop', { count: days }),
       overdue: isOverdue(r.expected_completion_date),
       urgent: isUrgent(r),
       statusName: status?.name ?? '',
       statusColor: status?.color ?? null,
-      finalPrice: r.final_price ?? null,
+      amountText: r.final_price != null ? formatEuro(r.final_price) : null,
     };
   };
 
@@ -196,8 +198,6 @@ export default async function DashboardPage() {
               <div className="mt-2 rounded-lg border border-ink-100">
                 <JobBoard
                   rows={visibleRepairs.map(toRow)}
-                  daysLabel={(n) => t('daysInShop', { count: n })}
-                  formatAmount={formatEuro}
                   ticketLabels={{
                     claim: t('ticketClaim'),
                     device: t('ticketDevice'),
