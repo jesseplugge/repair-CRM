@@ -130,7 +130,7 @@ export function PosTerminal() {
   if (success) {
     return (
       <Card className="flex flex-col items-center gap-3 p-10 text-center">
-        <CheckCircle2 size={32} className="text-green-600" />
+        <CheckCircle2 size={32} className="text-success-600" />
         <h2 className="font-display text-xl font-semibold text-ink-950">{t('paymentSuccess')}</h2>
         <div className="flex w-full max-w-xs flex-col gap-2 pt-2">
           <PrintControls baseUrl={`/api/pos-sales/${success}/pdf`} label={t('printReceipt')} />
@@ -162,7 +162,7 @@ export function PosTerminal() {
                   <div className="font-medium text-ink-900">{p.name}</div>
                   <div className="text-xs text-ink-400">{p.sku ?? ''} &middot; {t('stock', { count: p.stock_quantity })}</div>
                 </div>
-                <div className="tabular-nums text-ink-900">
+                <div className="font-mono tabular-nums text-ink-900">
                   {formatEuro(p.selling_price_incl_vat ?? p.selling_price_excl_vat * (1 + p.vat_rate / 100))}
                 </div>
               </button>
@@ -227,10 +227,10 @@ export function PosTerminal() {
                     </button>
                   </div>
                 </div>
-                <div className="tabular-nums text-ink-900">
+                <div className="font-mono tabular-nums text-ink-900">
                   {formatEuro((l.unitPriceInclVat ?? l.unitPriceExclVat * (1 + l.vatRate / 100)) * l.quantity)}
                 </div>
-                <button onClick={() => updateQty(l.key, 0)} className="ml-2 text-ink-300 hover:text-red-600">
+                <button onClick={() => updateQty(l.key, 0)} className="ml-2 text-ink-300 hover:text-danger-600">
                   <Trash2 size={14} />
                 </button>
               </div>
@@ -238,9 +238,9 @@ export function PosTerminal() {
             {cart.length === 0 && <p className="text-sm text-ink-400">{t('noItemsYet')}</p>}
           </div>
 
-          <div className="mt-4 flex justify-between border-t border-ink-100 pt-3 font-display text-lg font-semibold text-ink-950">
-            <span>{t('total')}</span>
-            <span className="tabular-nums">{formatEuro(totalInclVat)}</span>
+          <div className="mt-4 flex justify-between border-t border-ink-100 pt-3 text-lg font-semibold text-ink-950">
+            <span className="font-display">{t('total')}</span>
+            <span className="font-mono tabular-nums">{formatEuro(totalInclVat)}</span>
           </div>
 
           <div className="mt-4 grid grid-cols-2 gap-2">
@@ -274,10 +274,10 @@ export function PosTerminal() {
             />
           </div>
 
-          {error && <p className="mt-2 text-sm text-red-700">{error}</p>}
+          {error && <p className="mt-2 text-sm text-danger-700">{error}</p>}
 
           <Button
-            variant="primary"
+            variant="signal"
             size="lg"
             className="mt-4 w-full"
             disabled={cart.length === 0 || !method || pending}

@@ -19,9 +19,14 @@ export function AccentCard({ children, className }: { children: ReactNode; class
   );
 }
 
-type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
+type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'signal';
 type ButtonSize = 'md' | 'lg';
 
+/**
+ * variant="signal" is the committed indigo-violet reserved for the handful of actions that
+ * need a hand right now (starting a repair, handing one back, closing a sale) — not a
+ * general-purpose primary color. Reach for "primary" (the shop's own accent) otherwise.
+ */
 export function Button({
   variant = 'secondary',
   size = 'md',
@@ -31,13 +36,14 @@ export function Button({
   return (
     <button
       className={clsx(
-        'inline-flex items-center justify-center gap-2 rounded font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] disabled:opacity-50 disabled:pointer-events-none',
+        'inline-flex items-center justify-center gap-2 rounded font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] disabled:opacity-50 disabled:pointer-events-none',
         size === 'md' && 'px-3.5 py-2 text-sm',
         size === 'lg' && 'px-5 py-3 text-base',
-        variant === 'primary' && 'bg-[var(--accent)] text-white shadow-sm hover:bg-[var(--accent-hover)]',
-        variant === 'secondary' && 'bg-white border border-ink-200 text-ink-900 shadow-sm hover:bg-ink-50',
-        variant === 'ghost' && 'text-ink-600 hover:bg-ink-100',
-        variant === 'danger' && 'bg-red-600 text-white hover:bg-red-700',
+        variant === 'primary' && 'bg-[var(--accent)] text-white shadow-sm hover:bg-[var(--accent-hover)] font-medium',
+        variant === 'secondary' && 'bg-white border border-ink-200 text-ink-900 shadow-sm hover:bg-ink-50 font-medium',
+        variant === 'ghost' && 'text-ink-600 hover:bg-ink-100 font-medium',
+        variant === 'danger' && 'bg-danger-600 text-white hover:bg-danger-700 font-medium',
+        variant === 'signal' && 'bg-signal-500 text-white shadow-sm hover:bg-signal-600',
         className
       )}
       {...props}

@@ -6,6 +6,7 @@ import { getNotifications } from '@/lib/actions/notifications';
 import { FileText, Plus, Search, ShoppingCart, UserPlus, ShieldAlert, Clock, PackageX, Receipt, type LucideIcon } from 'lucide-react';
 import { JobBoard, type JobRowData } from './JobBoard';
 import { KpiTile, KpiStrip } from '@/components/ui/kpi-tile';
+import { Button } from '@/components/ui/primitives';
 
 const NOTIFICATION_ICON: Record<string, { icon: LucideIcon; className: string }> = {
   claim: { icon: ShieldAlert, className: 'text-danger-600' },
@@ -164,12 +165,11 @@ export default async function DashboardPage() {
               {label}
             </Link>
           ))}
-          <Link
-            href="/reparaties/nieuw"
-            className="focus-ring inline-flex items-center gap-2 rounded bg-signal-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-signal-600"
-          >
-            <Plus size={18} strokeWidth={2.5} />
-            {t('quickNewRepair')}
+          <Link href="/reparaties/nieuw">
+            <Button variant="signal">
+              <Plus size={18} strokeWidth={2.5} />
+              {t('quickNewRepair')}
+            </Button>
           </Link>
         </nav>
       </header>

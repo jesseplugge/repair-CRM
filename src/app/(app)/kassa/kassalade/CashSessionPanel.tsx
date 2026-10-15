@@ -53,15 +53,15 @@ export function CashSessionPanel({ session, movements }: { session: any; movemen
         <div className="space-y-1 text-sm">
           <div className="flex justify-between">
             <span className="text-ink-600">{t('expected')}</span>
-            <span className="tabular-nums">{formatEuro(result.expected)}</span>
+            <span className="font-mono tabular-nums">{formatEuro(result.expected)}</span>
           </div>
           <div className="flex justify-between">
             <span className="text-ink-600">{t('counted')}</span>
-            <span className="tabular-nums">{formatEuro(parseFloat(actualAmount))}</span>
+            <span className="font-mono tabular-nums">{formatEuro(parseFloat(actualAmount))}</span>
           </div>
           <div className="flex justify-between font-semibold">
             <span>{t('difference')}</span>
-            <span className={Math.abs(result.difference) > 0.01 ? 'text-red-600' : 'text-green-600'}>
+            <span className={`font-mono tabular-nums ${Math.abs(result.difference) > 0.01 ? 'text-danger-600' : 'text-success-600'}`}>
               {result.difference > 0 ? '+' : ''}
               {formatEuro(result.difference)}
             </span>
@@ -76,7 +76,7 @@ export function CashSessionPanel({ session, movements }: { session: any; movemen
       <Card className="p-5">
         <div className="flex justify-between text-sm">
           <span className="text-ink-600">{t('startingAmount')}</span>
-          <span className="tabular-nums font-medium">{formatEuro(session.opening_amount)}</span>
+          <span className="font-mono tabular-nums font-medium">{formatEuro(session.opening_amount)}</span>
         </div>
         <div className="mt-1 text-xs text-ink-400">{t('openedOn', { date: formatDateTime(session.opened_at) })}</div>
       </Card>
@@ -100,7 +100,7 @@ export function CashSessionPanel({ session, movements }: { session: any; movemen
             {movements.map((m) => (
               <div key={m.id} className="flex justify-between text-ink-600">
                 <span>{MOVEMENT_TYPE_KEYS[m.type] ? t(MOVEMENT_TYPE_KEYS[m.type] as any) : m.type}</span>
-                <span className="tabular-nums">{formatEuro(m.amount)}</span>
+                <span className="font-mono tabular-nums">{formatEuro(m.amount)}</span>
               </div>
             ))}
           </div>

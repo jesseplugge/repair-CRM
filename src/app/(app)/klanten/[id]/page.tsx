@@ -265,11 +265,10 @@ export default async function KlantProfielPage({ params }: { params: { id: strin
               <ShoppingCart size={16} /> {t('newSale')}
             </Button>
           </Link>
-          <Link
-            href={`/reparaties/nieuw?customer_id=${customer.id}`}
-            className="focus-ring inline-flex items-center gap-2 rounded px-3.5 py-2 text-sm font-semibold bg-signal-500 text-white hover:bg-signal-600"
-          >
-            <Wrench size={16} /> {t('newRepair')}
+          <Link href={`/reparaties/nieuw?customer_id=${customer.id}`}>
+            <Button variant="signal">
+              <Wrench size={16} /> {t('newRepair')}
+            </Button>
           </Link>
         </div>
       </div>

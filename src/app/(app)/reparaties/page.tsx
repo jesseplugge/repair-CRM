@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import { createClient, getCurrentUser } from '@/lib/supabase/server';
-import { Card } from '@/components/ui/primitives';
+import { Card, Button } from '@/components/ui/primitives';
 import { Table, Thead, Tbody, Th, Td } from '@/components/ui/table';
 import { ClickableTr } from '@/components/ui/clickable-tr';
 import { EmptyState } from '@/components/ui/empty-state';
@@ -69,11 +69,10 @@ export default async function ReparatiesPage({ searchParams }: { searchParams: {
               <Kanban size={14} /> {t('kanban')}
             </Link>
           </div>
-          <Link
-            href="/reparaties/nieuw"
-            className="focus-ring inline-flex items-center gap-2 rounded px-3.5 py-2 text-sm font-semibold bg-signal-500 text-white hover:bg-signal-600"
-          >
-            <Plus size={16} /> {t('newRepair')}
+          <Link href="/reparaties/nieuw">
+            <Button variant="signal">
+              <Plus size={16} /> {t('newRepair')}
+            </Button>
           </Link>
         </div>
       </div>
