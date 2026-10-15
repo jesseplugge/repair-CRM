@@ -44,8 +44,10 @@ export default async function DeviceHistoryPage({ params }: { params: { id: stri
         <div className="mt-1 text-sm text-ink-500">
           {device.color && <>{device.color} &middot; </>}
           {device.storage_capacity && <>{device.storage_capacity} &middot; </>}
-          {device.imei ? `IMEI ${device.imei}` : 'Geen IMEI'}
-          {device.serial_number ? ` · S/N ${device.serial_number}` : ''}
+          <span className="font-mono">
+            {device.imei ? `IMEI ${device.imei}` : 'Geen IMEI'}
+            {device.serial_number ? ` · S/N ${device.serial_number}` : ''}
+          </span>
         </div>
       </div>
 
@@ -68,7 +70,7 @@ export default async function DeviceHistoryPage({ params }: { params: { id: stri
                 <Card className="flex items-center justify-between p-4 transition-colors hover:border-[var(--accent-border-soft)]">
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="font-medium text-ink-900">{r.repair_number}</span>
+                      <span className="font-mono font-medium text-ink-900">{r.repair_number}</span>
                       {status && <StatusBadge name={status.name} color={status.color} />}
                     </div>
                     <div className="mt-0.5 text-sm text-ink-600">{r.repair_type_label ?? 'Reparatie'}</div>
@@ -78,7 +80,7 @@ export default async function DeviceHistoryPage({ params }: { params: { id: stri
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="tabular-nums font-medium text-ink-900">{formatEuro(r.final_price ?? r.estimated_price)}</div>
+                    <div className="font-mono tabular-nums font-medium text-ink-900">{formatEuro(r.final_price ?? r.estimated_price)}</div>
                     <PaymentStatusBadge status={r.payment_status} />
                   </div>
                 </Card>

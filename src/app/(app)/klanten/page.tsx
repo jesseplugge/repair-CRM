@@ -52,7 +52,7 @@ export default async function KlantenPage({ searchParams }: { searchParams: { q?
                       </Link>
                       {c.company_name && <div className="text-xs text-ink-400">{c.company_name}</div>}
                     </Td>
-                    <Td className="tabular-nums text-ink-600">{c.customer_number}</Td>
+                    <Td className="font-mono tabular-nums text-ink-600">{c.customer_number}</Td>
                     <Td className="text-ink-600">{c.phone ?? '—'}</Td>
                     <Td className="text-ink-600">{c.email ?? '—'}</Td>
                   </Tr>
@@ -68,7 +68,7 @@ export default async function KlantenPage({ searchParams }: { searchParams: { q?
                   <span className="min-w-0 truncate font-medium text-ink-900">
                     {c.first_name} {c.last_name}
                   </span>
-                  <span className="shrink-0 tabular-nums text-xs text-ink-400">{c.customer_number}</span>
+                  <span className="shrink-0 font-mono tabular-nums text-xs text-ink-400">{c.customer_number}</span>
                 </div>
                 {c.company_name && <div className="break-words text-xs text-ink-400">{c.company_name}</div>}
                 {(c.phone || c.email) && (

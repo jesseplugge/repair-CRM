@@ -5,7 +5,6 @@ import { Search, Plus } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { NotificationsBell } from '@/components/NotificationsBell';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
-import { Button } from '@/components/ui/primitives';
 import type { Notification } from '@/lib/actions/notifications';
 
 export function TopBar({ notifications }: { notifications: Notification[] }) {
@@ -13,10 +12,11 @@ export function TopBar({ notifications }: { notifications: Notification[] }) {
 
   return (
     <div className="mb-6 flex items-center justify-end gap-2">
-      <Link href="/reparaties/nieuw" className="mr-auto">
-        <Button variant="primary">
-          <Plus size={16} /> <span className="hidden sm:inline">{t('newRepair')}</span>
-        </Button>
+      <Link
+        href="/reparaties/nieuw"
+        className="focus-ring mr-auto inline-flex items-center gap-2 rounded px-3.5 py-2 text-sm font-semibold bg-signal-500 text-white hover:bg-signal-600"
+      >
+        <Plus size={16} /> <span className="hidden sm:inline">{t('newRepair')}</span>
       </Link>
       <button
         onClick={() => window.dispatchEvent(new Event('open-command-palette'))}

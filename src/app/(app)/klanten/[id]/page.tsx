@@ -120,7 +120,7 @@ export default async function KlantProfielPage({ params }: { params: { id: strin
               {allRepairs.map((r) => (
                 <Tr key={r.id}>
                   <Td>
-                    <Link href={`/reparaties/${r.id}`} className="font-medium text-[var(--accent)] hover:underline">
+                    <Link href={`/reparaties/${r.id}`} className="font-mono font-medium text-[var(--accent)] hover:underline">
                       {r.repair_number}
                     </Link>
                   </Td>
@@ -130,7 +130,7 @@ export default async function KlantProfielPage({ params }: { params: { id: strin
                   <Td>
                     <PaymentStatusBadge status={r.payment_status} />
                   </Td>
-                  <Td align="right" className="tabular-nums text-ink-900">
+                  <Td align="right" className="font-mono tabular-nums text-ink-900">
                     {formatEuro(r.final_price ?? r.estimated_price)}
                   </Td>
                 </Tr>
@@ -142,8 +142,8 @@ export default async function KlantProfielPage({ params }: { params: { id: strin
           {allRepairs.map((r) => (
             <Link key={r.id} href={`/reparaties/${r.id}`} className="block rounded-lg border border-ink-100 bg-white p-3 shadow-card">
               <div className="flex items-center justify-between gap-2">
-                <span className="min-w-0 truncate font-medium text-[var(--accent)]">{r.repair_number}</span>
-                <span className="shrink-0 tabular-nums font-medium text-ink-900">
+                <span className="min-w-0 truncate font-mono font-medium text-[var(--accent)]">{r.repair_number}</span>
+                <span className="shrink-0 font-mono tabular-nums font-medium text-ink-900">
                   {formatEuro(r.final_price ?? r.estimated_price)}
                 </span>
               </div>
@@ -171,7 +171,7 @@ export default async function KlantProfielPage({ params }: { params: { id: strin
             <div className="mt-0.5 text-xs text-ink-400">
               {d.color && <>{d.color} &middot; </>}
               {d.storage_capacity && <>{d.storage_capacity} &middot; </>}
-              {d.imei ? `IMEI ${d.imei}` : t('noImei')}
+              {d.imei ? <span className="font-mono">IMEI {d.imei}</span> : t('noImei')}
             </div>
           </Card>
         </Link>
@@ -203,7 +203,7 @@ export default async function KlantProfielPage({ params }: { params: { id: strin
                 return (
                   <Tr key={inv.id}>
                     <Td>
-                      <Link href={`/facturen/${inv.id}`} className="font-medium text-[var(--accent)] hover:underline">
+                      <Link href={`/facturen/${inv.id}`} className="font-mono font-medium text-[var(--accent)] hover:underline">
                         {inv.invoice_number}
                       </Link>
                     </Td>
@@ -211,7 +211,7 @@ export default async function KlantProfielPage({ params }: { params: { id: strin
                     <Td>
                       <StatusBadge name={label} color={color} />
                     </Td>
-                    <Td align="right" className="tabular-nums text-ink-900">
+                    <Td align="right" className="font-mono tabular-nums text-ink-900">
                       {formatEuro(inv.total_incl_vat)}
                     </Td>
                   </Tr>
@@ -227,8 +227,8 @@ export default async function KlantProfielPage({ params }: { params: { id: strin
             return (
               <Link key={inv.id} href={`/facturen/${inv.id}`} className="block rounded-lg border border-ink-100 bg-white p-3 shadow-card">
                 <div className="flex items-center justify-between gap-2">
-                  <span className="min-w-0 truncate font-medium text-[var(--accent)]">{inv.invoice_number}</span>
-                  <span className="shrink-0 tabular-nums font-medium text-ink-900">{formatEuro(inv.total_incl_vat)}</span>
+                  <span className="min-w-0 truncate font-mono font-medium text-[var(--accent)]">{inv.invoice_number}</span>
+                  <span className="shrink-0 font-mono tabular-nums font-medium text-ink-900">{formatEuro(inv.total_incl_vat)}</span>
                 </div>
                 <div className="mt-2 flex items-center justify-between gap-2">
                   <span className="shrink-0 text-xs text-ink-400">{formatDate(inv.invoice_date)}</span>
@@ -255,7 +255,7 @@ export default async function KlantProfielPage({ params }: { params: { id: strin
               {customer.first_name} {customer.last_name}
             </h1>
             <div className="truncate text-sm text-ink-400">
-              {customer.customer_number} &middot; {t('customerSince', { date: formatDate(customer.customer_since) })}
+              <span className="font-mono">{customer.customer_number}</span> &middot; {t('customerSince', { date: formatDate(customer.customer_since) })}
             </div>
           </div>
         </div>
@@ -265,10 +265,11 @@ export default async function KlantProfielPage({ params }: { params: { id: strin
               <ShoppingCart size={16} /> {t('newSale')}
             </Button>
           </Link>
-          <Link href={`/reparaties/nieuw?customer_id=${customer.id}`}>
-            <Button variant="primary">
-              <Wrench size={16} /> {t('newRepair')}
-            </Button>
+          <Link
+            href={`/reparaties/nieuw?customer_id=${customer.id}`}
+            className="focus-ring inline-flex items-center gap-2 rounded px-3.5 py-2 text-sm font-semibold bg-signal-500 text-white hover:bg-signal-600"
+          >
+            <Wrench size={16} /> {t('newRepair')}
           </Link>
         </div>
       </div>
