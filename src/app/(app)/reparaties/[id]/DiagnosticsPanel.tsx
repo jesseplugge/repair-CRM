@@ -11,7 +11,7 @@ const RESULT_DOTS: Record<Result, string> = {
   pass: '#2F8F5B',
   fail: '#C4453A',
   not_tested: '#C97A22',
-  na: '#8A93A6',
+  na: '#5C6D74',
 };
 const RESULT_KEYS: Record<Result, string> = {
   pass: 'resultPass',

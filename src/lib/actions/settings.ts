@@ -137,7 +137,7 @@ export async function createStatus(_prevState: { error?: string }, formData: For
   const { error } = await supabase.from('repair_statuses').insert({
     business_id: user.business_id,
     name,
-    color: (formData.get('color') as string) || '#495164',
+    color: (formData.get('color') as string) || '#3C4C54',
     sort_order: (existing?.sort_order ?? 0) + 1,
     is_terminal: formData.get('is_terminal') === 'on',
     active: true,

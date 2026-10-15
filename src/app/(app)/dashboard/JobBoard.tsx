@@ -56,7 +56,7 @@ export function JobBoard({
               onClick={() => setSelected(job)}
               className={clsx(
                 'focus-ring group flex w-full items-center gap-4 rounded-lg px-3 py-3 text-left transition-colors',
-                job.urgent ? 'bg-signal-50 hover:bg-signal-100' : 'hover:bg-ink-50'
+                job.urgent ? 'bg-signal-100 hover:bg-signal-200' : 'hover:bg-ink-50'
               )}
             >
               <div

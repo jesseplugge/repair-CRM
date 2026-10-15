@@ -1,11 +1,11 @@
 import Link from 'next/link';
-import { clsx } from 'clsx';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { createClient, getCurrentUser } from '@/lib/supabase/server';
 import { formatEuro } from '@/lib/utils/currency';
 import { getNotifications } from '@/lib/actions/notifications';
 import { FileText, Plus, Search, ShoppingCart, UserPlus, ShieldAlert, Clock, PackageX, Receipt, type LucideIcon } from 'lucide-react';
 import { JobBoard, type JobRowData } from './JobBoard';
+import { KpiTile, KpiStrip } from '@/components/ui/kpi-tile';
 
 const NOTIFICATION_ICON: Record<string, { icon: LucideIcon; className: string }> = {
   claim: { icon: ShieldAlert, className: 'text-danger-600' },
@@ -174,12 +174,12 @@ export default async function DashboardPage() {
         </nav>
       </header>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <KpiStrip>
         <KpiTile label={t('kpiOpenRepairs')} value={openRepairs.length} />
         <KpiTile label={t('kpiNeedsAction')} value={urgentRepairs.length} emphasize={urgentRepairs.length > 0} />
         <KpiTile label={t('revenueToday')} value={formatEuro(revenueToday)} />
         <KpiTile label={t('outstandingPayments')} value={unpaid} emphasize={unpaid > 0} />
-      </div>
+      </KpiStrip>
 
       <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,20rem)]">
         <div className="space-y-10">
@@ -284,13 +284,3 @@ export default async function DashboardPage() {
 }
 
 const LIST_LIMIT = 12;
-
-/** One KPI tile. The two that call for a hand now ride the committed brand surface; the calm two stay on its soft tint. */
-function KpiTile({ label, value, emphasize = false }: { label: string; value: string | number; emphasize?: boolean }) {
-  return (
-    <div className={clsx('rounded-lg px-4 py-3.5', emphasize ? 'bg-mat' : 'bg-signal-50')}>
-      <div className={clsx('font-mono text-2xl font-bold tabular-nums', emphasize ? 'text-white' : 'text-ink-950')}>{value}</div>
-      <div className={clsx('mt-1 text-xs font-medium', emphasize ? 'text-signal-100' : 'text-ink-600')}>{label}</div>
-    </div>
-  );
-}

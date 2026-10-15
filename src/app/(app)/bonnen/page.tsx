@@ -12,7 +12,7 @@ import { Download, Receipt } from 'lucide-react';
 const TYPE_COLORS: Record<string, string> = {
   intake: '#1F5F73',
   repair_completion: '#2F8F5B',
-  pos_sale: '#495164',
+  pos_sale: '#3C4C54',
 };
 const TYPE_KEYS: Record<string, string> = {
   intake: 'typeIntake',
@@ -67,7 +67,7 @@ export default async function BonnenPage({ searchParams }: { searchParams: { q?:
               <Tbody>
                 {receipts.map((r) => {
                   const typeLabel = TYPE_KEYS[r.type] ? t(TYPE_KEYS[r.type] as any) : r.type;
-                  const typeColor = TYPE_COLORS[r.type] ?? '#495164';
+                  const typeColor = TYPE_COLORS[r.type] ?? '#3C4C54';
                   const url = pdfUrl(r);
                   const reference = r.repairNumber ?? r.saleNumber;
                   const referenceHref = r.repairId ? `/reparaties/${r.repairId}` : null;
@@ -114,7 +114,7 @@ export default async function BonnenPage({ searchParams }: { searchParams: { q?:
           <div className="space-y-2 md:hidden">
             {receipts.map((r) => {
               const typeLabel = TYPE_KEYS[r.type] ? t(TYPE_KEYS[r.type] as any) : r.type;
-              const typeColor = TYPE_COLORS[r.type] ?? '#495164';
+              const typeColor = TYPE_COLORS[r.type] ?? '#3C4C54';
               const url = pdfUrl(r);
               const reference = r.repairNumber ?? r.saleNumber;
               const referenceHref = r.repairId ? `/reparaties/${r.repairId}` : null;

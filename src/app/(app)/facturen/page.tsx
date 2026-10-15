@@ -9,12 +9,12 @@ import { formatEuro } from '@/lib/utils/currency';
 import { Plus, FileText } from 'lucide-react';
 
 const STATUS_COLORS: Record<string, string> = {
-  draft: '#495164',
+  draft: '#3C4C54',
   sent: '#1F5F73',
   paid: '#2F8F5B',
   partially_paid: '#C97A22',
   overdue: '#C4453A',
-  cancelled: '#8A93A6',
+  cancelled: '#5C6D74',
 };
 
 export default async function FacturenPage() {
@@ -62,7 +62,7 @@ export default async function FacturenPage() {
               <Tbody>
                 {(invoices ?? []).map((inv: any) => {
                   const label = STATUS_COLORS[inv.status] ? tStatus(inv.status as any) : inv.status;
-                  const color = STATUS_COLORS[inv.status] ?? '#495164';
+                  const color = STATUS_COLORS[inv.status] ?? '#3C4C54';
                   return (
                     <Tr key={inv.id}>
                       <Td>
@@ -90,7 +90,7 @@ export default async function FacturenPage() {
           <div className="space-y-2 md:hidden">
             {(invoices ?? []).map((inv: any) => {
               const label = STATUS_COLORS[inv.status] ? tStatus(inv.status as any) : inv.status;
-              const color = STATUS_COLORS[inv.status] ?? '#495164';
+              const color = STATUS_COLORS[inv.status] ?? '#3C4C54';
               return (
                 <Link
                   key={inv.id}

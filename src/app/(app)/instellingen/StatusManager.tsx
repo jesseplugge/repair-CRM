@@ -22,7 +22,7 @@ function SubmitButton() {
 
 function StatusRow({ status, isFirst, isLast }: { status: Status; isFirst: boolean; isLast: boolean }) {
   const [name, setName] = useState(status.name);
-  const [color, setColor] = useState(status.color ?? '#495164');
+  const [color, setColor] = useState(status.color ?? '#3C4C54');
   const [pending, startTransition] = useTransition();
   const router = useRouter();
   const t = useTranslations('statusManager');

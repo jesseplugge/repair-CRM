@@ -3,7 +3,7 @@ import { getTranslations } from 'next-intl/server';
 import { getCurrentUser } from '@/lib/supabase/server';
 import { Card } from '@/components/ui/primitives';
 import { Table, Thead, Tbody, Tr, Th, Td } from '@/components/ui/table';
-import { MetricStrip } from '@/components/ui/metric-strip';
+import { KpiTile, KpiStrip } from '@/components/ui/kpi-tile';
 import { StatusBadge } from '@/components/StatusBadge';
 import { formatEuro } from '@/lib/utils/currency';
 import { formatDate } from '@/lib/utils/format';
@@ -60,14 +60,12 @@ export default async function RapportagesPage({ searchParams }: { searchParams: 
 
       <DateRangeFilter from={from} to={to} />
 
-      <MetricStrip
-        items={[
-          { label: t('revenue'), value: formatEuro(data.totalOmzet), hint: t('revenueHint') },
-          { label: t('vat'), value: formatEuro(data.totalBtw), hint: t('vatHint') },
-          { label: t('partsCost'), value: formatEuro(data.partsCost), hint: t('partsCostHint') },
-          { label: t('grossProfit'), value: formatEuro(data.grossProfit), hint: t('grossProfitHint') },
-        ]}
-      />
+      <KpiStrip>
+        <KpiTile label={t('revenue')} value={formatEuro(data.totalOmzet)} hint={t('revenueHint')} />
+        <KpiTile label={t('vat')} value={formatEuro(data.totalBtw)} hint={t('vatHint')} />
+        <KpiTile label={t('partsCost')} value={formatEuro(data.partsCost)} hint={t('partsCostHint')} />
+        <KpiTile label={t('grossProfit')} value={formatEuro(data.grossProfit)} hint={t('grossProfitHint')} emphasize />
+      </KpiStrip>
 
       <Card>
         <div className="grid grid-cols-1 divide-y divide-ink-100 sm:grid-cols-3 sm:divide-x sm:divide-y-0">
@@ -141,7 +139,7 @@ export default async function RapportagesPage({ searchParams }: { searchParams: 
                 <Tbody>
                   {data.outstandingInvoices.map((inv) => {
                     const label = STATUS_COLORS[inv.status] ? tStatus(inv.status as any) : inv.status;
-                    const color = STATUS_COLORS[inv.status] ?? '#495164';
+                    const color = STATUS_COLORS[inv.status] ?? '#3C4C54';
                     return (
                       <Tr key={inv.id}>
                         <Td className="!px-0">
@@ -168,7 +166,7 @@ export default async function RapportagesPage({ searchParams }: { searchParams: 
             <div className="space-y-2 md:hidden">
               {data.outstandingInvoices.map((inv) => {
                 const label = STATUS_COLORS[inv.status] ? tStatus(inv.status as any) : inv.status;
-                const color = STATUS_COLORS[inv.status] ?? '#495164';
+                const color = STATUS_COLORS[inv.status] ?? '#3C4C54';
                 return (
                   <Link
                     key={inv.id}

@@ -53,7 +53,7 @@ function ClaimRow({ claim, repairId }: { claim: WarrantyClaim; repairId: string 
   const router = useRouter();
   const t = useTranslations('repairTabs');
   const label = STATUS_KEYS[claim.status] ? t(STATUS_KEYS[claim.status] as any) : claim.status;
-  const color = STATUS_COLORS[claim.status] ?? '#495164';
+  const color = STATUS_COLORS[claim.status] ?? '#3C4C54';
 
   return (
     <div className="rounded border border-ink-100 p-3 text-sm">

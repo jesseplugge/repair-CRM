@@ -55,7 +55,7 @@ export function ReparatiesKanban({ statuses, repairs }: { statuses: Status[]; re
             }`}
           >
             <div className="mb-2 flex items-center gap-2 px-2 py-1">
-              <span className="h-2 w-2 rounded-full" style={{ backgroundColor: status.color ?? '#495164' }} />
+              <span className="h-2 w-2 rounded-full" style={{ backgroundColor: status.color ?? '#3C4C54' }} />
               <span className="text-xs font-semibold uppercase tracking-wide text-ink-500">{status.name}</span>
               <span className="text-xs text-ink-400">{columnRepairs.length}</span>
             </div>

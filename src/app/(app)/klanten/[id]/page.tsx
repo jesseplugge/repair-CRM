@@ -5,7 +5,7 @@ import { createClient, getCurrentUser } from '@/lib/supabase/server';
 import { Card, Button } from '@/components/ui/primitives';
 import { Table, Thead, Tbody, Tr, Th, Td } from '@/components/ui/table';
 import { EmptyState } from '@/components/ui/empty-state';
-import { MetricStrip } from '@/components/ui/metric-strip';
+import { KpiTile, KpiStrip } from '@/components/ui/kpi-tile';
 import { StatusBadge, PaymentStatusBadge } from '@/components/StatusBadge';
 import { formatDate, initials } from '@/lib/utils/format';
 import { formatEuro } from '@/lib/utils/currency';
@@ -14,12 +14,12 @@ import { AddDeviceForm } from './AddDeviceForm';
 import { CustomerTabs } from './CustomerTabs';
 
 const INVOICE_STATUS_COLORS: Record<string, string> = {
-  draft: '#495164',
+  draft: '#3C4C54',
   sent: '#1F5F73',
   paid: '#2F8F5B',
   partially_paid: '#C97A22',
   overdue: '#C4453A',
-  cancelled: '#8A93A6',
+  cancelled: '#5C6D74',
 };
 
 export default async function KlantProfielPage({ params }: { params: { id: string } }) {
@@ -198,7 +198,7 @@ export default async function KlantProfielPage({ params }: { params: { id: strin
             </Thead>
             <Tbody>
               {allInvoices.map((inv) => {
-                const color = INVOICE_STATUS_COLORS[inv.status] ?? '#495164';
+                const color = INVOICE_STATUS_COLORS[inv.status] ?? '#3C4C54';
                 const label = INVOICE_STATUS_COLORS[inv.status] ? tInvoiceStatus(inv.status as any) : inv.status;
                 return (
                   <Tr key={inv.id}>
@@ -222,7 +222,7 @@ export default async function KlantProfielPage({ params }: { params: { id: strin
         </div>
         <div className="space-y-2 p-4 md:hidden">
           {allInvoices.map((inv) => {
-            const color = INVOICE_STATUS_COLORS[inv.status] ?? '#495164';
+            const color = INVOICE_STATUS_COLORS[inv.status] ?? '#3C4C54';
             const label = INVOICE_STATUS_COLORS[inv.status] ? tInvoiceStatus(inv.status as any) : inv.status;
             return (
               <Link key={inv.id} href={`/facturen/${inv.id}`} className="block rounded-lg border border-ink-100 bg-white p-3 shadow-card">
@@ -273,14 +273,12 @@ export default async function KlantProfielPage({ params }: { params: { id: strin
         </div>
       </div>
 
-      <MetricStrip
-        items={[
-          { label: t('totalSpent'), value: formatEuro(totalSpent) },
-          { label: t('outstanding'), value: formatEuro(outstanding) },
-          { label: t('repairs'), value: allRepairs.length },
-          { label: t('devices'), value: allDevices.length },
-        ]}
-      />
+      <KpiStrip>
+        <KpiTile label={t('totalSpent')} value={formatEuro(totalSpent)} />
+        <KpiTile label={t('outstanding')} value={formatEuro(outstanding)} emphasize={outstanding > 0} />
+        <KpiTile label={t('repairs')} value={allRepairs.length} />
+        <KpiTile label={t('devices')} value={allDevices.length} />
+      </KpiStrip>
 
       <Card>
         <CustomerTabs

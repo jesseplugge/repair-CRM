@@ -171,9 +171,9 @@ export default async function ReparatieDetailPage({ params }: { params: { id: st
                 <div className="flex items-start gap-3">
                   <div
                     className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
-                    style={{ backgroundColor: `${status.color ?? '#495164'}1a` }}
+                    style={{ backgroundColor: `${status.color ?? '#3C4C54'}1a` }}
                   >
-                    <CircleDot size={16} style={{ color: status.color ?? '#495164' }} />
+                    <CircleDot size={16} style={{ color: status.color ?? '#3C4C54' }} />
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="text-xs text-ink-400">{t('status')}</div>

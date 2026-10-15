@@ -72,7 +72,7 @@ export default async function GarantiePage() {
                   const customer = repair?.customer;
                   const device = repair?.device;
                   const label = STATUS_KEYS[c.status] ? tTabs(STATUS_KEYS[c.status] as any) : c.status;
-                  const color = STATUS_COLORS[c.status] ?? '#495164';
+                  const color = STATUS_COLORS[c.status] ?? '#3C4C54';
                   return (
                     <Tr key={c.id}>
                       <Td className="font-medium text-ink-900">{c.claim_number}</Td>
@@ -107,7 +107,7 @@ export default async function GarantiePage() {
               const customer = repair?.customer;
               const device = repair?.device;
               const label = STATUS_KEYS[c.status] ? tTabs(STATUS_KEYS[c.status] as any) : c.status;
-              const color = STATUS_COLORS[c.status] ?? '#495164';
+              const color = STATUS_COLORS[c.status] ?? '#3C4C54';
               return (
                 <div key={c.id} className="rounded-lg border border-ink-100 bg-white p-3 shadow-card">
                   <div className="flex items-center justify-between gap-2">
