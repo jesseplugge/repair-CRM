@@ -73,12 +73,12 @@ export default async function BonnenPage({ searchParams }: { searchParams: { q?:
                   const referenceHref = r.repairId ? `/reparaties/${r.repairId}` : null;
                   return (
                     <Tr key={r.id}>
-                      <Td className="font-medium text-ink-900">{r.receiptNumber}</Td>
+                      <Td className="font-mono font-medium text-ink-900">{r.receiptNumber}</Td>
                       <Td>
                         <StatusBadge name={typeLabel} color={typeColor} />
                       </Td>
                       <Td className="text-ink-700">{r.customerName ?? t('cash')}</Td>
-                      <Td className="text-ink-600">
+                      <Td className="font-mono text-ink-600">
                         {reference ? (
                           referenceHref ? (
                             <Link href={referenceHref} className="text-[var(--accent)] hover:underline">
@@ -121,13 +121,13 @@ export default async function BonnenPage({ searchParams }: { searchParams: { q?:
               return (
                 <div key={r.id} className="rounded-lg border border-ink-100 bg-white p-3 shadow-card">
                   <div className="flex items-center justify-between gap-2">
-                    <span className="min-w-0 truncate font-medium text-ink-900">{r.receiptNumber}</span>
+                    <span className="min-w-0 truncate font-mono font-medium text-ink-900">{r.receiptNumber}</span>
                     <span className="shrink-0">
                       <StatusBadge name={typeLabel} color={typeColor} />
                     </span>
                   </div>
                   <div className="mt-0.5 break-words text-sm text-ink-700">{r.customerName ?? t('cash')}</div>
-                  <div className="text-xs text-ink-400">
+                  <div className="font-mono text-xs text-ink-400">
                     {reference ? (
                       referenceHref ? (
                         <Link href={referenceHref} className="text-[var(--accent)] hover:underline">
@@ -139,7 +139,7 @@ export default async function BonnenPage({ searchParams }: { searchParams: { q?:
                     ) : (
                       '—'
                     )}
-                    {' · '}
+                    <span className="font-sans"> &middot; </span>
                     {formatDateTime(r.createdAt)}
                   </div>
                   {url && (

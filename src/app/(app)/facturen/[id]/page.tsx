@@ -36,7 +36,7 @@ export default async function FactuurDetailPage({ params }: { params: { id: stri
     <div className="mx-auto max-w-3xl space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="font-display text-2xl font-semibold text-ink-950">{invoice.invoice_number}</h1>
+          <h1 className="font-mono text-2xl font-bold text-ink-950">{invoice.invoice_number}</h1>
           <p className="text-sm text-ink-600">
             {customer.first_name} {customer.last_name} &middot; {formatDate(invoice.invoice_date)}
           </p>
@@ -64,22 +64,22 @@ export default async function FactuurDetailPage({ params }: { params: { id: stri
                       {i.quantity}x &middot; {formatEuro(i.unit_price_excl_vat)} {t('exclVat')} &middot; {t('vat')} {i.vat_rate}%
                     </div>
                   </div>
-                  <div className="tabular-nums font-medium text-ink-900">{formatEuro(i.total_incl_vat)}</div>
+                  <div className="font-mono tabular-nums font-medium text-ink-900">{formatEuro(i.total_incl_vat)}</div>
                 </div>
               ))}
             </div>
             <div className="mt-3 space-y-1 border-t border-ink-100 pt-3 text-sm">
               <div className="flex justify-between text-ink-600">
                 <span>{t('subtotalExclVat')}</span>
-                <span className="tabular-nums">{formatEuro(invoice.subtotal_excl_vat)}</span>
+                <span className="font-mono tabular-nums">{formatEuro(invoice.subtotal_excl_vat)}</span>
               </div>
               <div className="flex justify-between text-ink-600">
                 <span>{t('vatLabel')}</span>
-                <span className="tabular-nums">{formatEuro(invoice.total_vat)}</span>
+                <span className="font-mono tabular-nums">{formatEuro(invoice.total_vat)}</span>
               </div>
-              <div className="flex justify-between font-display text-lg font-semibold text-ink-950">
-                <span>{t('total')}</span>
-                <span className="tabular-nums">{formatEuro(invoice.total_incl_vat)}</span>
+              <div className="flex justify-between text-lg font-semibold text-ink-950">
+                <span className="font-display">{t('total')}</span>
+                <span className="font-mono tabular-nums">{formatEuro(invoice.total_incl_vat)}</span>
               </div>
             </div>
           </Card>

@@ -4,6 +4,8 @@ import { createClient, getCurrentUser } from '@/lib/supabase/server';
 import { Card, Button } from '@/components/ui/primitives';
 import { Table, Thead, Tbody, Tr, Th, Td } from '@/components/ui/table';
 import { EmptyState } from '@/components/ui/empty-state';
+import { StatusBadge } from '@/components/StatusBadge';
+import { KpiTile, KpiStrip } from '@/components/ui/kpi-tile';
 import { formatDate } from '@/lib/utils/format';
 import { formatEuro } from '@/lib/utils/currency';
 import { Plus, FileText } from 'lucide-react';
@@ -16,6 +18,7 @@ const STATUS_COLORS: Record<string, string> = {
   overdue: '#C4453A',
   cancelled: '#5C6D74',
 };
+const OUTSTANDING_STATUSES = ['sent', 'partially_paid', 'overdue'];
 
 export default async function FacturenPage() {
   const user = await getCurrentUser();
@@ -28,12 +31,18 @@ export default async function FacturenPage() {
     .eq('business_id', user!.business_id)
     .order('created_at', { ascending: false });
 
+  const allInvoices = invoices ?? [];
+  const outstandingAmount = allInvoices
+    .filter((inv) => OUTSTANDING_STATUSES.includes(inv.status))
+    .reduce((sum, inv) => sum + inv.total_incl_vat, 0);
+  const overdueCount = allInvoices.filter((inv) => inv.status === 'overdue').length;
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="font-display text-2xl font-semibold text-ink-950">{t('title')}</h1>
-          <p className="text-sm text-ink-600">{t('count', { count: invoices?.length ?? 0 })}</p>
+          <p className="text-sm text-ink-600">{t('count', { count: allInvoices.length })}</p>
         </div>
         <Link href="/facturen/nieuw" className="self-start">
           <Button variant="primary">
@@ -42,7 +51,13 @@ export default async function FacturenPage() {
         </Link>
       </div>
 
-      {(invoices ?? []).length === 0 ? (
+      <KpiStrip>
+        <KpiTile label={t('kpiTotal')} value={allInvoices.length} />
+        <KpiTile label={t('kpiOutstanding')} value={formatEuro(outstandingAmount)} emphasize={outstandingAmount > 0} />
+        <KpiTile label={t('kpiOverdue')} value={overdueCount} emphasize={overdueCount > 0} />
+      </KpiStrip>
+
+      {allInvoices.length === 0 ? (
         <Card>
           <EmptyState icon={FileText} title={t('empty')} />
         </Card>
@@ -60,13 +75,13 @@ export default async function FacturenPage() {
                 </tr>
               </Thead>
               <Tbody>
-                {(invoices ?? []).map((inv: any) => {
+                {allInvoices.map((inv: any) => {
                   const label = STATUS_COLORS[inv.status] ? tStatus(inv.status as any) : inv.status;
                   const color = STATUS_COLORS[inv.status] ?? '#3C4C54';
                   return (
                     <Tr key={inv.id}>
                       <Td>
-                        <Link href={`/facturen/${inv.id}`} className="font-medium text-[var(--accent)] hover:underline">
+                        <Link href={`/facturen/${inv.id}`} className="font-mono font-medium text-[var(--accent)] hover:underline">
                           {inv.invoice_number}
                         </Link>
                       </Td>
@@ -75,11 +90,9 @@ export default async function FacturenPage() {
                       </Td>
                       <Td className="text-ink-600">{formatDate(inv.invoice_date)}</Td>
                       <Td>
-                        <span className="rounded-full px-2.5 py-1 text-xs font-medium" style={{ backgroundColor: `${color}1a`, color }}>
-                          {label}
-                        </span>
+                        <StatusBadge name={label} color={color} />
                       </Td>
-                      <Td align="right" className="tabular-nums text-ink-900">{formatEuro(inv.total_incl_vat)}</Td>
+                      <Td align="right" className="font-mono tabular-nums text-ink-900">{formatEuro(inv.total_incl_vat)}</Td>
                     </Tr>
                   );
                 })}
@@ -88,7 +101,7 @@ export default async function FacturenPage() {
           </Card>
 
           <div className="space-y-2 md:hidden">
-            {(invoices ?? []).map((inv: any) => {
+            {allInvoices.map((inv: any) => {
               const label = STATUS_COLORS[inv.status] ? tStatus(inv.status as any) : inv.status;
               const color = STATUS_COLORS[inv.status] ?? '#3C4C54';
               return (
@@ -98,17 +111,15 @@ export default async function FacturenPage() {
                   className="block rounded-lg border border-ink-100 bg-white p-3 shadow-card"
                 >
                   <div className="flex items-center justify-between gap-2">
-                    <span className="min-w-0 truncate font-medium text-[var(--accent)]">{inv.invoice_number}</span>
-                    <span className="shrink-0 tabular-nums font-medium text-ink-900">{formatEuro(inv.total_incl_vat)}</span>
+                    <span className="min-w-0 truncate font-mono font-medium text-[var(--accent)]">{inv.invoice_number}</span>
+                    <span className="shrink-0 font-mono tabular-nums font-medium text-ink-900">{formatEuro(inv.total_incl_vat)}</span>
                   </div>
                   <div className="mt-0.5 break-words text-sm text-ink-700">
                     {inv.customer?.first_name} {inv.customer?.last_name}
                   </div>
                   <div className="mt-2 flex items-center justify-between gap-2">
                     <span className="text-xs text-ink-400">{formatDate(inv.invoice_date)}</span>
-                    <span className="rounded-full px-2.5 py-1 text-xs font-medium" style={{ backgroundColor: `${color}1a`, color }}>
-                      {label}
-                    </span>
+                    <StatusBadge name={label} color={color} />
                   </div>
                 </Link>
               );

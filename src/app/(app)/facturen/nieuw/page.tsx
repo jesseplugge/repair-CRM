@@ -45,13 +45,13 @@ export default async function NieuweFactuurPage({ searchParams }: { searchParams
               {(items ?? []).map((i) => (
                 <div key={i.id} className="flex justify-between text-ink-600">
                   <span>{i.description}</span>
-                  <span className="tabular-nums">{formatEuro(i.total_incl_vat)}</span>
+                  <span className="font-mono tabular-nums">{formatEuro(i.total_incl_vat)}</span>
                 </div>
               ))}
             </div>
-            <div className="mt-3 flex justify-between border-t border-ink-100 pt-3 font-display text-lg font-semibold text-ink-950">
-              <span>{t('total')}</span>
-              <span className="tabular-nums">{formatEuro(totalInclVat)}</span>
+            <div className="mt-3 flex justify-between border-t border-ink-100 pt-3 text-lg font-semibold text-ink-950">
+              <span className="font-display">{t('total')}</span>
+              <span className="font-mono tabular-nums">{formatEuro(totalInclVat)}</span>
             </div>
             <form action={submitInvoiceFromRepair} className="mt-4">
               <input type="hidden" name="repair_id" value={repair.id} />
