@@ -80,6 +80,12 @@ export default async function RapportagesPage({ searchParams }: { searchParams: 
                 <span className="text-ink-600">{t('productsPos')}</span>
                 <span className="font-mono tabular-nums font-medium">{formatEuro(data.productRevenueIncl)}</span>
               </div>
+              {data.tipRevenueIncl > 0 && (
+                <div className="flex justify-between">
+                  <span className="text-ink-600">{t('tips')}</span>
+                  <span className="font-mono tabular-nums font-medium">{formatEuro(data.tipRevenueIncl)}</span>
+                </div>
+              )}
             </div>
           </div>
 

@@ -39,6 +39,7 @@ Built by and for a working repair counter rather than as a generic CRM: the inta
 - Interface languages: Dutch (primary), English, German, French, Spanish, Turkish.
 - Stack: Next.js 14 (App Router, server actions) and Supabase (Postgres, Auth, RLS), deployed on Vercel.
 - Money rule: the incl.-BTW price is the source of truth for products and lines; totals come from real line items, never re-derived at render time.
+- Tips (payments.tip_amount) are taxable turnover here, not a pass-through gratuity: 21% BTW-inclusive, counted in revenue, VAT, and profit everywhere money actually paid/handled is totaled (dashboard, reports, customer lifetime spend, receipts, cash-drawer reconciliation). They are deliberately excluded from payment_status/remaining-balance math — a tip doesn't pay down the service price owed.
 - Legal/sequential records (invoices, credit notes, signatures, terms versions, activity logs) are corrected, never edited or deleted. Payments are the one exception since 2026-10-16: amount, method, transaction ID, tip and paid-at time can be edited directly on a payment the owner entered wrong — the payment_status on its repair/invoice is recomputed after every edit, same as after recording or refunding one.
 - Terminology in the product: reparatie, klant, apparaat, kassa, kassalade, bon, factuur, BTW, Gereed, Opgehaald.
 

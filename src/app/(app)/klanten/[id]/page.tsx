@@ -57,16 +57,20 @@ export default async function KlantProfielPage({ params }: { params: { id: strin
   // Outstanding (and spent) must come from actual payments, not payment_status alone —
   // a partially-paid repair's full price is neither fully "spent" nor fully "outstanding"
   // (same paidSoFar pattern as PaymentPanel / InvoicePaymentPanel / lib/reports/data.ts).
+  // Tips count toward what the customer actually spent, but not toward paying down the
+  // service price itself, so "outstanding" is tracked from the base amount alone.
   const repairIds = allRepairs.map((r) => r.id);
   const { data: repairPayments } = repairIds.length
-    ? await supabase.from('payments').select('repair_id, amount').in('repair_id', repairIds)
-    : { data: [] as { repair_id: string | null; amount: number }[] };
+    ? await supabase.from('payments').select('repair_id, amount, tip_amount').in('repair_id', repairIds)
+    : { data: [] as { repair_id: string | null; amount: number; tip_amount: number | null }[] };
   const paidByRepair = new Map<string, number>();
+  const paidByRepairWithTip = new Map<string, number>();
   for (const p of repairPayments ?? []) {
     if (!p.repair_id) continue;
     paidByRepair.set(p.repair_id, (paidByRepair.get(p.repair_id) ?? 0) + p.amount);
+    paidByRepairWithTip.set(p.repair_id, (paidByRepairWithTip.get(p.repair_id) ?? 0) + p.amount + (p.tip_amount ?? 0));
   }
-  const totalSpent = allRepairs.reduce((sum, r) => sum + (paidByRepair.get(r.id) ?? 0), 0);
+  const totalSpent = allRepairs.reduce((sum, r) => sum + (paidByRepairWithTip.get(r.id) ?? 0), 0);
   const outstanding = allRepairs.reduce((sum, r) => {
     const total = r.final_price ?? r.estimated_price ?? 0;
     const paid = paidByRepair.get(r.id) ?? 0;

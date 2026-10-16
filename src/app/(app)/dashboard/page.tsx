@@ -36,7 +36,7 @@ export default async function DashboardPage() {
   const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
   const fiveDaysAgo = new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString();
 
-  const [{ data: statuses }, { data: repairs }, { data: posSalesToday }, needsAttention] = await Promise.all([
+  const [{ data: statuses }, { data: repairs }, { data: posSalesToday }, { data: tipPaymentsToday }, needsAttention] = await Promise.all([
     supabase.from('repair_statuses').select('*').eq('business_id', user!.business_id).order('sort_order'),
     supabase
       .from('repairs')
@@ -51,6 +51,8 @@ export default async function DashboardPage() {
       .eq('business_id', user!.business_id)
       .eq('status', 'paid')
       .gte('created_at', startOfToday.toISOString()),
+    // Tips run through the till as taxable turnover here, not a pass-through gratuity — counted the same as any other revenue.
+    supabase.from('payments').select('tip_amount').eq('business_id', user!.business_id).gte('paid_at', startOfToday.toISOString()),
     getNotifications(),
   ]);
 
@@ -66,7 +68,8 @@ export default async function DashboardPage() {
   );
   const repairRevenueToday = paidRepairsToday.reduce((sum, r) => sum + (r.final_price ?? 0), 0);
   const posRevenueToday = (posSalesToday ?? []).reduce((sum, s) => sum + s.total_incl_vat, 0);
-  const revenueToday = repairRevenueToday + posRevenueToday;
+  const tipRevenueToday = (tipPaymentsToday ?? []).reduce((sum, p) => sum + (p.tip_amount ?? 0), 0);
+  const revenueToday = repairRevenueToday + posRevenueToday + tipRevenueToday;
   const transactionsToday = paidRepairsToday.length + (posSalesToday ?? []).length;
 
   // Open repairs as one list, not columns: what can go back over the counter first,

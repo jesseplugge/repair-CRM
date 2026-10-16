@@ -64,9 +64,25 @@ export async function getReportData(businessId: string, from: string, to: string
   const productRevenueIncl = (posSales ?? []).reduce((s, p) => s + p.total_incl_vat, 0);
   const productVat = (posSales ?? []).reduce((s, p) => s + p.total_vat, 0);
 
-  const totalOmzet = repairRevenueIncl + productRevenueIncl;
-  const totalBtw = repairVat + productVat;
-  const grossProfit = repairRevenueExcl - partsCost + (productRevenueIncl - productVat);
+  // Tips run through the till as taxable turnover here (21% BTW), not a pass-through
+  // gratuity — counted in the same period as the repair/sale they were paid against.
+  const repairIds = (repairs ?? []).map((r) => r.id);
+  const posSaleIds = (posSales ?? []).map((p) => p.id);
+  const [{ data: repairTipPayments }, { data: posTipPayments }] = await Promise.all([
+    repairIds.length
+      ? supabase.from('payments').select('tip_amount').in('repair_id', repairIds)
+      : Promise.resolve({ data: [] as { tip_amount: number }[] }),
+    posSaleIds.length
+      ? supabase.from('payments').select('tip_amount').in('pos_sale_id', posSaleIds)
+      : Promise.resolve({ data: [] as { tip_amount: number }[] }),
+  ]);
+  const tipRevenueIncl = [...(repairTipPayments ?? []), ...(posTipPayments ?? [])].reduce((s, p) => s + (p.tip_amount ?? 0), 0);
+  const tipExclVat = Math.round((tipRevenueIncl / 1.21) * 100) / 100;
+  const tipVat = Math.round((tipRevenueIncl - tipExclVat) * 100) / 100;
+
+  const totalOmzet = repairRevenueIncl + productRevenueIncl + tipRevenueIncl;
+  const totalBtw = repairVat + productVat + tipVat;
+  const grossProfit = repairRevenueExcl - partsCost + (productRevenueIncl - productVat) + tipExclVat;
 
   const popularity = new Map<string, number>();
   for (const r of allRepairsForPopular ?? []) {
@@ -80,6 +96,7 @@ export async function getReportData(businessId: string, from: string, to: string
     const vat = i.total_incl_vat - i.total_excl_vat;
     vatByRate.set(i.vat_rate, (vatByRate.get(i.vat_rate) ?? 0) + vat);
   }
+  if (tipVat > 0) vatByRate.set(21, (vatByRate.get(21) ?? 0) + tipVat);
   const vatBreakdown = [...vatByRate.entries()].sort((a, b) => b[0] - a[0]);
 
   const outstandingInvoiceIds = (outstandingRaw ?? []).map((inv) => inv.id);
@@ -125,6 +142,7 @@ export async function getReportData(businessId: string, from: string, to: string
     grossProfit,
     repairRevenueIncl,
     productRevenueIncl,
+    tipRevenueIncl,
     popular,
     vatBreakdown,
     outstandingInvoices,
