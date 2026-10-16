@@ -53,12 +53,25 @@ export default async function KlantProfielPage({ params }: { params: { id: strin
   const allRepairs = repairs ?? [];
   const allDevices = devices ?? [];
   const allInvoices = invoices ?? [];
-  const totalSpent = allRepairs
-    .filter((r) => r.payment_status === 'paid')
-    .reduce((sum, r) => sum + (r.final_price ?? 0), 0);
-  const outstanding = allRepairs
-    .filter((r) => r.payment_status !== 'paid')
-    .reduce((sum, r) => sum + (r.final_price ?? r.estimated_price ?? 0), 0);
+
+  // Outstanding (and spent) must come from actual payments, not payment_status alone —
+  // a partially-paid repair's full price is neither fully "spent" nor fully "outstanding"
+  // (same paidSoFar pattern as PaymentPanel / InvoicePaymentPanel / lib/reports/data.ts).
+  const repairIds = allRepairs.map((r) => r.id);
+  const { data: repairPayments } = repairIds.length
+    ? await supabase.from('payments').select('repair_id, amount').in('repair_id', repairIds)
+    : { data: [] as { repair_id: string | null; amount: number }[] };
+  const paidByRepair = new Map<string, number>();
+  for (const p of repairPayments ?? []) {
+    if (!p.repair_id) continue;
+    paidByRepair.set(p.repair_id, (paidByRepair.get(p.repair_id) ?? 0) + p.amount);
+  }
+  const totalSpent = allRepairs.reduce((sum, r) => sum + (paidByRepair.get(r.id) ?? 0), 0);
+  const outstanding = allRepairs.reduce((sum, r) => {
+    const total = r.final_price ?? r.estimated_price ?? 0;
+    const paid = paidByRepair.get(r.id) ?? 0;
+    return sum + Math.max(0, total - paid);
+  }, 0);
 
   const overviewContent = (
     <div className="grid grid-cols-1 gap-4 p-4 lg:grid-cols-2">

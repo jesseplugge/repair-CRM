@@ -32,9 +32,22 @@ export default async function FacturenPage() {
     .order('created_at', { ascending: false });
 
   const allInvoices = invoices ?? [];
+
+  // Outstanding must subtract what's already been paid — a partially_paid invoice's
+  // full total is not what's still owed (see InvoicePaymentPanel / lib/reports/data.ts
+  // for the same paidSoFar pattern).
+  const outstandingInvoiceIds = allInvoices.filter((inv) => OUTSTANDING_STATUSES.includes(inv.status)).map((inv) => inv.id);
+  const { data: outstandingPayments } = outstandingInvoiceIds.length
+    ? await supabase.from('payments').select('invoice_id, amount').in('invoice_id', outstandingInvoiceIds)
+    : { data: [] as { invoice_id: string | null; amount: number }[] };
+  const paidByInvoice = new Map<string, number>();
+  for (const p of outstandingPayments ?? []) {
+    if (!p.invoice_id) continue;
+    paidByInvoice.set(p.invoice_id, (paidByInvoice.get(p.invoice_id) ?? 0) + p.amount);
+  }
   const outstandingAmount = allInvoices
     .filter((inv) => OUTSTANDING_STATUSES.includes(inv.status))
-    .reduce((sum, inv) => sum + inv.total_incl_vat, 0);
+    .reduce((sum, inv) => sum + Math.max(0, inv.total_incl_vat - (paidByInvoice.get(inv.id) ?? 0)), 0);
   const overdueCount = allInvoices.filter((inv) => inv.status === 'overdue').length;
 
   return (

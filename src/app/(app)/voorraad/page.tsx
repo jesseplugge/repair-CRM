@@ -21,8 +21,10 @@ export default async function VoorraadPage() {
 
   const allProducts = products ?? [];
   const lowStock = allProducts.filter((p) => p.stock_quantity <= (p.minimum_stock ?? 0));
+  // Stock value is what the inventory cost to buy in (its asset value), not what it would
+  // sell for — the purchase price, excl. VAT, since input VAT is reclaimed, not part of cost.
   const stockValue = allProducts.reduce(
-    (sum, p) => sum + p.stock_quantity * (p.selling_price_incl_vat ?? p.selling_price_excl_vat ?? 0),
+    (sum, p) => sum + p.stock_quantity * (p.purchase_price_excl_vat ?? p.purchase_price_incl_vat ?? 0),
     0
   );
 
