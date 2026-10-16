@@ -514,25 +514,32 @@ export async function getRepairPayments(repairId: string) {
   return data ?? [];
 }
 
-export async function updateRepairPaymentTime(repairId: string, paymentId: string, paidAt: string) {
+/** Edits a payment's amount/method/reference/tip/time/notes directly, then recomputes the repair's payment_status. */
+export async function updateRepairPayment(
+  repairId: string,
+  paymentId: string,
+  fields: { amount: number; method: string; transactionId?: string | null; tipAmount?: number; paidAt: string; notes?: string | null }
+) {
   const user = await getCurrentUser();
   if (!user) redirect('/login');
   const supabase = createClient();
   const t = await getTranslations('repairErrors');
 
-  const date = new Date(paidAt);
+  const date = new Date(fields.paidAt);
   if (isNaN(date.getTime())) return { error: t('invalidDate') };
 
-  const { updatePaymentTime } = await import('./payments');
-  const result = await updatePaymentTime(paymentId, date.toISOString());
+  const { updatePayment } = await import('./payments');
+  const result = await updatePayment(paymentId, { ...fields, paidAt: date.toISOString() });
   if (result.error) return { error: result.error };
 
   const { data: repair } = await supabase.from('repairs').select('business_id').eq('id', repairId).single();
   if (repair) {
-    await logActivity(supabase, repair.business_id, repairId, 'payment_time_updated', 'Betaaltijd aangepast', user.id);
+    await recalculateRepairPaymentStatus(repairId);
+    await logActivity(supabase, repair.business_id, repairId, 'payment_edited', 'Betaling aangepast', user.id);
   }
 
   revalidatePath(`/reparaties/${repairId}`);
+  revalidatePath('/dashboard');
   return { error: undefined };
 }
 

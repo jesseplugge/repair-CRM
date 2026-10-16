@@ -58,6 +58,46 @@ export async function updatePaymentTime(paymentId: string, paidAt: string): Prom
   return {};
 }
 
+export type PaymentEditFields = {
+  amount: number;
+  method: string;
+  transactionId?: string | null;
+  tipAmount?: number;
+  paidAt: string;
+  notes?: string | null;
+};
+
+/**
+ * Directly edits a payment the owner entered wrong (amount, method, reference, tip, time, notes) —
+ * the one exception to "corrected, never edited" for financial records (see PRODUCT.md). Unlike a
+ * refund, this does not leave the original mistaken entry on record; callers recompute the owning
+ * repair/invoice's payment_status afterward since the paid total may have changed.
+ */
+export async function updatePayment(paymentId: string, fields: PaymentEditFields): Promise<{ error?: string }> {
+  const user = await getCurrentUser();
+  if (!user) return { error: 'Niet ingelogd.' };
+  const supabase = createClient();
+
+  const { data: payment } = await supabase.from('payments').select('id, business_id').eq('id', paymentId).single();
+  if (!payment || payment.business_id !== user.business_id) return { error: 'Betaling niet gevonden.' };
+
+  if (!(fields.amount > 0)) return { error: 'Bedrag moet groter dan nul zijn.' };
+
+  const { error } = await supabase
+    .from('payments')
+    .update({
+      amount: fields.amount,
+      method: fields.method,
+      transaction_id: fields.transactionId || null,
+      tip_amount: fields.tipAmount ?? 0,
+      paid_at: fields.paidAt,
+      notes: fields.notes || null,
+    })
+    .eq('id', paymentId);
+  if (error) return { error: error.message };
+  return {};
+}
+
 export async function refundPayment(
   paymentId: string,
   amount: number,

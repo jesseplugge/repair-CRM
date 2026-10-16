@@ -247,7 +247,11 @@
     "tipOptional": "Pourboire (facultatif)",
     "tipInline": "pourboire",
     "paymentTimeUpdated": "Heure de paiement mise à jour",
-    "editPaymentTime": "Modifier l'heure de paiement"
+    "editPaymentTime": "Modifier l'heure de paiement",
+    "editPayment": "Modifier le paiement",
+    "editPaymentSaved": "Paiement mis à jour",
+    "paymentNotesOptional": "Note (facultatif)",
+    "amountLabel": "Montant"
   },
   "repairErrors": {
     "selectCustomerOrFillName": "Sélectionnez un client ou saisissez un prénom et un nom.",

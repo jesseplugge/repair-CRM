@@ -247,7 +247,11 @@
     "tipOptional": "Trinkgeld (optional)",
     "tipInline": "Trinkgeld",
     "paymentTimeUpdated": "Zahlungszeit aktualisiert",
-    "editPaymentTime": "Zahlungszeit bearbeiten"
+    "editPaymentTime": "Zahlungszeit bearbeiten",
+    "editPayment": "Zahlung bearbeiten",
+    "editPaymentSaved": "Zahlung aktualisiert",
+    "paymentNotesOptional": "Notiz (optional)",
+    "amountLabel": "Betrag"
   },
   "repairErrors": {
     "selectCustomerOrFillName": "Wähle einen Kunden oder gib Vor- und Nachname ein.",

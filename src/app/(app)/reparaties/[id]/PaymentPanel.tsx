@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { recordRepairPayment, refundRepairPayment, updateRepairPaymentTime } from '@/lib/actions/repairs';
+import { recordRepairPayment, refundRepairPayment, updateRepairPayment } from '@/lib/actions/repairs';
 import { Button, Input, Label } from '@/components/ui/primitives';
 import { Modal } from '@/components/ui/modal';
 import { useToast } from '@/components/ui/toast';
@@ -41,8 +41,13 @@ export function PaymentPanel({
   const [tipAmount, setTipAmount] = useState('');
   const [refundTarget, setRefundTarget] = useState<Payment | null>(null);
   const [refundAmount, setRefundAmount] = useState('');
-  const [editingTimeId, setEditingTimeId] = useState<string | null>(null);
+  const [editTarget, setEditTarget] = useState<Payment | null>(null);
+  const [editAmount, setEditAmount] = useState('');
+  const [editMethod, setEditMethod] = useState<string | null>(null);
+  const [editTransactionId, setEditTransactionId] = useState('');
+  const [editTipAmount, setEditTipAmount] = useState('');
   const [editPaidAt, setEditPaidAt] = useState('');
+  const [editNotes, setEditNotes] = useState('');
   const [pending, startTransition] = useTransition();
   const router = useRouter();
   const t = useTranslations('repairSub');
@@ -73,18 +78,32 @@ export function PaymentPanel({
     });
   }
 
-  function startEditTime(payment: Payment) {
-    setEditingTimeId(payment.id);
+  function startEdit(payment: Payment) {
+    setEditTarget(payment);
+    setEditAmount(payment.amount.toFixed(2));
+    setEditMethod(payment.method);
+    setEditTransactionId(payment.transaction_id ?? '');
+    setEditTipAmount(payment.tip_amount ? payment.tip_amount.toFixed(2) : '');
     setEditPaidAt(toDateTimeLocalValue(payment.paid_at));
+    setEditNotes(payment.notes ?? '');
   }
 
-  function saveEditTime() {
-    if (!editingTimeId || !editPaidAt) return;
+  function saveEdit() {
+    if (!editTarget || !editMethod || !editPaidAt) return;
+    const amountValue = parseFloat(editAmount);
+    if (isNaN(amountValue) || amountValue <= 0) return;
     startTransition(async () => {
-      const result = await updateRepairPaymentTime(repairId, editingTimeId, editPaidAt);
+      const result = await updateRepairPayment(repairId, editTarget.id, {
+        amount: amountValue,
+        method: editMethod,
+        transactionId: editTransactionId.trim() || null,
+        tipAmount: parseFloat(editTipAmount || '0') || 0,
+        paidAt: editPaidAt,
+        notes: editNotes.trim() || null,
+      });
       if (!result?.error) {
-        setEditingTimeId(null);
-        toast({ variant: 'success', title: t('paymentTimeUpdated') });
+        setEditTarget(null);
+        toast({ variant: 'success', title: t('editPaymentSaved') });
         router.refresh();
       }
     });
@@ -111,48 +130,33 @@ export function PaymentPanel({
     <div className="space-y-3">
       {payments.length > 0 && (
         <div className="space-y-1.5">
-          {payments.map((p) =>
-            editingTimeId === p.id ? (
-              <div key={p.id} className="flex items-center gap-1.5 rounded border border-ink-100 px-2.5 py-1.5 text-xs">
-                <Input
-                  type="datetime-local"
-                  value={editPaidAt}
-                  onChange={(e) => setEditPaidAt(e.target.value)}
-                  className="!py-1 text-xs"
-                  autoFocus
-                />
-                <button
-                  onClick={saveEditTime}
-                  disabled={pending}
-                  className="focus-ring shrink-0 font-medium text-[var(--accent)] hover:underline"
-                >
-                  {tCommon('save')}
-                </button>
-                <button onClick={() => setEditingTimeId(null)} className="focus-ring shrink-0 text-ink-400 hover:text-ink-700">
-                  {t('cancel')}
-                </button>
-              </div>
-            ) : (
-              <div key={p.id} className="flex items-center justify-between rounded border border-ink-100 px-2.5 py-1.5 text-xs">
-                <div>
-                  <div className="font-medium tabular-nums text-ink-900">
-                    {formatEuro(p.amount)}
-                    {p.tip_amount > 0 && <span className="text-ink-400"> + {formatEuro(p.tip_amount)} {t('tipInline')}</span>}
-                  </div>
-                  <div className="flex items-center gap-1 text-ink-400">
-                    {methodLabel(p.method)} &middot; {formatDateTime(p.paid_at)}
-                    {p.transaction_id && <> &middot; {p.transaction_id}</>}
-                    <button onClick={() => startEditTime(p)} className="focus-ring text-ink-300 hover:text-ink-700" title={t('editPaymentTime')}>
-                      <Pencil size={11} />
-                    </button>
-                  </div>
+          {payments.map((p) => (
+            <div key={p.id} className="flex items-center justify-between rounded border border-ink-100 px-2.5 py-1.5 text-xs">
+              <div>
+                <div className="font-mono font-medium tabular-nums text-ink-900">
+                  {formatEuro(p.amount)}
+                  {p.tip_amount > 0 && <span className="text-ink-400"> + {formatEuro(p.tip_amount)} {t('tipInline')}</span>}
                 </div>
+                <div className="flex items-center gap-1 text-ink-400">
+                  {methodLabel(p.method)} &middot; {formatDateTime(p.paid_at)}
+                  {p.transaction_id && (
+                    <>
+                      {' '}
+                      &middot; <span className="font-mono">{p.transaction_id}</span>
+                    </>
+                  )}
+                </div>
+              </div>
+              <div className="flex shrink-0 items-center gap-2">
+                <button onClick={() => startEdit(p)} className="focus-ring text-ink-300 hover:text-ink-700" title={t('editPayment')}>
+                  <Pencil size={13} />
+                </button>
                 <button onClick={() => openRefund(p)} className="focus-ring text-ink-300 hover:text-danger-600" title={t('refund')}>
                   <Undo2 size={14} />
                 </button>
               </div>
-            )
-          )}
+            </div>
+          ))}
         </div>
       )}
 
@@ -238,6 +242,56 @@ export function PaymentPanel({
           autoFocus
         />
         {refundTarget && <p className="mt-1.5 text-xs text-ink-400">{t('refundMax', { max: formatEuro(refundTarget.amount) })}</p>}
+      </Modal>
+
+      <Modal
+        open={editTarget !== null}
+        onClose={() => setEditTarget(null)}
+        title={t('editPayment')}
+        footer={
+          <>
+            <Button variant="ghost" disabled={pending} onClick={() => setEditTarget(null)}>
+              {t('cancel')}
+            </Button>
+            <Button variant="primary" disabled={pending || !editMethod} onClick={saveEdit}>
+              {pending ? t('busy') : tCommon('save')}
+            </Button>
+          </>
+        }
+      >
+        <div className="space-y-3">
+          <div>
+            <Label htmlFor="edit-amount">{t('amountLabel')}</Label>
+            <Input id="edit-amount" type="number" step="0.01" value={editAmount} onChange={(e) => setEditAmount(e.target.value)} autoFocus />
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            {METHODS.map((m) => (
+              <button
+                key={m.value}
+                type="button"
+                onClick={() => setEditMethod(m.value)}
+                className={`focus-ring flex flex-col items-center gap-1 rounded border px-2 py-3 text-xs font-medium transition-colors ${
+                  editMethod === m.value ? 'border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--accent)]' : 'border-ink-200 text-ink-600 hover:bg-ink-50'
+                }`}
+              >
+                <m.icon size={18} />
+                {m.label}
+              </button>
+            ))}
+          </div>
+          <div>
+            <Label htmlFor="edit-paid-at">{t('editPaymentTime')}</Label>
+            <Input id="edit-paid-at" type="datetime-local" value={editPaidAt} onChange={(e) => setEditPaidAt(e.target.value)} />
+          </div>
+          <Input
+            type="text"
+            placeholder={t('transactionIdOptional')}
+            value={editTransactionId}
+            onChange={(e) => setEditTransactionId(e.target.value)}
+          />
+          <Input type="number" step="0.01" placeholder={t('tipOptional')} value={editTipAmount} onChange={(e) => setEditTipAmount(e.target.value)} />
+          <Input type="text" placeholder={t('paymentNotesOptional')} value={editNotes} onChange={(e) => setEditNotes(e.target.value)} />
+        </div>
       </Modal>
     </div>
   );

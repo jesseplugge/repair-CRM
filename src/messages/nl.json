@@ -247,7 +247,11 @@
     "tipOptional": "Fooi (optioneel)",
     "tipInline": "fooi",
     "paymentTimeUpdated": "Betaaltijd bijgewerkt",
-    "editPaymentTime": "Betaaltijd wijzigen"
+    "editPaymentTime": "Betaaltijd wijzigen",
+    "editPayment": "Betaling bewerken",
+    "editPaymentSaved": "Betaling bijgewerkt",
+    "paymentNotesOptional": "Notitie (optioneel)",
+    "amountLabel": "Bedrag"
   },
   "repairErrors": {
     "selectCustomerOrFillName": "Selecteer een klant of vul voor- en achternaam in.",

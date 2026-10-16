@@ -247,7 +247,11 @@
     "tipOptional": "Bahşiş (opsiyonel)",
     "tipInline": "bahşiş",
     "paymentTimeUpdated": "Ödeme zamanı güncellendi",
-    "editPaymentTime": "Ödeme zamanını düzenle"
+    "editPaymentTime": "Ödeme zamanını düzenle",
+    "editPayment": "Ödemeyi düzenle",
+    "editPaymentSaved": "Ödeme güncellendi",
+    "paymentNotesOptional": "Not (isteğe bağlı)",
+    "amountLabel": "Tutar"
   },
   "repairErrors": {
     "selectCustomerOrFillName": "Bir müşteri seçin veya ad ve soyad girin.",

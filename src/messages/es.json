@@ -247,7 +247,11 @@
     "tipOptional": "Propina (opcional)",
     "tipInline": "propina",
     "paymentTimeUpdated": "Hora de pago actualizada",
-    "editPaymentTime": "Editar hora de pago"
+    "editPaymentTime": "Editar hora de pago",
+    "editPayment": "Editar pago",
+    "editPaymentSaved": "Pago actualizado",
+    "paymentNotesOptional": "Nota (opcional)",
+    "amountLabel": "Importe"
   },
   "repairErrors": {
     "selectCustomerOrFillName": "Selecciona un cliente o introduce nombre y apellidos.",

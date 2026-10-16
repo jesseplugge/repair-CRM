@@ -247,7 +247,11 @@
     "tipOptional": "Tip (optional)",
     "tipInline": "tip",
     "paymentTimeUpdated": "Payment time updated",
-    "editPaymentTime": "Edit payment time"
+    "editPaymentTime": "Edit payment time",
+    "editPayment": "Edit payment",
+    "editPaymentSaved": "Payment updated",
+    "paymentNotesOptional": "Note (optional)",
+    "amountLabel": "Amount"
   },
   "repairErrors": {
     "selectCustomerOrFillName": "Select a customer or enter a first and last name.",
