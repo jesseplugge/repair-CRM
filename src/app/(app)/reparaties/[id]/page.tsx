@@ -137,7 +137,7 @@ export default async function ReparatieDetailPage({ params }: { params: { id: st
         <Link href="/reparaties" className="focus-ring inline-flex items-center gap-1.5 text-sm text-ink-500 hover:text-ink-800">
           <ArrowLeft size={14} /> {tNav('repairs')}
         </Link>
-        <DeleteRepairButton repairId={repair.id} />
+        <DeleteRepairButton repairId={repair.id} redirectTo="/reparaties" />
       </div>
 
       <div className="flex flex-wrap items-center gap-3">

@@ -11,6 +11,7 @@ import { formatDate } from '@/lib/utils/format';
 import { formatEuro } from '@/lib/utils/currency';
 import { Plus, List, Kanban, Wrench } from 'lucide-react';
 import { ReparatiesKanban } from './ReparatiesKanban';
+import { DeleteRepairButton } from './[id]/DeleteRepairButton';
 
 export default async function ReparatiesPage({ searchParams }: { searchParams: { status?: string; view?: string } }) {
   const user = await getCurrentUser();
@@ -117,6 +118,7 @@ export default async function ReparatiesPage({ searchParams }: { searchParams: {
                   <Th>{t('colStatus')}</Th>
                   <Th>{t('colPayment')}</Th>
                   <Th align="right">{t('colAmount')}</Th>
+                  <Th></Th>
                 </tr>
               </Thead>
               <Tbody>
@@ -145,6 +147,9 @@ export default async function ReparatiesPage({ searchParams }: { searchParams: {
                       </Td>
                       <Td align="right" className="font-mono tabular-nums text-ink-900">
                         {formatEuro(r.final_price ?? r.estimated_price)}
+                      </Td>
+                      <Td align="right">
+                        <DeleteRepairButton repairId={r.id} compact />
                       </Td>
                     </ClickableTr>
                   );
@@ -179,9 +184,12 @@ export default async function ReparatiesPage({ searchParams }: { searchParams: {
                       {r.device?.brand} {r.device?.model}
                       {r.repair_type_label ? ` · ${r.repair_type_label}` : ''} · {formatDate(r.date_received)}
                     </div>
-                    <div className="mt-2 flex flex-wrap items-center gap-1.5">
-                      {r.status && <StatusBadge name={r.status.name} color={r.status.color} />}
-                      <PaymentStatusBadge status={r.payment_status} />
+                    <div className="mt-2 flex flex-wrap items-center justify-between gap-1.5">
+                      <span className="flex flex-wrap items-center gap-1.5">
+                        {r.status && <StatusBadge name={r.status.name} color={r.status.color} />}
+                        <PaymentStatusBadge status={r.payment_status} />
+                      </span>
+                      <DeleteRepairButton repairId={r.id} compact />
                     </div>
                   </div>
                 </Link>
