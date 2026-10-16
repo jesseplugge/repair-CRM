@@ -251,7 +251,11 @@
     "editPayment": "Edit payment",
     "editPaymentSaved": "Payment updated",
     "paymentNotesOptional": "Note (optional)",
-    "amountLabel": "Amount"
+    "amountLabel": "Amount",
+    "deletePayment": "Delete payment",
+    "deletePaymentConfirmTitle": "Delete this payment?",
+    "deletePaymentConfirmBody": "This payment will be permanently deleted. This cannot be undone.",
+    "paymentDeleted": "Payment deleted"
   },
   "repairErrors": {
     "selectCustomerOrFillName": "Select a customer or enter a first and last name.",

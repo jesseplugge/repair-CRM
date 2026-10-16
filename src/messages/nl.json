@@ -251,7 +251,11 @@
     "editPayment": "Betaling bewerken",
     "editPaymentSaved": "Betaling bijgewerkt",
     "paymentNotesOptional": "Notitie (optioneel)",
-    "amountLabel": "Bedrag"
+    "amountLabel": "Bedrag",
+    "deletePayment": "Betaling verwijderen",
+    "deletePaymentConfirmTitle": "Betaling verwijderen?",
+    "deletePaymentConfirmBody": "Deze betaling wordt definitief verwijderd. Dit kan niet ongedaan worden gemaakt.",
+    "paymentDeleted": "Betaling verwijderd"
   },
   "repairErrors": {
     "selectCustomerOrFillName": "Selecteer een klant of vul voor- en achternaam in.",

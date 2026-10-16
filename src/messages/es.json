@@ -251,7 +251,11 @@
     "editPayment": "Editar pago",
     "editPaymentSaved": "Pago actualizado",
     "paymentNotesOptional": "Nota (opcional)",
-    "amountLabel": "Importe"
+    "amountLabel": "Importe",
+    "deletePayment": "Eliminar pago",
+    "deletePaymentConfirmTitle": "¿Eliminar este pago?",
+    "deletePaymentConfirmBody": "Este pago se eliminará permanentemente. Esta acción no se puede deshacer.",
+    "paymentDeleted": "Pago eliminado"
   },
   "repairErrors": {
     "selectCustomerOrFillName": "Selecciona un cliente o introduce nombre y apellidos.",

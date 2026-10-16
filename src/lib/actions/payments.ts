@@ -98,6 +98,21 @@ export async function updatePayment(paymentId: string, fields: PaymentEditFields
   return {};
 }
 
+/** Removes a payment entry that shouldn't exist at all (mistaken or duplicate), not a refund of a real one. */
+export async function deletePayment(paymentId: string): Promise<{ error?: string }> {
+  const user = await getCurrentUser();
+  if (!user) return { error: 'Niet ingelogd.' };
+  const supabase = createClient();
+
+  const { data: payment } = await supabase.from('payments').select('id, business_id').eq('id', paymentId).single();
+  if (!payment || payment.business_id !== user.business_id) return { error: 'Betaling niet gevonden.' };
+
+  await supabase.from('refunds').delete().eq('original_payment_id', paymentId);
+  const { error } = await supabase.from('payments').delete().eq('id', paymentId);
+  if (error) return { error: error.message };
+  return {};
+}
+
 export async function refundPayment(
   paymentId: string,
   amount: number,

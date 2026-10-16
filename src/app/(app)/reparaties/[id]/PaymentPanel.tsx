@@ -3,13 +3,13 @@
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { recordRepairPayment, refundRepairPayment, updateRepairPayment } from '@/lib/actions/repairs';
+import { recordRepairPayment, refundRepairPayment, updateRepairPayment, deleteRepairPayment } from '@/lib/actions/repairs';
 import { Button, Input, Label } from '@/components/ui/primitives';
 import { Modal } from '@/components/ui/modal';
 import { useToast } from '@/components/ui/toast';
 import { formatEuro } from '@/lib/utils/currency';
 import { formatDateTime, toDateTimeLocalValue } from '@/lib/utils/format';
-import { Banknote, CreditCard, Landmark, Link2, Pencil, Undo2 } from 'lucide-react';
+import { Banknote, CreditCard, Landmark, Link2, Pencil, Undo2, Trash2 } from 'lucide-react';
 
 type Payment = {
   id: string;
@@ -48,6 +48,7 @@ export function PaymentPanel({
   const [editTipAmount, setEditTipAmount] = useState('');
   const [editPaidAt, setEditPaidAt] = useState('');
   const [editNotes, setEditNotes] = useState('');
+  const [deleteTarget, setDeleteTarget] = useState<Payment | null>(null);
   const [pending, startTransition] = useTransition();
   const router = useRouter();
   const t = useTranslations('repairSub');
@@ -126,6 +127,16 @@ export function PaymentPanel({
     });
   }
 
+  function submitDelete() {
+    if (!deleteTarget) return;
+    startTransition(async () => {
+      await deleteRepairPayment(repairId, deleteTarget.id);
+      setDeleteTarget(null);
+      toast({ variant: 'success', title: t('paymentDeleted') });
+      router.refresh();
+    });
+  }
+
   return (
     <div className="space-y-3">
       {payments.length > 0 && (
@@ -153,6 +164,9 @@ export function PaymentPanel({
                 </button>
                 <button onClick={() => openRefund(p)} className="focus-ring text-ink-300 hover:text-danger-600" title={t('refund')}>
                   <Undo2 size={14} />
+                </button>
+                <button onClick={() => setDeleteTarget(p)} className="focus-ring text-ink-300 hover:text-danger-600" title={t('deletePayment')}>
+                  <Trash2 size={13} />
                 </button>
               </div>
             </div>
@@ -292,6 +306,29 @@ export function PaymentPanel({
           <Input type="number" step="0.01" placeholder={t('tipOptional')} value={editTipAmount} onChange={(e) => setEditTipAmount(e.target.value)} />
           <Input type="text" placeholder={t('paymentNotesOptional')} value={editNotes} onChange={(e) => setEditNotes(e.target.value)} />
         </div>
+      </Modal>
+
+      <Modal
+        open={deleteTarget !== null}
+        onClose={() => setDeleteTarget(null)}
+        title={t('deletePaymentConfirmTitle')}
+        footer={
+          <>
+            <Button variant="ghost" disabled={pending} onClick={() => setDeleteTarget(null)}>
+              {t('cancel')}
+            </Button>
+            <Button variant="danger" disabled={pending} onClick={submitDelete}>
+              {pending ? t('busy') : tCommon('confirm')}
+            </Button>
+          </>
+        }
+      >
+        <p className="text-sm text-ink-600">{t('deletePaymentConfirmBody')}</p>
+        {deleteTarget && (
+          <p className="mt-2 font-mono text-sm font-medium text-ink-900">
+            {formatEuro(deleteTarget.amount)} &middot; {methodLabel(deleteTarget.method)} &middot; {formatDateTime(deleteTarget.paid_at)}
+          </p>
+        )}
       </Modal>
     </div>
   );

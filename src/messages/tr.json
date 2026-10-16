@@ -251,7 +251,11 @@
     "editPayment": "Ödemeyi düzenle",
     "editPaymentSaved": "Ödeme güncellendi",
     "paymentNotesOptional": "Not (isteğe bağlı)",
-    "amountLabel": "Tutar"
+    "amountLabel": "Tutar",
+    "deletePayment": "Ödemeyi sil",
+    "deletePaymentConfirmTitle": "Bu ödeme silinsin mi?",
+    "deletePaymentConfirmBody": "Bu ödeme kalıcı olarak silinecek. Bu işlem geri alınamaz.",
+    "paymentDeleted": "Ödeme silindi"
   },
   "repairErrors": {
     "selectCustomerOrFillName": "Bir müşteri seçin veya ad ve soyad girin.",

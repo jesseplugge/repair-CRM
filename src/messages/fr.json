@@ -251,7 +251,11 @@
     "editPayment": "Modifier le paiement",
     "editPaymentSaved": "Paiement mis à jour",
     "paymentNotesOptional": "Note (facultatif)",
-    "amountLabel": "Montant"
+    "amountLabel": "Montant",
+    "deletePayment": "Supprimer le paiement",
+    "deletePaymentConfirmTitle": "Supprimer ce paiement ?",
+    "deletePaymentConfirmBody": "Ce paiement sera définitivement supprimé. Cette action est irréversible.",
+    "paymentDeleted": "Paiement supprimé"
   },
   "repairErrors": {
     "selectCustomerOrFillName": "Sélectionnez un client ou saisissez un prénom et un nom.",

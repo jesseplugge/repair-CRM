@@ -251,7 +251,11 @@
     "editPayment": "Zahlung bearbeiten",
     "editPaymentSaved": "Zahlung aktualisiert",
     "paymentNotesOptional": "Notiz (optional)",
-    "amountLabel": "Betrag"
+    "amountLabel": "Betrag",
+    "deletePayment": "Zahlung löschen",
+    "deletePaymentConfirmTitle": "Diese Zahlung löschen?",
+    "deletePaymentConfirmBody": "Diese Zahlung wird endgültig gelöscht. Dies kann nicht rückgängig gemacht werden.",
+    "paymentDeleted": "Zahlung gelöscht"
   },
   "repairErrors": {
     "selectCustomerOrFillName": "Wähle einen Kunden oder gib Vor- und Nachname ein.",

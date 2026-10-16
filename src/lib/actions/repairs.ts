@@ -600,6 +600,27 @@ export async function refundRepairPayment(repairId: string, paymentId: string, a
   return { error: undefined };
 }
 
+/** Removes a mistaken/duplicate payment entry outright (not a refund of a real one), then recomputes payment_status. */
+export async function deleteRepairPayment(repairId: string, paymentId: string) {
+  const user = await getCurrentUser();
+  if (!user) redirect('/login');
+  const supabase = createClient();
+  const { deletePayment } = await import('./payments');
+
+  const result = await deletePayment(paymentId);
+  if (result.error) return { error: result.error };
+
+  const { data: repair } = await supabase.from('repairs').select('business_id').eq('id', repairId).single();
+  if (repair) {
+    await recalculateRepairPaymentStatus(repairId);
+    await logActivity(supabase, repair.business_id, repairId, 'payment_deleted', 'Betaling verwijderd', user.id);
+  }
+
+  revalidatePath(`/reparaties/${repairId}`);
+  revalidatePath('/dashboard');
+  return { error: undefined };
+}
+
 /**
  * Deletes a repair and everything tied to it — payments, the signed intake,
  * warranty claims, photos, diagnostics, receipts, and activity log entries.
