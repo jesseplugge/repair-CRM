@@ -1016,6 +1016,8 @@
     "vat": "MwSt.",
     "total": "Gesamt",
     "paymentMethod": "Zahlungsmethode",
+    "tip": "Trinkgeld",
+    "totalPaid": "Gesamt bezahlt",
     "warranty": "Garantie: {months} Monate ab Abholdatum.",
     "defaultFooter": "Vielen Dank für dein Vertrauen in {businessName}.",
     "kvk": "KVK {number}",

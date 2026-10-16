@@ -1016,6 +1016,8 @@
     "vat": "TVA",
     "total": "Total",
     "paymentMethod": "Mode de paiement",
+    "tip": "Pourboire",
+    "totalPaid": "Total payé",
     "warranty": "Garantie : {months} mois à partir de la date de retrait.",
     "defaultFooter": "Merci de votre confiance envers {businessName}.",
     "kvk": "KVK {number}",

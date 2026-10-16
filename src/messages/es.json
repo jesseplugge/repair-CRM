@@ -1016,6 +1016,8 @@
     "vat": "IVA",
     "total": "Total",
     "paymentMethod": "Método de pago",
+    "tip": "Propina",
+    "totalPaid": "Total pagado",
     "warranty": "Garantía: {months} meses desde la fecha de recogida.",
     "defaultFooter": "Gracias por confiar en {businessName}.",
     "kvk": "KVK {number}",

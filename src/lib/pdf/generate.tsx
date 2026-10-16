@@ -146,6 +146,7 @@ export async function generateCompletionPdf(repairId: string, businessId: string
   const subtotalExclVat = (items ?? []).reduce((s, i) => s + i.total_excl_vat, 0);
   const totalVat = (items ?? []).reduce((s, i) => s + (i.total_incl_vat - i.total_excl_vat), 0);
   const totalInclVat = (items ?? []).reduce((s, i) => s + i.total_incl_vat, 0);
+  const totalTip = (payments ?? []).reduce((s, p) => s + (p.tip_amount ?? 0), 0);
   const lastPaymentMethod = payments && payments[0] ? payments[0].method : repair.payment_method;
 
   const documentNumber = await findOrCreateReceipt(businessId, userId, 'repair_completion', format, {
@@ -174,6 +175,7 @@ export async function generateCompletionPdf(repairId: string, businessId: string
       subtotalExclVat={subtotalExclVat}
       totalVat={totalVat}
       totalInclVat={totalInclVat}
+      tipAmount={totalTip}
       paymentMethod={lastPaymentMethod}
       warrantyMonths={repair.warranty_months}
       footerNote={template.footerNote}
@@ -326,6 +328,7 @@ export async function generatePosReceiptPdf(saleId: string, businessId: string, 
     getPdfTranslator('pdfReceipt'),
   ]);
   const customer = sale.customer as any;
+  const totalTip = (payments ?? []).reduce((s, p) => s + (p.tip_amount ?? 0), 0);
 
   const documentNumber = await findOrCreateReceipt(businessId, userId, 'pos_sale', format, {
     customer_id: sale.customer_id,
@@ -355,6 +358,7 @@ export async function generatePosReceiptPdf(saleId: string, businessId: string, 
       subtotalExclVat={sale.subtotal_excl_vat}
       totalVat={sale.total_vat}
       totalInclVat={sale.total_incl_vat}
+      tipAmount={totalTip}
       paymentMethod={payments && payments[0] ? payments[0].method : null}
       footerNote={template.footerNote}
     />

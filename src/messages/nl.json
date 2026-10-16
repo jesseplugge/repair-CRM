@@ -1016,6 +1016,8 @@
     "vat": "BTW",
     "total": "Totaal",
     "paymentMethod": "Betaalmethode",
+    "tip": "Fooi",
+    "totalPaid": "Totaal betaald",
     "warranty": "Garantie: {months} maanden vanaf ophaaldatum.",
     "defaultFooter": "Bedankt voor uw vertrouwen in {businessName}.",
     "kvk": "KVK {number}",

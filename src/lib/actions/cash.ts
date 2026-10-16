@@ -90,12 +90,14 @@ export async function closeCashSession(
   const { data: movements } = await supabase.from('cash_movements').select('*').eq('cash_session_id', sessionId);
   const { data: cashPayments } = await supabase
     .from('payments')
-    .select('amount')
+    .select('amount, tip_amount')
     .eq('business_id', user.business_id)
     .eq('method', 'contant')
     .gte('paid_at', session.opened_at);
 
-  const salesTotal = (cashPayments ?? []).reduce((s, p) => s + p.amount, 0);
+  // A cash tip is cash too — it physically landed in the drawer, so it must count
+  // toward expected cash or every tipped sale would show up as an unexplained surplus.
+  const salesTotal = (cashPayments ?? []).reduce((s, p) => s + p.amount + (p.tip_amount ?? 0), 0);
   const deposits = (movements ?? []).filter((m) => m.type === 'deposit').reduce((s, m) => s + m.amount, 0);
   const withdrawals = (movements ?? []).filter((m) => m.type === 'withdrawal').reduce((s, m) => s + m.amount, 0);
   const refunds = (movements ?? []).filter((m) => m.type === 'refund').reduce((s, m) => s + m.amount, 0);

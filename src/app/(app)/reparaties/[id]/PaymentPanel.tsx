@@ -145,8 +145,13 @@ export function PaymentPanel({
             <div key={p.id} className="flex items-center justify-between rounded border border-ink-100 px-2.5 py-1.5 text-xs">
               <div>
                 <div className="font-mono font-medium tabular-nums text-ink-900">
-                  {formatEuro(p.amount)}
-                  {p.tip_amount > 0 && <span className="text-ink-400"> + {formatEuro(p.tip_amount)} {t('tipInline')}</span>}
+                  {formatEuro(p.amount + (p.tip_amount || 0))}
+                  {p.tip_amount > 0 && (
+                    <span className="text-ink-400">
+                      {' '}
+                      ({formatEuro(p.amount)} + {formatEuro(p.tip_amount)} {t('tipInline')})
+                    </span>
+                  )}
                 </div>
                 <div className="flex items-center gap-1 text-ink-400">
                   {methodLabel(p.method)} &middot; {formatDateTime(p.paid_at)}
@@ -326,7 +331,8 @@ export function PaymentPanel({
         <p className="text-sm text-ink-600">{t('deletePaymentConfirmBody')}</p>
         {deleteTarget && (
           <p className="mt-2 font-mono text-sm font-medium text-ink-900">
-            {formatEuro(deleteTarget.amount)} &middot; {methodLabel(deleteTarget.method)} &middot; {formatDateTime(deleteTarget.paid_at)}
+            {formatEuro(deleteTarget.amount + (deleteTarget.tip_amount || 0))} &middot; {methodLabel(deleteTarget.method)} &middot;{' '}
+            {formatDateTime(deleteTarget.paid_at)}
           </p>
         )}
       </Modal>

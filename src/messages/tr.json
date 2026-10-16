@@ -1016,6 +1016,8 @@
     "vat": "KDV",
     "total": "Toplam",
     "paymentMethod": "Ödeme yöntemi",
+    "tip": "Bahşiş",
+    "totalPaid": "Toplam ödenen",
     "warranty": "Garanti: teslim tarihinden itibaren {months} ay.",
     "defaultFooter": "{businessName} işletmesine gösterdiğiniz güven için teşekkür ederiz.",
     "kvk": "KVK {number}",

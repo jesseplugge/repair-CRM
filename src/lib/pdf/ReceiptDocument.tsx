@@ -43,6 +43,7 @@ export type ReceiptDocumentProps = {
   subtotalExclVat: number;
   totalVat: number;
   totalInclVat: number;
+  tipAmount?: number;
   paymentMethod?: string | null;
   warrantyMonths?: number | null;
   complaint?: string | null;
@@ -178,6 +179,18 @@ export function ReceiptDocument(props: ReceiptDocumentProps) {
             <Text style={s.grandTotal}>{t('total')}</Text>
             <Text style={s.grandTotal}>{formatEuro(props.totalInclVat)}</Text>
           </View>
+          {!!props.tipAmount && (
+            <>
+              <View style={s.totalsRow}>
+                <Text style={s.small}>{t('tip')}</Text>
+                <Text style={s.small}>{formatEuro(props.tipAmount)}</Text>
+              </View>
+              <View style={s.totalsRow}>
+                <Text style={s.grandTotal}>{t('totalPaid')}</Text>
+                <Text style={s.grandTotal}>{formatEuro(props.totalInclVat + props.tipAmount)}</Text>
+              </View>
+            </>
+          )}
           {props.paymentMethod && (
             <View style={s.totalsRow}>
               <Text style={s.small}>{t('paymentMethod')}</Text>

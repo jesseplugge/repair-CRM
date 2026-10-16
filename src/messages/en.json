@@ -1016,6 +1016,8 @@
     "vat": "VAT",
     "total": "Total",
     "paymentMethod": "Payment method",
+    "tip": "Tip",
+    "totalPaid": "Total paid",
     "warranty": "Warranty: {months} months from pickup date.",
     "defaultFooter": "Thank you for trusting {businessName}.",
     "kvk": "KVK {number}",
